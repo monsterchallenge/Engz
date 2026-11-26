@@ -3,21 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>إدارة Engz</title>
+  <title>لوحة تحكم انجز - ADMIN</title>
   <style>
-    :root {
-      --primary: #0f766e;
-      --primary-dark: #115e59;
-      --danger: #b91c1c;
-      --danger-bg: #fef2f2;
-      --bg: #f1f5f9;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #475569;
-      --border: #cbd5e1;
-      --soft: #f8fafc;
-    }
-
     * {
       box-sizing: border-box;
     }
@@ -26,262 +13,346 @@
       margin: 0;
       padding: 16px;
       font-family: Tahoma, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: linear-gradient(135deg, #090d16 0%, #1a103c 50%, #082f49 100%);
+      color: #0f172a;
+      min-height: 100vh;
       line-height: 1.6;
     }
 
-    .wrapper {
-      max-width: 820px;
-      margin: 16px auto;
-      background: var(--card);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
     }
 
-    .header {
+    .lock-card {
+      max-width: 420px;
+      margin: 60px auto;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 28px 22px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+      text-align: center;
+    }
+
+    .admin-shell {
+      display: none;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 22px 18px 40px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .top-banner {
+      background: linear-gradient(120deg, #ec4899, #7c3aed, #06b6d4);
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 16px 20px;
+      margin-bottom: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 14px;
-      margin-bottom: 18px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 24px;
-      color: var(--primary);
-    }
-
-    .sub {
-      margin: 2px 0 0;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .lock-box {
-      max-width: 400px;
-      margin: 30px auto;
-      background: var(--soft);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-    }
-
-    .stats {
+    .nav-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 8px;
+      margin-bottom: 20px;
     }
 
-    @media (min-width: 600px) {
-      .stats {
-        grid-template-columns: repeat(4, 1fr);
+    @media (min-width: 720px) {
+      .nav-grid {
+        grid-template-columns: repeat(5, 1fr);
       }
     }
 
-    .stat-card {
-      background: var(--soft);
-      border: 1px solid #e2e8f0;
+    .nav-btn {
+      padding: 10px 8px;
       border-radius: 12px;
-      padding: 12px;
-      text-align: center;
-    }
-
-    .stat-num {
-      font-size: 22px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
       font-weight: bold;
-      color: var(--primary);
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .tab-btn {
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--soft);
-      color: var(--text);
-      font-weight: bold;
+      font-size: 13px;
       cursor: pointer;
-      font-size: 14px;
     }
 
-    .tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
+    .nav-btn.active {
+      background: linear-gradient(135deg, #ec4899, #7c3aed);
+      color: #ffffff;
+      border-color: transparent;
     }
 
-    .section {
+    .panel {
       display: none;
     }
 
-    .section.active {
+    .panel.active {
       display: block;
     }
 
-    .item-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
+    .card {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
       padding: 14px;
       margin-bottom: 12px;
-      background: var(--soft);
     }
 
-    .item-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .badge {
-      padding: 3px 9px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: bold;
-      background: #ccfbf1;
-      color: var(--primary-dark);
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    input, select, button {
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
       font-family: inherit;
       font-size: 14px;
-      border-radius: 9px;
-    }
-
-    input[type="password"], input[type="number"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border);
+      background: #ffffff;
       margin-bottom: 10px;
     }
 
-    select {
-      padding: 7px 10px;
-      border: 1px solid var(--border);
-      background: #fff;
-    }
-
     button {
-      padding: 8px 14px;
-      border: none;
+      font-family: inherit;
       font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 13px;
       cursor: pointer;
     }
 
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      width: 100%;
+    .btn-grad {
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: #ffffff;
     }
 
-    .btn-save {
-      background: var(--primary);
-      color: #fff;
+    .btn-green {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
     }
 
-    .btn-del {
-      background: var(--danger-bg);
-      color: var(--danger);
-      border: 1px solid #fecaca;
+    .btn-red {
+      background: linear-gradient(135deg, #ef4444, #be123c);
+      color: #ffffff;
+    }
+
+    .btn-amber {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #ffffff;
+    }
+
+    .btn-cyan {
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      color: #ffffff;
     }
 
     .notice {
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      font-weight: bold;
       font-size: 13px;
-      background: #f1f5f9;
-      color: #334155;
-      border: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+      display: none;
     }
 
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 20px;
+    .img-thumb {
+      max-width: 140px;
+      max-height: 110px;
+      border-radius: 10px;
+      margin-top: 6px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-radius: 18px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 18px;
     }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <div class="header">
-      <div>
-        <h1 id="admin-title">لوحة تحكم Engz</h1>
-        <p class="sub">متابعة الطلبات والمهام والنقاط وتحديث الحالات</p>
-      </div>
-      <a href="index.html" style="font-size:13px; color:#0f766e; font-weight:bold; text-decoration:none;">العودة للتطبيق</a>
+  <div class="container">
+    <!-- شاشة الدخول بكلمة السر -->
+    <div id="admin-lock" class="lock-card">
+      <h2 style="margin-top:0; color:#7c3aed;">لوحة إدارة انجز</h2>
+      <p style="color:#64748b; font-size:14px;">أدخل كلمة السر للوصول إلى كافة إعدادات الإدارة</p>
+      <input type="password" id="admin-pin-input" placeholder="كلمة السر" />
+      <button class="btn-grad" style="width:100%; padding:12px; font-size:15px;" onclick="verifyAdminPin()">دخول</button>
+      <div id="pin-error" style="color:#be123c; font-weight:bold; font-size:13px; margin-top:10px;"></div>
     </div>
 
-    <!-- شاشة الدخول بالرمز السري -->
-    <div id="lock-screen" class="lock-box">
-      <label for="pin-input" style="display:block; font-weight:bold; margin-bottom:6px;">أدخل كلمة سر الإدارة للدخول</label>
-      <input type="password" id="pin-input" placeholder="أدخل كلمة السر..." />
-      <button class="btn-primary" onclick="unlockAdmin()">دخول لوحة الإدارة</button>
-      <div id="lock-msg" class="notice" style="display:none;"></div>
+    <!-- واجهة الأدمن الكاملة -->
+    <div id="admin-app" class="admin-shell">
+      <div class="top-banner">
+        <div>
+          <h1 style="margin:0; font-size:22px;">إدارة تطبيق انجز</h1>
+          <div style="font-size:12px; opacity:0.95;">العملة: جنيه • جميع البيانات متصلة لحظياً بقاعدة البيانات</div>
+        </div>
+        <button class="btn-cyan" onclick="openImpersonateModal()">دخول إلى حساب مستخدم</button>
+      </div>
+
+      <div id="admin-toast" class="notice"></div>
+
+      <div class="nav-grid">
+        <button class="nav-btn active" data-p="client-reqs" onclick="showAdminPanel('client-reqs')">طلبات تسجيل العملاء</button>
+        <button class="nav-btn" data-p="clients-mgr" onclick="showAdminPanel('clients-mgr')">إعداد العملاء والرصيد</button>
+        <button class="nav-btn" data-p="chal-reqs" onclick="showAdminPanel('chal-reqs')">طلبات تسجيل المتسابقين</button>
+        <button class="nav-btn" data-p="chal-mgr" onclick="showAdminPanel('chal-mgr')">إعداد المتسابقين</button>
+        <button class="nav-btn" data-p="waitlist" onclick="showAdminPanel('waitlist')">قائمة الانتظار</button>
+        <button class="nav-btn" data-p="depts-items" onclick="showAdminPanel('depts-items')">الأقسام والسلع والعروض</button>
+        <button class="nav-btn" data-p="cash-phones" onclick="showAdminPanel('cash-phones')">إعداد أرقام الاتصال</button>
+        <button class="nav-btn" data-p="challenges-cfg" onclick="showAdminPanel('challenges-cfg')">إعداد التحديات</button>
+        <button class="nav-btn" data-p="active-done" onclick="showAdminPanel('active-done')">النشطة والمنتهية</button>
+        <button class="nav-btn" data-p="gifts-receipts" onclick="showAdminPanel('gifts-receipts')">هدايا والوصولات</button>
+      </div>
+
+      <!-- 1. طلبات تسجيل العملاء -->
+      <div id="panel-client-reqs" class="panel active">
+        <h3>صفحة طلبات التسجيل (عملاء)</h3>
+        <div id="admin-client-requests-list"></div>
+      </div>
+
+      <!-- 2. إعداد العملاء والرصيد والحذف -->
+      <div id="panel-clients-mgr" class="panel">
+        <h3>إدارة العملاء وشحن الرصيد (جنيه) أو الحذف</h3>
+        <div id="admin-clients-list"></div>
+      </div>
+
+      <!-- 3. إعداد طلبات تسجيل المتسابقين -->
+      <div id="panel-chal-reqs" class="panel">
+        <h3>صفحة إعداد طلبات تسجيل المتسابقين</h3>
+        <div id="admin-challenger-requests-list"></div>
+      </div>
+
+      <!-- 4. إعداد المتسابقين مرتبين حسب النشاط وعدد التحديات + سجل الطلبات + حذف بتأكيد -->
+      <div id="panel-chal-mgr" class="panel">
+        <h3>صفحة إعداد المتسابقين (مرتبة حسب النشاط وعدد التحديات)</h3>
+        <div id="admin-challengers-list"></div>
+      </div>
+
+      <!-- 5. قائمة الانتظار مرتبة تنازلياً حسب تاريخ تقديم الطلب -->
+      <div id="panel-waitlist" class="panel">
+        <h3>قائمة الانتظار (ترتيب تنازلي حسب تاريخ تقديم الطلب)</h3>
+        <div id="admin-waitlist-list"></div>
+      </div>
+
+      <!-- 6. إعداد الأقسام والسلع والعروض -->
+      <div id="panel-depts-items" class="panel">
+        <h3>إعداد الأقسام والسلع والعروض (جنيه)</h3>
+        <div class="card">
+          <label>إضافة قسم جديد</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="new-dept-name" placeholder="اسم القسم الجديد..." style="margin:0;" />
+            <button class="btn-grad" onclick="addNewDepartment()">إضافة قسم</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <label>اختر القسم لإضافة سلعة أو عرض وسعره كجزء من الصورة</label>
+          <select id="target-dept-select"></select>
+          <input type="text" id="item-title-input" placeholder="اسم السلعة أو العرض..." />
+          <input type="number" id="item-price-input" placeholder="السعر بالجنيه (مثال: 150)" />
+          <input type="text" id="item-desc-input" placeholder="وصف مختصر أو تفاصيل العرض..." />
+          <label>
+            <input type="checkbox" id="item-is-offer" style="width:auto; margin-left:6px;" />
+            اعتبار هذا العنصر عرضاً خاصاً
+          </label>
+          <label>اختر صورة السلعة أو العرض (يتم ضغطها تلقائياً وحفظها)</label>
+          <input type="file" id="item-image-file" accept="image/*" onchange="handleAdminImage(this, 'item-img-prev', 'product')" />
+          <img id="item-img-prev" class="img-thumb" style="display:none;" alt="معاينة" />
+          <div style="margin-top:10px;">
+            <button class="btn-green" onclick="addProductOrOffer()">حفظ السلعة / العرض في القسم</button>
+          </div>
+        </div>
+
+        <div id="admin-dept-products-preview"></div>
+      </div>
+
+      <!-- 7. إعداد أرقام الاتصال (7 خانات + checkbox + زر + لإضافة أي عدد) -->
+      <div id="panel-cash-phones" class="panel">
+        <h3>إعداد أرقام الاتصال لاستقبال الكاش</h3>
+        <p style="font-size:13px; color:#475569;">7 خانات أساسية مع اختيار عبر checkbox، ويمكنك إضافة أي عدد إضافي بزر (+). يظهر للعميل حتى 5 أرقام مختارة.</p>
+        <div id="cash-phones-slots" class="card"></div>
+        <div class="card" style="display:flex; gap:8px; align-items:center;">
+          <input type="tel" id="extra-cash-phone-input" placeholder="أدخل رقم كاش إضافي..." style="margin:0;" />
+          <button class="btn-grad" onclick="addExtraCashPhone()">+</button>
+        </div>
+        <button class="btn-green" onclick="saveSelectedCashPhones()">حفظ أرقام الكاش المختارة</button>
+      </div>
+
+      <!-- 8. إعداد التحديات -->
+      <div id="panel-challenges-cfg" class="panel">
+        <h3>صفحة إعداد التحديات</h3>
+        <div class="card">
+          <label>عنوان التحدي / المهمة</label>
+          <input type="text" id="chal-title-input" placeholder="مثال: توصيل طلب مطعم للحي..." />
+          <label>تفاصيل التحدي وقائمة المشتريات أو التعليمات</label>
+          <textarea id="chal-details-input" placeholder="اكتب تفاصيل التحدي..."></textarea>
+          <label>قيمة المكافأة (جنيه)</label>
+          <input type="number" id="chal-reward-input" placeholder="مثال: 50" />
+          <button class="btn-green" onclick="publishChallenge()">تأكيد</button>
+        </div>
+        <div id="admin-challenges-list"></div>
+      </div>
+
+      <!-- 9. الطلبات النشطة والطلبات المنتهية -->
+      <div id="panel-active-done" class="panel">
+        <h3>الطلبات النشطة</h3>
+        <div id="admin-active-orders-list"></div>
+        <h3 style="margin-top:20px;">الطلبات المنتهية (مع صورة تأكيد الوصول)</h3>
+        <div id="admin-completed-orders-list"></div>
+      </div>
+
+      <!-- 10. إعداد إرسال هدية والوصولات -->
+      <div id="panel-gifts-receipts" class="panel">
+        <h3>صفحة إعداد إرسال هدية أو عرض أو مكافأة</h3>
+        <div class="card">
+          <input type="text" id="gift-target-input" placeholder="اسم العميل أو المتسابق (أو اتركه للجميع)" />
+          <input type="text" id="gift-title-input" placeholder="اسم الهدية / العرض / المكافأة..." />
+          <input type="text" id="gift-details-input" placeholder="تفاصيل المكافأة أو القيمة بالجنيه..." />
+          <button class="btn-grad" onclick="sendGiftOrReward()">إرسال الهدية / المكافأة</button>
+        </div>
+
+        <h3>وصولات الدفع والاستلام</h3>
+        <div id="admin-receipts-list"></div>
+      </div>
     </div>
+  </div>
 
-    <!-- محتوى لوحة الإدارة بعد الدخول -->
-    <div id="admin-panel" style="display:none;">
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-num" id="stat-orders">0</div>
-          <div class="stat-label">إجمالي الطلبات</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="stat-new-orders">0</div>
-          <div class="stat-label">طلبات جديدة</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="stat-tasks">0</div>
-          <div class="stat-label">المهام المسجلة</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="stat-points">0</div>
-          <div class="stat-label">إجمالي النقاط</div>
-        </div>
-      </div>
+  <!-- نافذة الدخول إلى حساب أي مستخدم -->
+  <div id="impersonate-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <h3 style="margin-top:0;">الدخول إلى حساب أي مستخدم</h3>
+      <div id="impersonate-users-list"></div>
+      <button class="btn-red" style="margin-top:12px;" onclick="closeImpersonateModal()">إغلاق</button>
+    </div>
+  </div>
 
-      <div class="tabs">
-        <button class="tab-btn active" data-sec="orders" onclick="switchSection('orders')">إدارة الطلبات</button>
-        <button class="tab-btn" data-sec="tasks" onclick="switchSection('tasks')">إدارة المهام والنقاط</button>
-      </div>
-
-      <div id="sec-orders" class="section active">
-        <div id="orders-list"></div>
-      </div>
-
-      <div id="sec-tasks" class="section">
-        <div id="tasks-list"></div>
-      </div>
-
-      <div id="admin-notice" class="notice">جاهز لمتابعة البيانات لحظياً.</div>
+  <!-- نافذة سجل الطلبات المنفذة لكل متسابق -->
+  <div id="history-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <h3 id="history-modal-title" style="margin-top:0;">سجل طلبات المتسابق</h3>
+      <div id="history-modal-body"></div>
+      <button class="btn-cyan" style="margin-top:12px;" onclick="closeHistoryModal()">إغلاق</button>
     </div>
   </div>
 
@@ -290,52 +361,54 @@
     import {
       getDatabase,
       ref,
+      set,
+      push,
       onValue,
       update,
-      remove
+      remove,
+      runTransaction
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // إعدادات الإدارة
-    const ADMIN_CONFIG = {
-      appName: "Engz",
-      pin: "38512385",
-      databaseURL: "https://engz-2567e-default-rtdb.firebaseio.com"
+    const ADMIN_PIN = "38512385"; // كلمة السر المطلوبة
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
+      authDomain: "engz-2567e.firebaseapp.com",
+      databaseURL: "https://engz-2567e-default-rtdb.firebaseio.com",
+      projectId: "engz-2567e",
+      storageBucket: "engz-2567e.firebasestorage.app",
+      messagingSenderId: "933265018725",
+      appId: "1:933265018725:web:279ba4bfb56489b895db8c",
+      measurementId: "G-RB49T4CWT3"
     };
 
-    document.title = "إدارة " + ADMIN_CONFIG.appName;
-    document.getElementById("admin-title").textContent = "لوحة تحكم " + ADMIN_CONFIG.appName;
-
-    const app = initializeApp({ databaseURL: ADMIN_CONFIG.databaseURL });
+    const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    window.unlockAdmin = function () {
-      const entered = document.getElementById("pin-input").value.trim();
-      const lockMsg = document.getElementById("lock-msg");
+    const DEFAULT_DEPARTMENTS = [
+      "كتابة وتلخيص",
+      "مطعم",
+      "سوبرمركت",
+      "خضار وفاكهه",
+      "توصيل عملاء",
+      "توصيل اغراض",
+      "خدمات الشراء والبيع"
+    ];
 
-      if (entered === ADMIN_CONFIG.pin) {
-        document.getElementById("lock-screen").style.display = "none";
-        document.getElementById("admin-panel").style.display = "block";
-        startListeners();
-      } else {
-        lockMsg.style.display = "block";
-        lockMsg.textContent = "كلمة السر غير صحيحة، حاول مرة أخرى.";
-      }
+    const state = {
+      users: {},
+      clientRegRequests: {},
+      challengerRegRequests: {},
+      departments: [],
+      products: {},
+      cashPhones: [],
+      cashPool: ["", "", "", "", "", "", ""],
+      challenges: {},
+      orders: {},
+      challengersStats: {},
+      receipts: {},
+      uploadedProductImg: ""
     };
-
-    window.switchSection = function (sec) {
-      document.querySelectorAll(".tab-btn").forEach((b) => {
-        b.classList.toggle("active", b.dataset.sec === sec);
-      });
-      document.querySelectorAll(".section").forEach((s) => {
-        s.classList.remove("active");
-      });
-      document.getElementById("sec-" + sec).classList.add("active");
-    };
-
-    function notify(msg) {
-      const el = document.getElementById("admin-notice");
-      if (el) el.textContent = msg;
-    }
 
     function esc(v) {
       return String(v ?? "")
@@ -345,129 +418,626 @@
         .replace(/"/g, "&quot;");
     }
 
-    let ordersArr = [];
-    let tasksArr = [];
-
-    function updateStats() {
-      document.getElementById("stat-orders").textContent = String(ordersArr.length);
-      const newCount = ordersArr.filter((o) => (o.status || "جديد") === "جديد").length;
-      document.getElementById("stat-new-orders").textContent = String(newCount);
-      document.getElementById("stat-tasks").textContent = String(tasksArr.length);
-      const totalPts = tasksArr.reduce((sum, t) => sum + (Number(t.points) || 0), 0);
-      document.getElementById("stat-points").textContent = String(totalPts);
+    function toast(msg) {
+      const el = document.getElementById("admin-toast");
+      el.style.display = "block";
+      el.textContent = msg;
+      setTimeout(() => {
+        el.style.display = "none";
+      }, 4000);
     }
 
-    function renderOrders() {
-      const container = document.getElementById("orders-list");
-      if (!ordersArr.length) {
-        container.innerHTML = '<div class="empty">لا توجد طلبات مسجلة حالياً.</div>';
+    window.verifyAdminPin = function () {
+      const val = document.getElementById("admin-pin-input").value.trim();
+      if (val === ADMIN_PIN) {
+        document.getElementById("admin-lock").style.display = "none";
+        document.getElementById("admin-app").style.display = "block";
+        renderAll();
+      } else {
+        document.getElementById("pin-error").textContent = "كلمة السر غير صحيحة";
+      }
+    };
+
+    window.showAdminPanel = function (panelKey) {
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.p === panelKey));
+      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+      document.getElementById("panel-" + panelKey).classList.add("active");
+    };
+
+    // 1. طلبات تسجيل العملاء -> زر قبول يحوله لمشترك ليذهب مباشرة لصفحة الطلبات
+    function renderClientRequests() {
+      const el = document.getElementById("admin-client-requests-list");
+      const reqs = Object.entries(state.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
+      if (!reqs.length) {
+        el.innerHTML = `<div class="card">لا توجد طلبات تسجيل عملاء جديدة.</div>`;
+        return;
+      }
+      el.innerHTML = reqs
+        .map(
+          ([id, r]) => `
+          <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div><strong>العميل:</strong> ${esc(r.name)} — <strong>موبايل:</strong> ${esc(r.phone)}</div>
+            <button class="btn-green" onclick="approveClientRequest('${esc(id)}')">قبول</button>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    window.approveClientRequest = async function (reqId) {
+      const reqData = state.clientRegRequests[reqId];
+      if (!reqData) return;
+      const userRef = push(ref(db, "users"));
+      await set(userRef, {
+        name: reqData.name,
+        phone: reqData.phone,
+        role: "client",
+        status: "approved",
+        wallet: 0,
+        createdAt: Date.now()
+      });
+      await remove(ref(db, `clientRegRequests/${reqId}`));
+      toast(`تم قبول العميل ${reqData.name} وأصبح مشتركاً.`);
+    };
+
+    // 2. إدارة العملاء: رصيد + حذف وحظر الدخول بنفس البيانات
+    function renderClientsManager() {
+      const el = document.getElementById("admin-clients-list");
+      const clients = Object.entries(state.users || {}).filter(([, u]) => u.role === "client");
+      if (!clients.length) {
+        el.innerHTML = `<div class="card">لا يوجد عملاء مسجلون حالياً.</div>`;
+        return;
+      }
+      el.innerHTML = clients
+        .map(
+          ([uid, u]) => `
+          <div class="card">
+            <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الرصيد الحالي: <strong>${Number(u.wallet) || 0} جنيه</strong></div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+              <input type="number" id="add-wal-${esc(uid)}" placeholder="إضافة رصيد (جنيه)" style="width:170px; margin:0;" />
+              <button class="btn-green" onclick="addClientWallet('${esc(uid)}')">إضافة رصيد</button>
+              <button class="btn-red" onclick="deleteClientAndBan('${esc(uid)}')">حذف العميل</button>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    window.addClientWallet = async function (uid) {
+      const amt = Number(document.getElementById("add-wal-" + uid).value) || 0;
+      if (!amt) return;
+      await runTransaction(ref(db, `users/${uid}/wallet`), (cur) => (Number(cur) || 0) + amt);
+      toast(`تمت إضافة ${amt} جنيه للرصيد.`);
+    };
+
+    window.deleteClientAndBan = async function (uid) {
+      if (!confirm("هل أنت متأكد من حذف هذا العميل ومنعه من الدخول بنفس البيانات؟")) return;
+      const u = state.users[uid];
+      if (u) {
+        await push(ref(db, "banned"), { name: u.name, phone: u.phone, bannedAt: Date.now() });
+      }
+      await remove(ref(db, `users/${uid}`));
+      toast("تم حذف العميل وحظر دخوله بنفس البيانات.");
+    };
+
+    // 3. طلبات تسجيل المتسابقين: قبول | رفض | waiting
+    function renderChallengerRequests() {
+      const el = document.getElementById("admin-challenger-requests-list");
+      const reqs = Object.entries(state.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
+      if (!reqs.length) {
+        el.innerHTML = `<div class="card">لا توجد طلبات تسجيل متسابقين حالياً.</div>`;
+        return;
+      }
+      el.innerHTML = reqs
+        .map(
+          ([id, r]) => `
+          <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div><strong>مقدم الطلب:</strong> ${esc(r.name)} — <strong>موبايل:</strong> ${esc(r.phone)}</div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-green" onclick="decideChallenger('${esc(id)}', 'approved')">قبول</button>
+              <button class="btn-red" onclick="decideChallenger('${esc(id)}', 'rejected')">رفض</button>
+              <button class="btn-amber" onclick="decideChallenger('${esc(id)}', 'waiting')">waiting</button>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    window.decideChallenger = async function (reqId, decision) {
+      const reqData = state.challengerRegRequests[reqId];
+      if (!reqData) return;
+
+      if (decision === "approved") {
+        const uRef = push(ref(db, "users"));
+        await set(uRef, {
+          name: reqData.name,
+          phone: reqData.phone,
+          role: "challenger",
+          status: "approved",
+          wallet: 0,
+          createdAt: Date.now()
+        });
+        toast(`تم قبول المتسابق ${reqData.name} وأصبح مشتركاً في صفحة التحديات.`);
+      } else if (decision === "rejected") {
+        const uRef = push(ref(db, "users"));
+        await set(uRef, {
+          name: reqData.name,
+          phone: reqData.phone,
+          role: "challenger",
+          status: "rejected",
+          createdAt: Date.now()
+        });
+        toast(`تم رفض طلب ${reqData.name} (تم رفض طلبك).`);
+      } else if (decision === "waiting") {
+        await push(ref(db, "waitlist"), {
+          name: reqData.name,
+          phone: reqData.phone,
+          submittedAt: Date.now()
+        });
+        toast(`تم نقل ${reqData.name} إلى قائمة الانتظار.`);
+      }
+
+      await remove(ref(db, `challengerRegRequests/${reqId}`));
+    };
+
+    // 4. إعداد المتسابقين: مرتب حسب النشاط وعدد التحديات + سجل الطلبات + حذف بتأكيد
+    function renderChallengersManager() {
+      const el = document.getElementById("admin-challengers-list");
+      const challengers = Object.entries(state.users || {})
+        .filter(([, u]) => u.role === "challenger" && u.status === "approved")
+        .map(([id, u]) => {
+          const st = state.challengersStats[id] || { completedCount: 0 };
+          const completedOrders = Object.values(state.orders || {}).filter(
+            (o) => o.assignedChallengerId === id && o.stage === "completed"
+          );
+          const count = Math.max(Number(st.completedCount) || 0, completedOrders.length);
+          return { id, ...u, completedCount: count, completedOrders };
+        })
+        .sort((a, b) => b.completedCount - a.completedCount);
+
+      if (!challengers.length) {
+        el.innerHTML = `<div class="card">لا يوجد متسابقون معتمدون حالياً.</div>`;
         return;
       }
 
-      container.innerHTML = ordersArr
-        .map((o) => {
-          const st = o.status || "جديد";
+      el.innerHTML = challengers
+        .map(
+          (c) => `
+          <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <strong>${esc(c.name)}</strong> (${esc(c.phone)}) —
+              <strong>عدد الطلبات المنفذة / التحديات:</strong> <span style="color:#059669; font-weight:bold;">${c.completedCount}</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-cyan" onclick="openChallengerHistory('${esc(c.id)}')">سجل الطلبات</button>
+              <button class="btn-red" onclick="deleteChallengerWithConfirm('${esc(c.id)}')">حذف</button>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    window.openChallengerHistory = function (chalId) {
+      const u = state.users[chalId];
+      const list = Object.values(state.orders || {}).filter(
+        (o) => o.assignedChallengerId === chalId && o.stage === "completed"
+      );
+      document.getElementById("history-modal-title").textContent = `سجل طلبات المتسابق: ${u ? u.name : ""}`;
+      document.getElementById("history-modal-body").innerHTML = list.length
+        ? list
+            .map(
+              (o) =>
+                `<div class="card"><strong>${esc(o.challengeTitle || "طلب")}</strong> — ${Number(o.totalAmount) || 0} جنيه<br/>العميل: ${esc(o.buyerName)} (${esc(o.buyerPhone)})</div>`
+            )
+            .join("")
+        : "<p>لا توجد طلبات مكتملة مسجلة لهذا المتسابق.</p>";
+      document.getElementById("history-modal").style.display = "flex";
+    };
+
+    window.closeHistoryModal = function () {
+      document.getElementById("history-modal").style.display = "none";
+    };
+
+    window.deleteChallengerWithConfirm = async function (chalId) {
+      if (!confirm("تأكيد حذف المتسابق؟ سيتم حذفه ومنع دخوله بنفس البيانات.")) return;
+      const u = state.users[chalId];
+      if (u) {
+        await push(ref(db, "banned"), { name: u.name, phone: u.phone, bannedAt: Date.now() });
+      }
+      await remove(ref(db, `users/${chalId}`));
+      toast("تم حذف المتسابق وتأكيد الحذف.");
+    };
+
+    // 5. قائمة الانتظار مرتبة تنازلياً حسب تاريخ تقديم الطلب
+    let waitlistData = {};
+    onValue(ref(db, "waitlist"), (s) => {
+      waitlistData = s.val() || {};
+      renderWaitlist();
+    });
+
+    function renderWaitlist() {
+      const el = document.getElementById("admin-waitlist-list");
+      const rows = Object.values(waitlistData).sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
+      if (!rows.length) {
+        el.innerHTML = `<div class="card">قائمة الانتظار فارغة.</div>`;
+        return;
+      }
+      el.innerHTML = rows
+        .map(
+          (r) => `
+          <div class="card">
+            <strong>${esc(r.name)}</strong> — <span>${esc(r.phone)}</span> —
+            <span style="color:#64748b; font-size:12px;">تاريخ التقديم: ${new Date(r.submittedAt || Date.now()).toLocaleString("ar-EG")}</span>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    // 6. إعداد الأقسام والسلع والعروض
+    function getAllDepts() {
+      return [...new Set([...DEFAULT_DEPARTMENTS, ...(state.departments || [])])];
+    }
+
+    function renderDepartmentsAndProducts() {
+      const sel = document.getElementById("target-dept-select");
+      const depts = getAllDepts();
+      const prevVal = sel.value;
+      sel.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+      if (prevVal && depts.includes(prevVal)) sel.value = prevVal;
+
+      const preview = document.getElementById("admin-dept-products-preview");
+      preview.innerHTML = depts
+        .map((d) => {
+          const items = Object.entries(state.products[d] || {});
           return `
-            <div class="item-card">
-              <div class="item-top">
-                <strong>${esc(o.customer)}</strong>
-                <span class="badge">${esc(o.category || "طلب")} — ${esc(st)}</span>
-              </div>
-              <div>${esc(o.details)}</div>
-              <div class="actions">
-                <select id="status-${esc(o.id)}">
-                  <option value="جديد" ${st === "جديد" ? "selected" : ""}>جديد</option>
-                  <option value="جاري التنفيذ" ${st === "جاري التنفيذ" ? "selected" : ""}>جاري التنفيذ</option>
-                  <option value="مكتمل" ${st === "مكتمل" ? "selected" : ""}>مكتمل</option>
-                </select>
-                <button class="btn-save" onclick="updateOrderStatus('${esc(o.id)}')">تحديث الحالة</button>
-                <button class="btn-del" onclick="deleteRecord('orders', '${esc(o.id)}')">حذف الطلب</button>
-              </div>
+            <div class="card">
+              <h4 style="margin:0 0 8px;">${esc(d)} (${items.length})</h4>
+              ${items
+                .map(
+                  ([pid, it]) => `
+                  <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #e2e8f0;">
+                    <div><strong>${esc(it.title)}</strong> — ${Number(it.price) || 0} جنيه ${it.isOffer ? "(عرض)" : ""}</div>
+                    <button class="btn-red" onclick="deleteProductItem('${esc(d)}', '${esc(pid)}')">حذف</button>
+                  </div>
+                `
+                )
+                .join("")}
             </div>
           `;
         })
         .join("");
     }
 
-    function renderTasks() {
-      const container = document.getElementById("tasks-list");
-      if (!tasksArr.length) {
-        container.innerHTML = '<div class="empty">لا توجد مهام مسجلة حالياً.</div>';
-        return;
+    window.addNewDepartment = async function () {
+      const name = document.getElementById("new-dept-name").value.trim();
+      if (!name) return;
+      const updated = [...new Set([...getAllDepts(), name])];
+      await set(ref(db, "departments"), updated);
+      document.getElementById("new-dept-name").value = "";
+      toast(`تمت إضافة القسم (${name}).`);
+    };
+
+    window.handleAdminImage = function (inputEl, prevId) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxDim = 640;
+          let w = img.width;
+          let h = img.height;
+          if (w > h && w > maxDim) {
+            h = (h * maxDim) / w;
+            w = maxDim;
+          } else if (h > maxDim) {
+            w = (w * maxDim) / h;
+            h = maxDim;
+          }
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.65);
+          state.uploadedProductImg = dataUrl;
+          const prev = document.getElementById(prevId);
+          prev.src = dataUrl;
+          prev.style.display = "block";
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.addProductOrOffer = async function () {
+      const dept = document.getElementById("target-dept-select").value;
+      const title = document.getElementById("item-title-input").value.trim();
+      const price = Number(document.getElementById("item-price-input").value) || 0;
+      const desc = document.getElementById("item-desc-input").value.trim();
+      const isOffer = document.getElementById("item-is-offer").checked;
+
+      if (!title || price <= 0) {
+        return toast("أدخل اسم العنصر وسعراً صحيحاً بالجنيه.");
       }
 
-      container.innerHTML = tasksArr
-        .map((t) => {
-          const pts = Number(t.points) || 0;
+      const itemRef = push(ref(db, `products/${dept}`));
+      await set(itemRef, {
+        title,
+        price,
+        desc,
+        isOffer,
+        image: state.uploadedProductImg || ""
+      });
+
+      document.getElementById("item-title-input").value = "";
+      document.getElementById("item-price-input").value = "";
+      document.getElementById("item-desc-input").value = "";
+      document.getElementById("item-is-offer").checked = false;
+      state.uploadedProductImg = "";
+      document.getElementById("item-img-prev").style.display = "none";
+      toast(`تمت إضافة العنصر إلى قسم ${dept}.`);
+    };
+
+    window.deleteProductItem = async function (dept, pid) {
+      await remove(ref(db, `products/${dept}/${pid}`));
+      toast("تم حذف العنصر.");
+    };
+
+    // 7. إعداد أرقام الاتصال (7 خانات + checkbox + زر + لإضافة أي عدد)
+    function renderCashPhonesEditor() {
+      const slotsEl = document.getElementById("cash-phones-slots");
+      const activeSet = new Set(state.cashPhones || []);
+      const allNumbers = [...new Set([...state.cashPool, ...(state.cashPhones || [])])];
+      while (allNumbers.length < 7) allNumbers.push("");
+
+      slotsEl.innerHTML = allNumbers
+        .map((num, idx) => {
+          const checked = num && activeSet.has(num) ? "checked" : "";
           return `
-            <div class="item-card">
-              <div class="item-top">
-                <strong>${esc(t.user)}</strong>
-                <span class="badge">${esc(t.taskTitle || "مهمة")} (${pts} نقطة)</span>
-              </div>
-              <div>الإثبات: ${esc(t.proof)}</div>
-              <div class="actions">
-                <input type="number" id="pts-${esc(t.id)}" value="${pts}" style="width:110px; margin:0;" />
-                <button class="btn-save" onclick="updateTaskPoints('${esc(t.id)}')">حفظ النقاط</button>
-                <button class="btn-del" onclick="deleteRecord('tasks', '${esc(t.id)}')">حذف المهمة</button>
-              </div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <input type="checkbox" class="cash-chk" data-idx="${idx}" ${checked} style="width:20px; height:20px; margin:0;" />
+              <input type="tel" class="cash-num-inp" data-idx="${idx}" value="${esc(num)}" placeholder="رقم الكاش ${idx + 1}" style="margin:0;" />
             </div>
           `;
         })
         .join("");
     }
 
-    window.updateOrderStatus = async function (id) {
-      const selectEl = document.getElementById("status-" + id);
-      if (!selectEl) return;
-      try {
-        await update(ref(db, `orders/${id}`), { status: selectEl.value });
-        notify("تم تحديث حالة الطلب بنجاح.");
-      } catch (err) {
-        notify("تعذر تحديث الحالة: " + err.message);
-      }
+    window.addExtraCashPhone = function () {
+      const val = document.getElementById("extra-cash-phone-input").value.trim();
+      if (!val) return;
+      state.cashPool.push(val);
+      document.getElementById("extra-cash-phone-input").value = "";
+      renderCashPhonesEditor();
+      toast(`تمت إضافة الرقم ${val} للقائمة.`);
     };
 
-    window.updateTaskPoints = async function (id) {
-      const inputEl = document.getElementById("pts-" + id);
-      if (!inputEl) return;
-      const newPts = Number(inputEl.value) || 0;
-      try {
-        await update(ref(db, `tasks/${id}`), { points: newPts });
-        notify("تم تحديث نقاط المهمة بنجاح.");
-      } catch (err) {
-        notify("تعذر تحديث النقاط: " + err.message);
-      }
-    };
+    window.saveSelectedCashPhones = async function () {
+      const checks = [...document.querySelectorAll(".cash-chk")];
+      const inputs = [...document.querySelectorAll(".cash-num-inp")];
+      const poolVals = inputs.map((i) => i.value.trim());
+      state.cashPool = poolVals;
 
-    window.deleteRecord = async function (node, id) {
-      try {
-        await remove(ref(db, `${node}/${id}`));
-        notify("تم حذف السجل بنجاح.");
-      } catch (err) {
-        notify("تعذر الحذف: " + err.message);
-      }
-    };
-
-    function startListeners() {
-      onValue(ref(db, "orders"), (snap) => {
-        const data = snap.val() || {};
-        ordersArr = Object.entries(data)
-          .map(([id, val]) => ({ id, ...val }))
-          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        renderOrders();
-        updateStats();
+      const selected = [];
+      checks.forEach((chk, i) => {
+        const ph = poolVals[i];
+        if (chk.checked && ph && selected.length < 5) {
+          selected.push(ph);
+        }
       });
 
-      onValue(ref(db, "tasks"), (snap) => {
-        const data = snap.val() || {};
-        tasksArr = Object.entries(data)
-          .map(([id, val]) => ({ id, ...val }))
-          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        renderTasks();
-        updateStats();
+      await set(ref(db, "cashPhones"), selected);
+      toast(`تم حفظ ${selected.length} أرقام كاش للظهور في صفحة الدفع.`);
+    };
+
+    // 8. إعداد التحديات
+    window.publishChallenge = async function () {
+      const title = document.getElementById("chal-title-input").value.trim();
+      const details = document.getElementById("chal-details-input").value.trim();
+      const reward = Number(document.getElementById("chal-reward-input").value) || 0;
+      if (!title || !details) return toast("أدخل عنوان التحدي وتفاصيله.");
+
+      const cRef = push(ref(db, "challenges"));
+      await set(cRef, {
+        title,
+        details,
+        reward,
+        createdAt: Date.now()
       });
+
+      document.getElementById("chal-title-input").value = "";
+      document.getElementById("chal-details-input").value = "";
+      document.getElementById("chal-reward-input").value = "";
+      toast("تم تأكيد نشر التحدي في صفحة التحديات للمتسابقين.");
+    };
+
+    function renderChallengesAdminList() {
+      const el = document.getElementById("admin-challenges-list");
+      const list = Object.entries(state.challenges || {});
+      el.innerHTML = list
+        .map(
+          ([id, c]) => `
+          <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+            <div><strong>${esc(c.title)}</strong> (${Number(c.reward) || 0} جنيه) — ${c.acceptedBy ? `مقبول بواسطة ${esc(c.acceptedByName)}` : "متاح"}</div>
+            <button class="btn-red" onclick="deleteChallengeItem('${esc(id)}')">حذف</button>
+          </div>
+        `
+        )
+        .join("");
     }
+
+    window.deleteChallengeItem = async function (id) {
+      await remove(ref(db, `challenges/${id}`));
+    };
+
+    // 9. الطلبات النشطة والطلبات المنتهية
+    function renderOrdersPanels() {
+      const all = Object.entries(state.orders || {}).map(([id, o]) => ({ id, ...o }));
+      const activeList = all.filter((o) => o.stage === "active" || (!o.stage && o.status === "جاري تنفيذ طلبك"));
+      const doneList = all.filter((o) => o.stage === "completed");
+
+      document.getElementById("admin-active-orders-list").innerHTML = activeList.length
+        ? activeList
+            .map(
+              (o) => `
+              <div class="card">
+                <strong>${esc(o.buyerName || o.challengeTitle || "طلب")}</strong> — ${Number(o.totalAmount) || 0} جنيه<br/>
+                المتسابق: ${esc(o.assignedChallengerName || "قيد التعيين")} • هاتف: ${esc(o.assignedChallengerPhone || o.buyerPhone || "")}
+              </div>
+            `
+            )
+            .join("")
+        : `<div class="card">لا توجد طلبات نشطة حالياً.</div>`;
+
+      document.getElementById("admin-completed-orders-list").innerHTML = doneList.length
+        ? doneList
+            .map(
+              (o) => `
+              <div class="card">
+                <div><strong>${esc(o.challengeTitle || o.buyerName || "طلب منتهي")}</strong> — ${Number(o.totalAmount) || 0} جنيه</div>
+                <div>المتسابق: ${esc(o.assignedChallengerName)}</div>
+                ${o.deliveryImage ? `<img src="${o.deliveryImage}" class="img-thumb" alt="صورة التسليم" />` : ""}
+              </div>
+            `
+            )
+            .join("")
+        : `<div class="card">لا توجد طلبات منتهية بعد.</div>`;
+    }
+
+    // 10. هدايا والوصولات
+    window.sendGiftOrReward = async function () {
+      const targetName = document.getElementById("gift-target-input").value.trim();
+      const title = document.getElementById("gift-title-input").value.trim();
+      const details = document.getElementById("gift-details-input").value.trim();
+      if (!title) return toast("أدخل عنوان الهدية أو المكافأة.");
+
+      await push(ref(db, "gifts"), {
+        targetName,
+        title,
+        details,
+        createdAt: Date.now()
+      });
+
+      document.getElementById("gift-target-input").value = "";
+      document.getElementById("gift-title-input").value = "";
+      document.getElementById("gift-details-input").value = "";
+      toast("تم إرسال الهدية / المكافأة.");
+    };
+
+    function renderReceiptsList() {
+      const el = document.getElementById("admin-receipts-list");
+      const rows = Object.entries(state.receipts || {});
+      el.innerHTML = rows.length
+        ? rows
+            .map(
+              ([rid, r]) => `
+              <div class="card">
+                <div><strong>${esc(r.userName)}</strong> (${esc(r.phone)}) — <strong>${Number(r.amount) || 0} جنيه</strong> — ${esc(r.method || "")}</div>
+                <div>رقم الاستقبال: ${esc(r.receiverPhone || "")} • الحالة: <strong>${esc(r.adminConfirmed || "بانتظار التأكيد")}</strong></div>
+                ${r.receiptImage ? `<img src="${r.receiptImage}" class="img-thumb" alt="صورة الإيصال" />` : ""}
+                <div style="margin-top:8px;">
+                  <button class="btn-green" onclick="confirmReceiptAdmin('${esc(rid)}')">تأكيد استلام الكاش</button>
+                </div>
+              </div>
+            `
+            )
+            .join("")
+        : `<div class="card">لا توجد وصولات بعد.</div>`;
+    }
+
+    window.confirmReceiptAdmin = async function (rid) {
+      await update(ref(db, `receipts/${rid}`), { adminConfirmed: "تم تأكيد الاستلام" });
+      toast("تم تأكيد استلام الكاش.");
+    };
+
+    // الدخول إلى حساب أي مستخدم (عميل أو متسابق)
+    window.openImpersonateModal = function () {
+      const box = document.getElementById("impersonate-users-list");
+      const entries = Object.entries(state.users || {});
+      box.innerHTML = entries.length
+        ? entries
+            .map(
+              ([uid, u]) => `
+              <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div><strong>${esc(u.name)}</strong> (${u.role === "challenger" ? "متسابق" : "عميل"}) • ${esc(u.phone)}</div>
+                <button class="btn-grad" onclick="impersonateUser('${esc(uid)}')">دخول الحساب</button>
+              </div>
+            `
+            )
+            .join("")
+        : "<p>لا يوجد مستخدمون مسجلون.</p>";
+      document.getElementById("impersonate-modal").style.display = "flex";
+    };
+
+    window.closeImpersonateModal = function () {
+      document.getElementById("impersonate-modal").style.display = "none";
+    };
+
+    window.impersonateUser = function (uid) {
+      const u = state.users[uid];
+      if (!u) return;
+      toast(`تم فتح حساب (${u.name}) - الصلاحية: ${u.role === "challenger" ? "متسابق" : "عميل"} - الرصيد: ${Number(u.wallet) || 0} جنيه.`);
+      closeImpersonateModal();
+    };
+
+    function renderAll() {
+      if (document.getElementById("admin-app").style.display !== "block") return;
+      renderClientRequests();
+      renderClientsManager();
+      renderChallengerRequests();
+      renderChallengersManager();
+      renderWaitlist();
+      renderDepartmentsAndProducts();
+      renderCashPhonesEditor();
+      renderChallengesAdminList();
+      renderOrdersPanels();
+      renderReceiptsList();
+    }
+
+    onValue(ref(db, "users"), (s) => {
+      state.users = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "clientRegRequests"), (s) => {
+      state.clientRegRequests = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "challengerRegRequests"), (s) => {
+      state.challengerRegRequests = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "departments"), (s) => {
+      state.departments = s.val() || [];
+      renderAll();
+    });
+    onValue(ref(db, "products"), (s) => {
+      state.products = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "cashPhones"), (s) => {
+      state.cashPhones = s.val() || [];
+      renderAll();
+    });
+    onValue(ref(db, "challenges"), (s) => {
+      state.challenges = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "orders"), (s) => {
+      state.orders = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "challengersStats"), (s) => {
+      state.challengersStats = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "receipts"), (s) => {
+      state.receipts = s.val() || {};
+      renderAll();
+    });
   </script>
 </body>
 </html>
