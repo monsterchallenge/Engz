@@ -255,32 +255,38 @@
         <div id="admin-waitlist-list"></div>
       </div>
 
-      <!-- 6. إعداد الأقسام والسلع والعروض -->
+      <!-- 6. إعداد الأقسام والأنواع والسلع والعروض -->
       <div id="panel-depts-items" class="panel">
-        <h3>إعداد الأقسام والسلع والعروض (جنيه)</h3>
+        <h3>إعداد الأقسام والأنواع والسلع والعروض (جنيه)</h3>
+
         <div class="card">
-          <label>إضافة قسم جديد</label>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="new-dept-name" placeholder="اسم القسم الجديد..." style="margin:0;" />
-            <button class="btn-grad" onclick="addNewDepartment()">إضافة قسم</button>
+          <label>إضافة قسم جديد أو تحديث صورة تعبيرية لأي قسم</label>
+          <input type="text" id="new-dept-name" placeholder="اسم القسم الجديد..." />
+          <label>اختر صورة تعبر عن القسم (تُضغط تلقائياً)</label>
+          <input type="file" id="dept-cover-file" accept="image/*" onchange="handleDeptCoverImage(this)" />
+          <img id="dept-cover-prev" class="img-thumb" style="display:none;" alt="صورة القسم" />
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+            <button class="btn-grad" onclick="addNewDepartment()">إضافة قسم جديد</button>
+            <button class="btn-cyan" onclick="saveCoverForSelectedDepartment()">حفظ الصورة للقسم المحدد بالأسفل</button>
           </div>
         </div>
 
         <div class="card">
-          <label>اختر القسم لإضافة سلعة أو عرض وسعره كجزء من الصورة</label>
-          <select id="target-dept-select"></select>
-          <input type="text" id="item-title-input" placeholder="اسم السلعة أو العرض..." />
+          <label>اختر القسم لإضافة نوع أو سلعة أو عرض وسعره مع الصورة</label>
+          <select id="target-dept-select" onchange="renderDepartmentItemsTable()"></select>
+          <input type="text" id="item-type-input" placeholder="النوع المتاح داخل القسم (مثال: بيتزا / تفاح / تلخيص جامعي)..." />
+          <input type="text" id="item-title-input" placeholder="اسم الصنف أو العرض..." />
           <input type="number" id="item-price-input" placeholder="السعر بالجنيه (مثال: 150)" />
           <input type="text" id="item-desc-input" placeholder="وصف مختصر أو تفاصيل العرض..." />
           <label>
             <input type="checkbox" id="item-is-offer" style="width:auto; margin-left:6px;" />
             اعتبار هذا العنصر عرضاً خاصاً
           </label>
-          <label>اختر صورة السلعة أو العرض (يتم ضغطها تلقائياً وحفظها)</label>
-          <input type="file" id="item-image-file" accept="image/*" onchange="handleAdminImage(this, 'item-img-prev', 'product')" />
+          <label>اختر صورة الصنف أو العرض مع السعر (يتم ضغطها تلقائياً وحفظها)</label>
+          <input type="file" id="item-image-file" accept="image/*" onchange="handleAdminImage(this, 'item-img-prev')" />
           <img id="item-img-prev" class="img-thumb" style="display:none;" alt="معاينة" />
           <div style="margin-top:10px;">
-            <button class="btn-green" onclick="addProductOrOffer()">حفظ السلعة / العرض في القسم</button>
+            <button class="btn-green" onclick="addProductOrOffer()">حفظ النوع / السلعة / العرض في القسم</button>
           </div>
         </div>
 
@@ -369,7 +375,7 @@
       runTransaction
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const ADMIN_PIN = "38512385"; // كلمة السر المطلوبة
+    const ADMIN_PIN = "38512385";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
@@ -400,6 +406,7 @@
       clientRegRequests: {},
       challengerRegRequests: {},
       departments: [],
+      departmentsMeta: {},
       products: {},
       cashPhones: [],
       cashPool: ["", "", "", "", "", "", ""],
@@ -407,7 +414,8 @@
       orders: {},
       challengersStats: {},
       receipts: {},
-      uploadedProductImg: ""
+      uploadedProductImg: "",
+      uploadedDeptCoverImg: ""
     };
 
     function esc(v) {
@@ -427,6 +435,32 @@
       }, 4000);
     }
 
+    function compressFileToDataUrl(file, cb) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxDim = 640;
+          let w = img.width;
+          let h = img.height;
+          if (w > h && w > maxDim) {
+            h = (h * maxDim) / w;
+            w = maxDim;
+          } else if (h > maxDim) {
+            w = (w * maxDim) / h;
+            h = maxDim;
+          }
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          cb(canvas.toDataURL("image/jpeg", 0.65));
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     window.verifyAdminPin = function () {
       const val = document.getElementById("admin-pin-input").value.trim();
       if (val === ADMIN_PIN) {
@@ -444,7 +478,7 @@
       document.getElementById("panel-" + panelKey).classList.add("active");
     };
 
-    // 1. طلبات تسجيل العملاء -> زر قبول يحوله لمشترك ليذهب مباشرة لصفحة الطلبات
+    // 1. طلبات تسجيل العملاء
     function renderClientRequests() {
       const el = document.getElementById("admin-client-requests-list");
       const reqs = Object.entries(state.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -457,7 +491,10 @@
           ([id, r]) => `
           <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div><strong>العميل:</strong> ${esc(r.name)} — <strong>موبايل:</strong> ${esc(r.phone)}</div>
-            <button class="btn-green" onclick="approveClientRequest('${esc(id)}')">قبول</button>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-green" onclick="approveClientRequest('${esc(id)}')">قبول</button>
+              <button class="btn-red" onclick="rejectClientRequest('${esc(id)}')">رفض</button>
+            </div>
           </div>
         `
         )
@@ -480,7 +517,23 @@
       toast(`تم قبول العميل ${reqData.name} وأصبح مشتركاً.`);
     };
 
-    // 2. إدارة العملاء: رصيد + حذف وحظر الدخول بنفس البيانات
+    window.rejectClientRequest = async function (reqId) {
+      const reqData = state.clientRegRequests[reqId];
+      if (!reqData) return;
+      const userRef = push(ref(db, "users"));
+      await set(userRef, {
+        name: reqData.name,
+        phone: reqData.phone,
+        role: "client",
+        status: "rejected",
+        wallet: 0,
+        createdAt: Date.now()
+      });
+      await remove(ref(db, `clientRegRequests/${reqId}`));
+      toast(`تم رفض طلب تسجيل العميل ${reqData.name}.`);
+    };
+
+    // 2. إدارة العملاء
     function renderClientsManager() {
       const el = document.getElementById("admin-clients-list");
       const clients = Object.entries(state.users || {}).filter(([, u]) => u.role === "client");
@@ -492,7 +545,7 @@
         .map(
           ([uid, u]) => `
           <div class="card">
-            <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الرصيد الحالي: <strong>${Number(u.wallet) || 0} جنيه</strong></div>
+            <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الحالة: <strong>${esc(u.status || "approved")}</strong> — الرصيد الحالي: <strong>${Number(u.wallet) || 0} جنيه</strong></div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
               <input type="number" id="add-wal-${esc(uid)}" placeholder="إضافة رصيد (جنيه)" style="width:170px; margin:0;" />
               <button class="btn-green" onclick="addClientWallet('${esc(uid)}')">إضافة رصيد</button>
@@ -521,7 +574,7 @@
       toast("تم حذف العميل وحظر دخوله بنفس البيانات.");
     };
 
-    // 3. طلبات تسجيل المتسابقين: قبول | رفض | waiting
+    // 3. طلبات تسجيل المتسابقين
     function renderChallengerRequests() {
       const el = document.getElementById("admin-challenger-requests-list");
       const reqs = Object.entries(state.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -582,7 +635,7 @@
       await remove(ref(db, `challengerRegRequests/${reqId}`));
     };
 
-    // 4. إعداد المتسابقين: مرتب حسب النشاط وعدد التحديات + سجل الطلبات + حذف بتأكيد
+    // 4. إعداد المتسابقين
     function renderChallengersManager() {
       const el = document.getElementById("admin-challengers-list");
       const challengers = Object.entries(state.users || {})
@@ -651,7 +704,7 @@
       toast("تم حذف المتسابق وتأكيد الحذف.");
     };
 
-    // 5. قائمة الانتظار مرتبة تنازلياً حسب تاريخ تقديم الطلب
+    // 5. قائمة الانتظار مرتبة تنازلياً
     let waitlistData = {};
     onValue(ref(db, "waitlist"), (s) => {
       waitlistData = s.val() || {};
@@ -677,10 +730,46 @@
         .join("");
     }
 
-    // 6. إعداد الأقسام والسلع والعروض
+    // 6. إعداد الأقسام وصورة القسم والأنواع المتاحة والأسعار والعروض والصور
     function getAllDepts() {
       return [...new Set([...DEFAULT_DEPARTMENTS, ...(state.departments || [])])];
     }
+
+    window.handleDeptCoverImage = function (inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      compressFileToDataUrl(file, (dataUrl) => {
+        state.uploadedDeptCoverImg = dataUrl;
+        const prev = document.getElementById("dept-cover-prev");
+        prev.src = dataUrl;
+        prev.style.display = "block";
+      });
+    };
+
+    window.addNewDepartment = async function () {
+      const name = document.getElementById("new-dept-name").value.trim();
+      if (!name) return toast("أدخل اسم القسم أولاً.");
+      const updated = [...new Set([...getAllDepts(), name])];
+      await set(ref(db, "departments"), updated);
+      if (state.uploadedDeptCoverImg) {
+        await set(ref(db, `departmentsMeta/${name}/image`), state.uploadedDeptCoverImg);
+      }
+      document.getElementById("new-dept-name").value = "";
+      state.uploadedDeptCoverImg = "";
+      document.getElementById("dept-cover-prev").style.display = "none";
+      toast(`تمت إضافة القسم (${name}).`);
+    };
+
+    window.saveCoverForSelectedDepartment = async function () {
+      const dept = document.getElementById("target-dept-select").value;
+      if (!dept || !state.uploadedDeptCoverImg) {
+        return toast("اختر صورة للقسم أولاً.");
+      }
+      await set(ref(db, `departmentsMeta/${dept}/image`), state.uploadedDeptCoverImg);
+      state.uploadedDeptCoverImg = "";
+      document.getElementById("dept-cover-prev").style.display = "none";
+      toast(`تم حفظ الصورة التعبيرية لقسم (${dept}).`);
+    };
 
     function renderDepartmentsAndProducts() {
       const sel = document.getElementById("target-dept-select");
@@ -688,84 +777,77 @@
       const prevVal = sel.value;
       sel.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
       if (prevVal && depts.includes(prevVal)) sel.value = prevVal;
+      renderDepartmentItemsTable();
+    }
 
+    window.renderDepartmentItemsTable = function () {
+      const selDept = document.getElementById("target-dept-select").value;
       const preview = document.getElementById("admin-dept-products-preview");
+      const depts = getAllDepts();
+
       preview.innerHTML = depts
         .map((d) => {
           const items = Object.entries(state.products[d] || {});
+          const meta = state.db.departmentsMeta?.[d] || state.departmentsMeta[d] || {};
+          const isSelectedDept = d === selDept;
+
           return `
-            <div class="card">
-              <h4 style="margin:0 0 8px;">${esc(d)} (${items.length})</h4>
-              ${items
-                .map(
-                  ([pid, it]) => `
-                  <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #e2e8f0;">
-                    <div><strong>${esc(it.title)}</strong> — ${Number(it.price) || 0} جنيه ${it.isOffer ? "(عرض)" : ""}</div>
-                    <button class="btn-red" onclick="deleteProductItem('${esc(d)}', '${esc(pid)}')">حذف</button>
-                  </div>
-                `
-                )
-                .join("")}
+            <div class="card" style="${isSelectedDept ? "border-color:#7c3aed;" : ""}">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                <h4 style="margin:0;">${esc(d)} (${items.length} صنف / نوع / عرض)</h4>
+                ${meta.image ? `<img src="${meta.image}" class="img-thumb" alt="${esc(d)}" />` : ""}
+              </div>
+              ${
+                items.length
+                  ? items
+                      .map(
+                        ([pid, it]) => `
+                      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #e2e8f0;">
+                        <div>
+                          <strong>${esc(it.title || it.type)}</strong>
+                          ${it.type ? `• النوع: <span style="color:#7c3aed;">${esc(it.type)}</span>` : ""}
+                          • السعر: <strong style="color:#be185d;">${Number(it.price) || 0} جنيه</strong>
+                          ${it.isOffer ? `• <span style="color:#d97706;">عرض</span>` : ""}
+                        </div>
+                        <button class="btn-red" onclick="deleteProductItem('${esc(d)}', '${esc(pid)}')">حذف</button>
+                      </div>
+                    `
+                      )
+                      .join("")
+                  : `<div style="font-size:13px; color:#64748b;">لا توجد أنواع أو سلع أو عروض مضافة في هذا القسم بعد.</div>`
+              }
             </div>
           `;
         })
         .join("");
-    }
-
-    window.addNewDepartment = async function () {
-      const name = document.getElementById("new-dept-name").value.trim();
-      if (!name) return;
-      const updated = [...new Set([...getAllDepts(), name])];
-      await set(ref(db, "departments"), updated);
-      document.getElementById("new-dept-name").value = "";
-      toast(`تمت إضافة القسم (${name}).`);
     };
 
     window.handleAdminImage = function (inputEl, prevId) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const maxDim = 640;
-          let w = img.width;
-          let h = img.height;
-          if (w > h && w > maxDim) {
-            h = (h * maxDim) / w;
-            w = maxDim;
-          } else if (h > maxDim) {
-            w = (w * maxDim) / h;
-            h = maxDim;
-          }
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.65);
-          state.uploadedProductImg = dataUrl;
-          const prev = document.getElementById(prevId);
-          prev.src = dataUrl;
-          prev.style.display = "block";
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
+      compressFileToDataUrl(file, (dataUrl) => {
+        state.uploadedProductImg = dataUrl;
+        const prev = document.getElementById(prevId);
+        prev.src = dataUrl;
+        prev.style.display = "block";
+      });
     };
 
     window.addProductOrOffer = async function () {
       const dept = document.getElementById("target-dept-select").value;
-      const title = document.getElementById("item-title-input").value.trim();
+      const typeName = document.getElementById("item-type-input").value.trim();
+      const title = document.getElementById("item-title-input").value.trim() || typeName;
       const price = Number(document.getElementById("item-price-input").value) || 0;
       const desc = document.getElementById("item-desc-input").value.trim();
       const isOffer = document.getElementById("item-is-offer").checked;
 
       if (!title || price <= 0) {
-        return toast("أدخل اسم العنصر وسعراً صحيحاً بالجنيه.");
+        return toast("أدخل اسم الصنف أو النوع وسعراً صحيحاً بالجنيه.");
       }
 
       const itemRef = push(ref(db, `products/${dept}`));
       await set(itemRef, {
+        type: typeName || title,
         title,
         price,
         desc,
@@ -773,13 +855,14 @@
         image: state.uploadedProductImg || ""
       });
 
+      document.getElementById("item-type-input").value = "";
       document.getElementById("item-title-input").value = "";
       document.getElementById("item-price-input").value = "";
       document.getElementById("item-desc-input").value = "";
       document.getElementById("item-is-offer").checked = false;
       state.uploadedProductImg = "";
       document.getElementById("item-img-prev").style.display = "none";
-      toast(`تمت إضافة العنصر إلى قسم ${dept}.`);
+      toast(`تمت إضافة العنصر والسعر إلى قسم ${dept}.`);
     };
 
     window.deleteProductItem = async function (dept, pid) {
@@ -787,7 +870,7 @@
       toast("تم حذف العنصر.");
     };
 
-    // 7. إعداد أرقام الاتصال (7 خانات + checkbox + زر + لإضافة أي عدد)
+    // 7. إعداد أرقام الاتصال
     function renderCashPhonesEditor() {
       const slotsEl = document.getElementById("cash-phones-slots");
       const activeSet = new Set(state.cashPhones || []);
@@ -954,7 +1037,7 @@
       toast("تم تأكيد استلام الكاش.");
     };
 
-    // الدخول إلى حساب أي مستخدم (عميل أو متسابق)
+    // الدخول إلى حساب أي مستخدم
     window.openImpersonateModal = function () {
       const box = document.getElementById("impersonate-users-list");
       const entries = Object.entries(state.users || {});
@@ -1012,6 +1095,10 @@
     });
     onValue(ref(db, "departments"), (s) => {
       state.departments = s.val() || [];
+      renderAll();
+    });
+    onValue(ref(db, "departmentsMeta"), (s) => {
+      state.departmentsMeta = s.val() || {};
       renderAll();
     });
     onValue(ref(db, "products"), (s) => {
