@@ -138,7 +138,6 @@
       color: #e2e8f0;
     }
 
-    /* الحاوية الرئيسية للتطبيق */
     #main-app {
       display: none;
       max-width: 920px;
@@ -258,33 +257,12 @@
       transform: scale(0.98);
     }
 
-    .btn-client {
-      background: linear-gradient(135deg, #ec4899, #8b5cf6);
-    }
-
-    .btn-challenge {
-      background: linear-gradient(135deg, #06b6d4, #10b981);
-    }
-
-    .btn-amber {
-      background: linear-gradient(135deg, #f59e0b, #ef4444);
-      color: #ffffff;
-    }
-
-    .btn-dark {
-      background: #1e293b;
-      color: #ffffff;
-    }
-
-    .btn-soft {
-      background: #e2e8f0;
-      color: #0f172a;
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #ffffff;
-    }
+    .btn-client { background: linear-gradient(135deg, #ec4899, #8b5cf6); }
+    .btn-challenge { background: linear-gradient(135deg, #06b6d4, #10b981); }
+    .btn-amber { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #ffffff; }
+    .btn-dark { background: #1e293b; color: #ffffff; }
+    .btn-soft { background: #e2e8f0; color: #0f172a; }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; }
 
     button {
       font-family: inherit;
@@ -319,7 +297,6 @@
       color: #0f172a;
     }
 
-    /* شبكة الأقسام السبعة + الإضافية بصورة تعبيرية */
     .dept-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -363,7 +340,6 @@
     .dept-card:nth-child(5n+4) { background: linear-gradient(135deg, #10b981, #0d9488); }
     .dept-card:nth-child(5n+5) { background: linear-gradient(135deg, #f59e0b, #ea580c); }
 
-    /* قائمة الأنواع المتاحة داخل القسم */
     .types-bar {
       display: flex;
       gap: 8px;
@@ -388,7 +364,6 @@
       border-color: transparent;
     }
 
-    /* بطاقات السلع والعروض مع السعر كجزء واضح من الصورة */
     .items-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -431,7 +406,6 @@
       display: block;
     }
 
-    /* السعر بخط واضح وكبير كجزء من الصورة */
     .price-overlay {
       position: absolute;
       bottom: 10px;
@@ -593,6 +567,9 @@
       <div>
         <h1 class="brand-name">انجز • ENGZ</h1>
         <div id="active-user-summary" style="font-size:13px; opacity:0.95;">زائر</div>
+        <div id="user-points-summary" style="font-size:12px; margin-top:2px; color:#fde047; font-weight:bold;">
+          نقاطي (point): 0 • قيمة النقطة = 33.333333333333 جنيه
+        </div>
       </div>
       <div class="header-actions">
         <div class="user-pill">رصيدي: <span id="user-wallet-display">0</span> جنيه</div>
@@ -603,6 +580,23 @@
     </div>
 
     <div id="global-notice" class="status-banner" style="display:none;"></div>
+
+    <!-- رابط الدعوة الخاص بالمستخدم + تحويل النقاط إلى فلوس للعميل -->
+    <div id="personal-referral-wallet-bar" class="box-card" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-weight:bold; color:#1e1b4b;">رابطك المخصص لإرسال التطبيق:</div>
+          <div id="my-referral-link-text" style="font-size:12px; color:#0284c7; word-break:break-all; margin-top:4px;"></div>
+          <div id="my-referral-stats-text" style="font-size:12px; color:#475569; margin-top:4px;"></div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-cyan" onclick="copyMyReferralLink()">نسخ رابطي</button>
+          <button id="convert-points-btn" class="btn-success" style="display:none;" onclick="convertClientPointsToMoney()">
+            تحويل النقاط إلى فلوس (1 point = 33.333333333333 جنيه)
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- 2. صفحة الاختيار: عميل | تحدى -->
     <div id="screen-choice" class="screen active">
@@ -704,7 +698,7 @@
       </div>
     </div>
 
-    <!-- صفحة تأكيد الشراء وظهور الأصناف والأسعار كجزء من الصورة -->
+    <!-- صفحة تأكيد الشراء -->
     <div id="screen-confirm-purchase" class="screen">
       <h2 class="screen-title">تأكيد الشراء</h2>
       <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى طرق الدفع.</p>
@@ -832,6 +826,8 @@
       runTransaction
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+    const POINT_VALUE_EGP = 33.333333333333;
+
     const firebaseConfig = {
       apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
       authDomain: "engz-2567e.firebaseapp.com",
@@ -855,6 +851,10 @@
       "توصيل اغراض",
       "خدمات الشراء والبيع"
     ];
+
+    // قراءة كود الإحالة من الرابط المخصص (?ref=USER_ID)
+    const urlParams = new URLSearchParams(window.location.search);
+    const incomingRefCode = (urlParams.get("ref") || "").trim();
 
     // عد تنازلي 30 ثانية بدون زر تخطي
     (function runSplash30Sec() {
@@ -881,7 +881,6 @@
       }, 1000);
     })();
 
-    // حالة التطبيق المحلية والبيانات اللحظية
     const state = {
       currentRole: null,
       currentUser: null,
@@ -903,7 +902,8 @@
         orders: {},
         challenges: {},
         gifts: {},
-        receipts: {}
+        receipts: {},
+        referrals: {}
       }
     };
 
@@ -924,6 +924,104 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+    }
+
+    function buildPersonalReferralUrl(userId) {
+      const base = window.location.origin + window.location.pathname;
+      return `${base}?ref=${encodeURIComponent(userId)}`;
+    }
+
+    window.copyMyReferralLink = function () {
+      if (!state.currentUser || !state.currentUser.id) return;
+      const link = buildPersonalReferralUrl(state.currentUser.id);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).catch(() => {});
+      }
+      notify(`تم نسخ رابطك المخصص: ${link}`, "success");
+    };
+
+    function renderReferralAndWalletBar() {
+      const bar = document.getElementById("personal-referral-wallet-bar");
+      const pointsSummary = document.getElementById("user-points-summary");
+      const convertBtn = document.getElementById("convert-points-btn");
+
+      if (!state.currentUser || !state.currentUser.id) {
+        bar.style.display = "none";
+        pointsSummary.textContent = `نقاطي (point): 0 • قيمة النقطة = ${POINT_VALUE_EGP} جنيه`;
+        convertBtn.style.display = "none";
+        return;
+      }
+
+      const latest = state.db.users[state.currentUser.id] || state.currentUser;
+      state.currentUser = { ...state.currentUser, ...latest };
+      const pts = Number(state.currentUser.points) || 0;
+      const ptsValueEgp = (pts * POINT_VALUE_EGP).toFixed(2);
+
+      pointsSummary.textContent = `نقاطي (point): ${pts} (${ptsValueEGP} جنيه) • 1 point = ${POINT_VALUE_EGP} جنيه`;
+
+      // زر تحويل النقاط إلى فلوس للعميل
+      convertBtn.style.display = state.currentUser.role === "client" && pts > 0 ? "inline-block" : "none";
+
+      bar.style.display = "block";
+      const myLink = buildPersonalReferralUrl(state.currentUser.id);
+      document.getElementById("my-referral-link-text").textContent = myLink;
+
+      const refMap = state.db.referrals[state.currentUser.id] || {};
+      const invitedEntries = Object.values(refMap);
+      const sentCount = invitedEntries.length;
+      const completedCount = invitedEntries.filter((x) => x.completedFirstAction === true).length;
+      document.getElementById("my-referral-stats-text").textContent =
+        `عدد الأشخاص المرسل لهم الرابط: ${sentCount} • عدد من أتموا أول طلب شراء أو مهمة ناجحة: ${completedCount}`;
+    }
+
+    // تحويل النقاط إلى رصيد محفظة بالفلوس للعميل (1 point = 33.333333333333 جنيه)
+    window.convertClientPointsToMoney = async function () {
+      if (!state.currentUser || state.currentUser.role !== "client") return;
+      const uid = state.currentUser.id;
+      const currentPts = Number(state.db.users[uid]?.points) || 0;
+      if (currentPts <= 0) {
+        return notify("لا توجد نقاط متاحة للتحويل.", "error");
+      }
+
+      const addedMoney = Number((currentPts * POINT_VALUE_EGP).toFixed(2));
+      await update(ref(db, `users/${uid}`), {
+        points: 0,
+        wallet: Number(((Number(state.db.users[uid]?.wallet) || 0) + addedMoney).toFixed(2))
+      });
+
+      notify(`تم تحويل ${currentPts} point إلى ${addedMoney} جنيه وأضيفت إلى رصيدك بنجاح.`, "success");
+    };
+
+    // تسجيل انضمام شخص عبر رابط مخصص دون تكرار
+    async function recordReferralJoin(referrerId, invitedUserId, invitedName) {
+      if (!referrerId || !invitedUserId || referrerId === invitedUserId) return;
+      if (!state.db.users[referrerId]) return;
+      const entryRef = ref(db, `referrals/${referrerId}/${invitedUserId}`);
+      await runTransaction(entryRef, (existing) => {
+        if (existing) return existing;
+        return {
+          invitedUserId,
+          invitedName,
+          joinedAt: Date.now(),
+          completedFirstAction: false
+        };
+      });
+    }
+
+    // عند قيام الشخص المدعو بأول طلب شراء أو أول مهمة ناجحة
+    async function markReferrerFirstActionSuccess(invitedUserId) {
+      if (!invitedUserId) return;
+      const allReferrals = state.db.referrals || {};
+      for (const [referrerId, invitedMap] of Object.entries(allReferrals)) {
+        const rec = invitedMap && invitedMap[invitedUserId];
+        if (rec && rec.completedFirstAction !== true) {
+          await update(ref(db, `referrals/${referrerId}/${invitedUserId}`), {
+            completedFirstAction: true,
+            completedAt: Date.now()
+          });
+          await runTransaction(ref(db, `users/${referrerId}/points`), (curPts) => (Number(curPts) || 0) + 1);
+        }
+      }
     }
 
     function checkRegistrationStatusBanner() {
@@ -969,6 +1067,7 @@
       if (!state.currentUser) {
         summary.textContent = state.currentRole === "challenger" ? "مسار التحدي" : "مسار العميل";
         walletEl.textContent = "0";
+        renderReferralAndWalletBar();
         return;
       }
       const latest = state.db.users[state.currentUser.id] || state.currentUser;
@@ -976,6 +1075,7 @@
       const roleLabel = state.currentUser.role === "challenger" ? "متسابق مشترك" : "عميل";
       summary.textContent = `${state.currentUser.name} (${roleLabel}) • ${state.currentUser.phone}`;
       walletEl.textContent = String(Number(state.currentUser.wallet || 0));
+      renderReferralAndWalletBar();
     }
 
     function isNameTaken(name) {
@@ -992,7 +1092,6 @@
       );
     }
 
-    // تسجيل عميل جديد -> يذهب لصفحة طلبات التسجيل في الأدمن وتظهر رسالة قيد المراجعة
     window.submitClientRegistration = async function () {
       const name = document.getElementById("reg-client-name").value.trim();
       const phone = document.getElementById("reg-client-phone").value.trim();
@@ -1007,6 +1106,7 @@
         phone,
         role: "client",
         status: "pending",
+        invitedBy: incomingRefCode || "",
         createdAt: Date.now()
       });
 
@@ -1016,7 +1116,6 @@
       notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
     };
 
-    // دخول مشترك (عميل مسجل من قبل أو اختيار اسم غير مكرر + ربط رقمي موبايل)
     window.loginClientSubscriber = async function () {
       const name = document.getElementById("sub-client-name").value.trim();
       const phone1 = document.getElementById("sub-client-phone1").value.trim();
@@ -1056,6 +1155,9 @@
         });
         state.currentUser = { id: uid, ...uData, phone: phone1, phone2: phone2 || uData.phone2 || "" };
         state.currentRole = "client";
+        if (incomingRefCode || uData.invitedBy) {
+          await recordReferralJoin(incomingRefCode || uData.invitedBy, uid, name);
+        }
         syncUserHeader();
         notify("تم قبول حسابك بنجاح، أهلاً بك في صفحة الطلبات.", "success");
         goScreen("screen-orders-home");
@@ -1070,17 +1172,21 @@
         role: "client",
         status: "approved",
         wallet: 0,
+        points: 0,
+        invitedBy: incomingRefCode || "",
         createdAt: Date.now()
       };
       await set(newRef, newUser);
       state.currentUser = { id: newRef.key, ...newUser };
       state.currentRole = "client";
+      if (incomingRefCode) {
+        await recordReferralJoin(incomingRefCode, newRef.key, name);
+      }
       syncUserHeader();
       notify("تم قبول الدخول كمشترك بنجاح.", "success");
       goScreen("screen-orders-home");
     };
 
-    // تسجيل متسابق جديد -> يذهب لصفحة طلبات تسجيل المتسابقين في الأدمن وتظهر رسالة قيد المراجعة
     window.submitChallengerRegistration = async function () {
       const name = document.getElementById("reg-chal-name").value.trim();
       const phone = document.getElementById("reg-chal-phone").value.trim();
@@ -1096,6 +1202,7 @@
         phone,
         role: "challenger",
         status: "pending",
+        invitedBy: incomingRefCode || "",
         createdAt: Date.now()
       });
 
@@ -1105,7 +1212,6 @@
       notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
     };
 
-    // دخول متسابق مشترك مع إظهار حالة القبول أو الرفض أو قيد المراجعة
     window.loginChallengerSubscriber = async function () {
       const name = document.getElementById("sub-chal-name").value.trim();
       const phone = document.getElementById("sub-chal-phone").value.trim();
@@ -1146,12 +1252,14 @@
 
       state.currentUser = { id: uid, ...uData, phone };
       state.currentRole = "challenger";
+      if (incomingRefCode || uData.invitedBy) {
+        await recordReferralJoin(incomingRefCode || uData.invitedBy, uid, name);
+      }
       syncUserHeader();
       notify("تم قبول طلبك كمتسابق، مرحباً بك في صفحة التحديات.", "success");
       goScreen("screen-challenges-hub");
     };
 
-    // عرض الأقسام مع الصورة التعبيرية الخاصة بكل قسم
     function getAllDepartments() {
       const extra = Array.isArray(state.db.departments) ? state.db.departments : [];
       return [...new Set([...DEFAULT_DEPARTMENTS, ...extra])];
@@ -1174,7 +1282,6 @@
         .join("");
     }
 
-    // ضغط 3 ثوانٍ لتحديد / إلغاء تحديد الصورة
     const holdTimers = {};
     window.startLongPress3Sec = function (itemKey, itemPayload) {
       clearTimeout(holdTimers[itemKey]);
@@ -1247,7 +1354,7 @@
         .map(([id, item]) => {
           const uid = `${deptName}__${id}`;
           const isSelected = state.cart.some((c) => c.uid === uid);
-          const priceNum = Number(item.price) || 0;
+          const priceNum = Math.max(0, Number(item.price) || 0);
           const payloadStr = encodeURIComponent(
             JSON.stringify({
               uid,
@@ -1296,12 +1403,12 @@
       let total = 0;
       listEl.innerHTML = state.cart
         .map((item) => {
-          total += Number(item.price) || 0;
+          total += Math.max(0, Number(item.price) || 0);
           return `
             <div class="box-card" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
               <div>
                 <strong>${esc(item.title)}</strong> <span style="font-size:12px; color:#64748b;">(${esc(item.dept)})</span><br/>
-                <span style="color:#be185d; font-weight:bold;">${Number(item.price) || 0} جنيه</span>
+                <span style="color:#be185d; font-weight:bold;">${Math.max(0, Number(item.price) || 0)} جنيه</span>
               </div>
               <button class="btn-soft" onclick="removeFromCart('${esc(item.uid)}')">إزالة</button>
             </div>
@@ -1327,12 +1434,13 @@
       let total = 0;
       grid.innerHTML = state.cart
         .map((item) => {
-          total += Number(item.price) || 0;
+          const p = Math.max(0, Number(item.price) || 0);
+          total += p;
           return `
             <div class="product-card selected">
               <div class="product-img-wrap">
                 ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" />` : ""}
-                <div class="price-overlay">${Number(item.price) || 0} جنيه</div>
+                <div class="price-overlay">${p} جنيه</div>
               </div>
               <div class="product-body">
                 <h3 class="product-title">${esc(item.title)}</h3>
@@ -1348,7 +1456,7 @@
     };
 
     function getCartTotal() {
-      return state.cart.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+      return state.cart.reduce((sum, item) => sum + Math.max(0, Number(item.price) || 0), 0);
     }
 
     window.openPaymentMethodsScreen = function () {
@@ -1389,7 +1497,6 @@
       document.getElementById("other-number-receipt-box").style.display = "block";
     };
 
-    // ضغط الصورة تلقائياً في المتصفح وتخزينها في قاعدة البيانات
     window.previewCompressedImage = function (inputEl, previewImgId, key) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
@@ -1428,6 +1535,7 @@
 
     async function createOrderRecord(paymentMethod, receiptImage) {
       const total = getCartTotal();
+      if (total <= 0) return notify("قيمة الطلب غير صالحة.", "error");
       const buyer = state.currentUser || {
         id: "guest_" + Date.now(),
         name: "عميل سريع",
@@ -1450,6 +1558,22 @@
         createdAt: Date.now()
       };
       await set(orderRef, orderData);
+
+      // تحديث إحصائيات العميل النشط واحتساب نجاح الإحالة عند أول طلب شراء
+      if (state.currentUser && state.currentUser.id) {
+        await runTransaction(ref(db, `clientActivity/${state.currentUser.id}`), (curr) => {
+          const prev = curr || { userId: state.currentUser.id, name: state.currentUser.name, phone: state.currentUser.phone, orderCount: 0, totalSpent: 0 };
+          return {
+            userId: state.currentUser.id,
+            name: state.currentUser.name,
+            phone: state.currentUser.phone,
+            orderCount: (Number(prev.orderCount) || 0) + 1,
+            totalSpent: Number(((Number(prev.totalSpent) || 0) + total).toFixed(2)),
+            lastOrderAt: Date.now()
+          };
+        });
+        await markReferrerFirstActionSuccess(state.currentUser.id);
+      }
 
       await push(ref(db, "receipts"), {
         type: "وصل دفع واستلام",
@@ -1476,7 +1600,6 @@
       `;
     }
 
-    // الدفع من نفس الرقم -> خصم تلقائي من رصيد العميل ووصول المبلغ لرقم الأدمن
     window.handlePayFromSameNumber = async function () {
       const total = getCartTotal();
       if (!state.currentUser || !state.currentUser.id) {
@@ -1491,7 +1614,7 @@
           return;
         }
         paid = true;
-        return bal - total;
+        return Number((bal - total).toFixed(2));
       });
 
       if (!paid) {
@@ -1510,7 +1633,6 @@
       notify("تم إرسال صورة الإيصال وتسجيل طلبك.", "success");
     };
 
-    // صفحة التحديات للمتسابق
     window.switchChallengerSubTab = function (tab) {
       ["available", "active", "rewards"].forEach((t) => {
         document.getElementById(`stab-${t}`).classList.toggle("active", t === tab);
@@ -1687,6 +1809,9 @@
         return notify("يرجى التقاط أو اختيار صورة تأكيد وصول الطلب أولاً.", "error");
       }
 
+      const orderObj = state.db.orders[orderId] || {};
+      const rewardVal = Math.max(0, Number(orderObj.totalAmount) || Number(state.db.challenges[challengeId]?.reward) || 0);
+
       await update(ref(db, `orders/${orderId}`), {
         stage: "completed",
         status: "منتهي",
@@ -1694,19 +1819,19 @@
         completedAt: Date.now()
       });
 
-      if (challengeId && state.currentUser) {
-        const chalObj = state.db.challenges[challengeId] || {};
-        const reward = Number(chalObj.reward) || 0;
+      if (state.currentUser) {
         const statsRef = ref(db, `challengersStats/${state.currentUser.id}`);
         await runTransaction(statsRef, (curr) => {
-          const prev = curr || { name: state.currentUser.name, completedCount: 0, totalEarned: 0 };
+          const prev = curr || { name: state.currentUser.name, phone: state.currentUser.phone, completedCount: 0, totalEarned: 0 };
           return {
             name: state.currentUser.name,
+            phone: state.currentUser.phone,
             completedCount: (Number(prev.completedCount) || 0) + 1,
-            totalEarned: (Number(prev.totalEarned) || 0) + reward,
+            totalEarned: Number(((Number(prev.totalEarned) || 0) + rewardVal).toFixed(2)),
             lastCompletedAt: Date.now()
           };
         });
+        await markReferrerFirstActionSuccess(state.currentUser.id);
       }
 
       state.uploadedImages.deliveryProof = "";
@@ -1714,7 +1839,6 @@
       renderChallengesHub();
     };
 
-    // مستمعات قاعدة البيانات اللحظية
     onValue(ref(db, "users"), (s) => {
       state.db.users = s.val() || {};
       syncUserHeader();
@@ -1776,6 +1900,10 @@
       if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
         renderChallengesHub();
       }
+    });
+    onValue(ref(db, "referrals"), (s) => {
+      state.db.referrals = s.val() || {};
+      renderReferralAndWalletBar();
     });
   </script>
 </body>
