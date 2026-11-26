@@ -3,108 +3,297 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Engz</title>
+  <title>انجز - للخصومات والمهام والمكافآت</title>
   <style>
     :root {
-      --primary: #0f766e;
-      --primary-dark: #115e59;
-      --bg: #f1f5f9;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #475569;
-      --border: #cbd5e1;
-      --success-bg: #ecfdf5;
-      --success-text: #065f46;
-      --warn-bg: #fffbeb;
-      --warn-text: #92400e;
+      --bg-grad-1: #0f172a;
+      --bg-grad-2: #1e1b4b;
+      --accent-pink: #ec4899;
+      --accent-amber: #f59e0b;
+      --accent-teal: #06b6d4;
+      --accent-violet: #8b5cf6;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text-dark: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
     }
 
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       margin: 0;
-      padding: 16px;
+      padding: 0;
+      min-height: 100vh;
       font-family: Tahoma, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
+      background: linear-gradient(135deg, #090d16 0%, #1a103c 45%, #082f49 100%);
+      color: var(--text-dark);
+      line-height: 1.65;
     }
 
-    .app-wrapper {
-      max-width: 680px;
-      margin: 16px auto;
-      background: var(--card);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    /* شاشة البداية - 30 ثانية بدون تخطي */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(236, 72, 153, 0.35), transparent 45%),
+        radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.35), transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.32), transparent 50%),
+        linear-gradient(145deg, #0b1021 0%, #24124d 50%, #0b2d48 100%);
     }
 
-    .top-bar {
+    .splash-card {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 28px;
+      padding: 32px 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .splash-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--accent-pink), var(--accent-amber));
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    .splash-title {
+      margin: 0 0 22px;
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 1.5;
+      background: linear-gradient(90deg, #fde047, #f472b6, #67e8f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .countdown-circle {
+      width: 112px;
+      height: 112px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(6, 182, 212, 0.25));
+      border: 3px solid #38bdf8;
+      box-shadow: 0 0 28px rgba(56, 189, 248, 0.4);
+    }
+
+    .countdown-num {
+      font-size: 38px;
+      font-weight: bold;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+
+    .countdown-unit {
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .progress-outer {
+      width: 100%;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-amber), var(--accent-pink), var(--accent-teal));
+      transition: width 0.25s linear;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #e2e8f0;
+    }
+
+    /* الحاوية الرئيسية للتطبيق */
+    #main-app {
+      display: none;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 16px 14px 48px;
+    }
+
+    .top-header {
+      background: linear-gradient(120deg, #ff2e93 0%, #7c3aed 50%, #06b6d4 100%);
+      color: #ffffff;
+      border-radius: 22px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
       flex-wrap: wrap;
-      padding-bottom: 14px;
-      border-bottom: 1px solid #e2e8f0;
-      margin-bottom: 18px;
+      gap: 12px;
     }
 
-    .brand-title {
+    .brand-name {
       margin: 0;
-      font-size: 26px;
-      color: var(--primary);
+      font-size: 24px;
       font-weight: bold;
     }
 
-    .brand-sub {
-      margin: 2px 0 0;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .points-badge {
-      background: #f0fdfa;
-      border: 1px solid #99f6e4;
-      color: var(--primary-dark);
+    .user-pill {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
       padding: 8px 14px;
       border-radius: 999px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
     }
 
-    .tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 18px;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .tab-btn {
-      padding: 10px;
-      border: 1px solid var(--border);
-      background: #f8fafc;
-      color: var(--text);
-      border-radius: 10px;
+    .cart-fab {
+      position: relative;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 14px;
+      padding: 9px 15px;
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
+      box-shadow: 0 8px 20px rgba(234, 88, 12, 0.4);
     }
 
-    .tab-btn.active {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
+    .cart-count {
+      background: #0f172a;
+      color: #fde047;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+      font-size: 13px;
     }
 
-    .panel {
+    .screen {
       display: none;
+      background: var(--surface);
+      border-radius: 22px;
+      padding: 22px 18px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
     }
 
-    .panel.active {
+    .screen.active {
       display: block;
+    }
+
+    .screen-title {
+      margin: 0 0 8px;
+      font-size: 21px;
+      font-weight: bold;
+      color: #1e1b4b;
+    }
+
+    .screen-sub {
+      margin: 0 0 18px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .two-big-btns {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    @media (min-width: 600px) {
+      .two-big-btns {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .big-choice-btn {
+      padding: 24px 18px;
+      border: none;
+      border-radius: 18px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+      transition: transform 0.15s ease;
+    }
+
+    .big-choice-btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-client {
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    }
+
+    .btn-challenge {
+      background: linear-gradient(135deg, #06b6d4, #10b981);
+    }
+
+    .btn-amber {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #ffffff;
+    }
+
+    .btn-dark {
+      background: #1e293b;
+      color: #ffffff;
+    }
+
+    .btn-soft {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: bold;
     }
 
     .form-group {
@@ -113,200 +302,483 @@
 
     label {
       display: block;
-      margin-bottom: 6px;
       font-size: 14px;
       font-weight: bold;
+      margin-bottom: 6px;
       color: #1e293b;
     }
 
     input, select, textarea {
       width: 100%;
       padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
       font-size: 15px;
       font-family: inherit;
       background: #ffffff;
-      color: var(--text);
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    .btn-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    @media (min-width: 520px) {
-      .btn-row.two-cols {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .btn-primary, .btn-secondary {
-      padding: 12px 16px;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: #ffffff;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-    }
-
-    .btn-secondary {
-      background: #e2e8f0;
       color: #0f172a;
     }
 
-    .alert {
+    /* شبكة الأقسام السبعة + الإضافية */
+    .dept-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
       margin-top: 14px;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      background: var(--warn-bg);
-      color: var(--warn-text);
-      border: 1px solid #fde68a;
     }
 
-    .alert.ok {
-      background: var(--success-bg);
-      color: var(--success-text);
+    @media (min-width: 640px) {
+      .dept-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .dept-card {
+      padding: 18px 12px;
+      border-radius: 16px;
+      color: #ffffff;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+      cursor: pointer;
+    }
+
+    .dept-card:nth-child(5n+1) { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+    .dept-card:nth-child(5n+2) { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+    .dept-card:nth-child(5n+3) { background: linear-gradient(135deg, #06b6d4, #0284c7); }
+    .dept-card:nth-child(5n+4) { background: linear-gradient(135deg, #10b981, #0d9488); }
+    .dept-card:nth-child(5n+5) { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+
+    /* بطاقات السلع والعروض مع السعر كجزء واضح من الصورة */
+    .items-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    @media (min-width: 640px) {
+      .items-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .product-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #ffffff;
+      position: relative;
+      user-select: none;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .product-card.selected {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.28);
+    }
+
+    .product-img-wrap {
+      position: relative;
+      height: 190px;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .product-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* السعر بخط واضح وكبير كجزء من الصورة */
+    .price-overlay {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: linear-gradient(90deg, #0f172a, #be185d);
+      color: #fde047;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 12px;
+      border: 2px solid rgba(253, 224, 71, 0.75);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    .offer-ribbon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: linear-gradient(90deg, #f59e0b, #ef4444);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .select-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.78);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .product-card.selected .select-indicator {
+      background: #10b981;
+      color: #ffffff;
+    }
+
+    .product-body {
+      padding: 12px 14px;
+    }
+
+    .product-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 4px;
+      color: #0f172a;
+    }
+
+    .product-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .hold-hint {
+      font-size: 12px;
+      color: #7c3aed;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .box-card {
+      background: var(--surface-soft);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .status-banner {
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: bold;
+      background: #eff6ff;
+      color: #1e3a8a;
+      border: 1px solid #bfdbfe;
+    }
+
+    .status-banner.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .status-banner.success {
+      background: #ecfdf5;
+      color: #065f46;
       border-color: #a7f3d0;
     }
 
-    .feed-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
+    .receipt-box {
+      background: linear-gradient(135deg, #f0fdf4, #eff6ff);
+      border: 2px dashed #10b981;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 14px;
     }
 
-    .feed-item {
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 12px;
-      background: #f8fafc;
-    }
-
-    .feed-top {
+    .sub-tabs {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
       gap: 8px;
-      margin-bottom: 6px;
-      font-size: 13px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
     }
 
-    .tag {
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 12px;
-      background: #ccfbf1;
-      color: #0f766e;
+    .sub-tab-btn {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
     }
 
-    .empty-msg {
-      text-align: center;
-      color: var(--muted);
-      padding: 20px;
-      font-size: 14px;
+    .sub-tab-btn.active {
+      background: linear-gradient(90deg, #7c3aed, #ec4899);
+      color: #ffffff;
+      border-color: transparent;
+    }
+
+    .thumb-preview {
+      max-width: 180px;
+      max-height: 140px;
+      border-radius: 10px;
+      margin-top: 8px;
+      display: none;
+      border: 1px solid #cbd5e1;
     }
   </style>
 </head>
 <body>
-  <div class="app-wrapper">
-    <div class="top-bar">
+  <!-- 1. شاشة البداية: عد تنازلي 30 ثانية بدون زر تخطي -->
+  <div id="splash-screen">
+    <div class="splash-card">
+      <div class="splash-badge">تطبيق انجز • ENGZ</div>
+      <h1 class="splash-title">مرحبا بك فى تطبيق انجز للخصومات واللمهام واللمكافأت</h1>
+      <div class="countdown-circle">
+        <div class="countdown-num" id="splash-seconds">30</div>
+        <div class="countdown-unit">ثانية</div>
+      </div>
+      <div class="progress-outer">
+        <div class="progress-inner" id="splash-progress-bar"></div>
+      </div>
+      <div class="progress-meta">
+        <span>جاري تجهيز التطبيق...</span>
+        <span id="splash-percent">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- التطبيق الرئيسي بعد انتهاء 30 ثانية -->
+  <div id="main-app">
+    <div class="top-header">
       <div>
-        <h1 class="brand-title" id="app-heading">Engz</h1>
-        <p class="brand-sub">إدارة الطلبات والمهام والنقاط لحظياً</p>
+        <h1 class="brand-name">انجز • ENGZ</h1>
+        <div id="active-user-summary" style="font-size:13px; opacity:0.95;">زائر</div>
       </div>
-      <div class="points-badge">
-        إجمالي النقاط: <span id="total-points">0</span> نقطة
-      </div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="orders" onclick="switchTab('orders')">الطلبات</button>
-      <button class="tab-btn" data-tab="tasks" onclick="switchTab('tasks')">المهام والنقاط</button>
-      <button class="tab-btn" data-tab="feed" onclick="switchTab('feed')">السجل المباشر</button>
-    </div>
-
-    <!-- تبويب الطلبات -->
-    <div id="panel-orders" class="panel active">
-      <div class="form-group">
-        <label for="order-customer">الاسم أو رقم الهاتف</label>
-        <input type="text" id="order-customer" placeholder="مثال: محمود - 010xxxxxxxx" />
-      </div>
-
-      <div class="form-group">
-        <label for="order-category">نوع الطلب</label>
-        <select id="order-category">
-          <option value="توصيل طلبات">توصيل طلبات</option>
-          <option value="مطعم وعروض">مطعم وعروض</option>
-          <option value="مشوار / خدمة">مشوار / خدمة</option>
-          <option value="استفسار أو حجز">استفسار أو حجز</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="order-details">تفاصيل الطلب والعنوان</label>
-        <textarea id="order-details" placeholder="اكتب تفاصيل الطلب ومكان التوصيل بدقة..."></textarea>
-      </div>
-
-      <div class="btn-row two-cols">
-        <button class="btn-primary" id="save-order-btn" onclick="saveOrder(false)">حفظ الطلب في النظام</button>
-        <button class="btn-secondary" onclick="saveOrder(true)">حفظ وإرسال عبر واتساب</button>
+      <div class="header-actions">
+        <div class="user-pill">رصيدي: <span id="user-wallet-display">0</span> جنيه</div>
+        <button class="cart-fab" id="cart-open-btn" onclick="openCartScreen()">
+          عربة التسوق <span class="cart-count" id="cart-count-badge">0</span>
+        </button>
       </div>
     </div>
 
-    <!-- تبويب المهام والنقاط -->
-    <div id="panel-tasks" class="panel">
-      <div class="form-group">
-        <label for="task-user">اسم العضو أو رقم التواصل</label>
-        <input type="text" id="task-user" placeholder="اكتب اسمك أو رقمك..." />
-      </div>
+    <div id="global-notice" class="status-banner" style="display:none;"></div>
 
-      <div class="form-group">
-        <label for="task-type">اختر المهمة المنجزة</label>
-        <select id="task-type">
-          <option value="مشاركة عرض أو منشور|10">مشاركة عرض أو منشور (+10 نقاط)</option>
-          <option value="إحالة عميل أو طلب جديد|25">إحالة عميل أو طلب جديد (+25 نقطة)</option>
-          <option value="تقييم أو ملاحظات خدمة|15">تقييم أو ملاحظات خدمة (+15 نقطة)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="task-proof">رابط أو وصف الإثبات</label>
-        <input type="text" id="task-proof" placeholder="مثال: تمت المشاركة في مجموعة كذا..." />
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-primary" id="save-task-btn" onclick="saveTask()">تسجيل المهمة وإضافة النقاط</button>
+    <!-- 2. صفحة الاختيار: عميل | تحدى -->
+    <div id="screen-choice" class="screen active">
+      <h2 class="screen-title">اختر مسارك داخل تطبيق انجز</h2>
+      <p class="screen-sub">يمكنك الدخول كعميل لطلب المنتجات والخدمات أو الدخول كمتسابق لتنفيذ التحديات.</p>
+      <div class="two-big-btns">
+        <button class="big-choice-btn btn-client" onclick="goScreen('screen-client-entry')">عميل</button>
+        <button class="big-choice-btn btn-challenge" onclick="goScreen('screen-challenger-entry')">تحدى</button>
       </div>
     </div>
 
-    <!-- تبويب السجل المباشر -->
-    <div id="panel-feed" class="panel">
-      <div class="feed-list" id="activity-feed">
-        <div class="empty-msg">جاري تحميل السجل من قاعدة البيانات...</div>
+    <!-- صفحة عميل: تسجيل | مشترك -->
+    <div id="screen-client-entry" class="screen">
+      <h2 class="screen-title">صفحة العميل</h2>
+      <p class="screen-sub">اختر تسجيل حساب جديد أو الدخول كمشترك مسجل من قبل.</p>
+      <div class="two-big-btns">
+        <button class="big-choice-btn btn-client" onclick="goScreen('screen-client-register')">تسجيل</button>
+        <button class="big-choice-btn btn-amber" onclick="goScreen('screen-client-subscriber')">مشترك</button>
+      </div>
+      <button class="btn-soft" onclick="goScreen('screen-choice')">رجوع لصفحة الاختيار</button>
+    </div>
+
+    <!-- صفحة تسجيل العميل -->
+    <div id="screen-client-register" class="screen">
+      <h2 class="screen-title">تسجيل عميل جديد</h2>
+      <p class="screen-sub">الاسم يجب أن يكون فريداً ورقم الموبايل يجب أن يكون رقماً مصرياً صحيحاً.</p>
+      <div class="form-group">
+        <label for="reg-client-name">الاسم (فريد غير مكرر)</label>
+        <input type="text" id="reg-client-name" placeholder="مثال: أحمد محمود" />
+      </div>
+      <div class="form-group">
+        <label for="reg-client-phone">رقم الموبايل (مصر - 11 رقم)</label>
+        <input type="tel" id="reg-client-phone" placeholder="مثال: 01012345678" maxlength="11" />
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-success" onclick="submitClientRegistration()">تأكيد</button>
+        <button class="btn-soft" onclick="goScreen('screen-client-entry')">رجوع</button>
       </div>
     </div>
 
-    <div id="status-message" class="alert">جاري الاتصال بقاعدة بيانات Firebase...</div>
+    <!-- صفحة المشتركين (عميل مسجل من قبل مع إمكانية ربط رقمي موبايل) -->
+    <div id="screen-client-subscriber" class="screen">
+      <h2 class="screen-title">دخول المشتركين (عميل)</h2>
+      <p class="screen-sub">اختر اسماً غير مكرر ورقم موبايل مصري صالح، ويمكن ربط الاسم برقمي موبايل.</p>
+      <div class="form-group">
+        <label for="sub-client-name">الاسم المسجل / غير المكرر</label>
+        <input type="text" id="sub-client-name" placeholder="اكتب اسمك..." />
+      </div>
+      <div class="form-group">
+        <label for="sub-client-phone1">رقم الموبايل الأساسي (مصر)</label>
+        <input type="tel" id="sub-client-phone1" placeholder="01xxxxxxxxx" maxlength="11" />
+      </div>
+      <div class="form-group">
+        <label for="sub-client-phone2">رقم موبايل إضافي مرتبط بالاسم (اختياري - مصر)</label>
+        <input type="tel" id="sub-client-phone2" placeholder="01xxxxxxxxx" maxlength="11" />
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-success" onclick="loginClientSubscriber()">تأكيد</button>
+        <button class="btn-soft" onclick="goScreen('screen-client-entry')">رجوع</button>
+      </div>
+    </div>
+
+    <!-- صفحة الطلبات والأقسام -->
+    <div id="screen-orders-home" class="screen">
+      <h2 class="screen-title">صفحة الطلبات والأقسام</h2>
+      <p class="screen-sub">اضغط على أي قسم لفتح منتجاته وعروضه، واضغط على أي صورة لمدة 3 ثوانٍ لتحديدها في عربة التسوق.</p>
+      <div id="departments-container" class="dept-grid"></div>
+      <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-amber" onclick="openCartScreen()">عرض عربة التسوق (<span class="cart-count-inline">0</span>)</button>
+        <button class="btn-soft" onclick="goScreen('screen-choice')">تغيير المسار</button>
+      </div>
+    </div>
+
+    <!-- صفحة القسم المقصود -->
+    <div id="screen-department-view" class="screen">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+        <h2 class="screen-title" id="current-dept-title" style="margin:0;">القسم</h2>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-amber" onclick="openCartScreen()">عربة التسوق (<span class="cart-count-inline">0</span>)</button>
+          <button class="btn-soft" onclick="goScreen('screen-orders-home')">كل الأقسام</button>
+        </div>
+      </div>
+      <p class="screen-sub">اضغط مطولاً على أي صورة لمدة <strong>3 ثوانٍ</strong> لتحديدها أو إلغاء تحديدها.</p>
+      <div id="dept-items-container" class="items-grid"></div>
+    </div>
+
+    <!-- صفحة عربة التسوق -->
+    <div id="screen-cart" class="screen">
+      <h2 class="screen-title">عربة التسوق</h2>
+      <p class="screen-sub">الأصناف والعروض والخدمات المحددة من مختلف الأقسام.</p>
+      <div id="cart-items-list"></div>
+      <div id="cart-total-box" class="box-card" style="font-size:18px; font-weight:bold; color:#0f172a;">
+        الإجمالي: 0 جنيه
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-success" onclick="goToCheckoutConfirmation()">تأكيد</button>
+        <button class="btn-soft" onclick="goScreen('screen-orders-home')">عودة</button>
+      </div>
+    </div>
+
+    <!-- صفحة تأكيد الشراء وظهور الأصناف والأسعار كجزء من الصورة -->
+    <div id="screen-confirm-purchase" class="screen">
+      <h2 class="screen-title">تأكيد الشراء</h2>
+      <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى طرق الدفع.</p>
+      <div id="confirm-cards-grid" class="items-grid"></div>
+      <div id="confirm-total-line" class="box-card" style="margin-top:14px; font-size:18px; font-weight:bold;"></div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-success" onclick="openPaymentMethodsScreen()">تأكيد</button>
+        <button class="btn-soft" onclick="openCartScreen()">عودة</button>
+      </div>
+    </div>
+
+    <!-- صفحة طرق الدفع -->
+    <div id="screen-payment" class="screen">
+      <h2 class="screen-title">صفحة طرق الدفع (كاش)</h2>
+      <p class="screen-sub">اختر أحد أرقام استقبال الكاش المتاحة ثم حدد طريقة الدفع.</p>
+      <div id="payment-amount-banner" class="status-banner"></div>
+      <div class="form-group">
+        <label>اختر رقم الكاش المراد التحويل إليه</label>
+        <div id="admin-cash-phones-list"></div>
+      </div>
+
+      <div id="same-or-other-box" class="box-card" style="display:none;">
+        <p style="font-weight:bold; margin-top:0;">اختر طريقة الدفع:</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-success" onclick="handlePayFromSameNumber()">الدفع من نفس الرقم</button>
+          <button class="btn-amber" onclick="showOtherNumberReceiptBox()">الدفع من رقم اخر</button>
+        </div>
+      </div>
+
+      <div id="other-number-receipt-box" class="box-card" style="display:none;">
+        <label>التقط صورة الإيصال بالكاميرا أو اخترها من الاستوديو</label>
+        <input type="file" id="receipt-file-input" accept="image/*" capture="environment" onchange="previewCompressedImage(this, 'receipt-preview', 'receipt')" />
+        <img id="receipt-preview" class="thumb-preview" alt="معاينة الإيصال" />
+        <div style="margin-top:12px;">
+          <button class="btn-success" onclick="submitOtherNumberReceipt()">إرسال الإيصال وتأكيد الطلب</button>
+        </div>
+      </div>
+
+      <div id="payment-result-box"></div>
+    </div>
+
+    <!-- صفحة تسجيل المتسابق: تسجيل | مشترك -->
+    <div id="screen-challenger-entry" class="screen">
+      <h2 class="screen-title">صفحة المتسابق (تحدى)</h2>
+      <p class="screen-sub">اختر تسجيل كمتسابق جديد أو الدخول كمتسابق مشترك.</p>
+      <div class="two-big-btns">
+        <button class="big-choice-btn btn-challenge" onclick="goScreen('screen-challenger-register')">تسجيل</button>
+        <button class="big-choice-btn btn-amber" onclick="goScreen('screen-challenger-subscriber')">مشترك</button>
+      </div>
+      <button class="btn-soft" onclick="goScreen('screen-choice')">رجوع لصفحة الاختيار</button>
+    </div>
+
+    <!-- صفحة تسجيل متسابق جديد -->
+    <div id="screen-challenger-register" class="screen">
+      <h2 class="screen-title">تسجيل متسابق جديد</h2>
+      <div class="form-group">
+        <label for="reg-chal-name">اسم مقدم الطلب (فريد)</label>
+        <input type="text" id="reg-chal-name" placeholder="مثال: كريم حسن" />
+      </div>
+      <div class="form-group">
+        <label for="reg-chal-phone">رقم الموبايل (مصر - 11 رقم)</label>
+        <input type="tel" id="reg-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-success" onclick="submitChallengerRegistration()">تأكيد</button>
+        <button class="btn-soft" onclick="goScreen('screen-challenger-entry')">رجوع</button>
+      </div>
+    </div>
+
+    <!-- صفحة دخول متسابق مشترك -->
+    <div id="screen-challenger-subscriber" class="screen">
+      <h2 class="screen-title">دخول متسابق مشترك</h2>
+      <div class="form-group">
+        <label for="sub-chal-name">اسم المتسابق</label>
+        <input type="text" id="sub-chal-name" placeholder="اكتب اسمك..." />
+      </div>
+      <div class="form-group">
+        <label for="sub-chal-phone">رقم الموبايل (مصر - 11 رقم)</label>
+        <input type="tel" id="sub-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-success" onclick="loginChallengerSubscriber()">تأكيد</button>
+        <button class="btn-soft" onclick="goScreen('screen-challenger-entry')">رجوع</button>
+      </div>
+    </div>
+
+    <!-- صفحة التحديات والطلبات النشطة والهدايا والوصولات للمتسابق -->
+    <div id="screen-challenges-hub" class="screen">
+      <h2 class="screen-title">صفحة التحديات</h2>
+      <p class="screen-sub">يمكنك اختيار مهمة واحدة نشطة في كل مرة حتى يتم تأكيد انتهائها.</p>
+
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active" id="stab-available" onclick="switchChallengerSubTab('available')">قائمة التحديات</button>
+        <button class="sub-tab-btn" id="stab-active" onclick="switchChallengerSubTab('active')">الطلبات النشطة</button>
+        <button class="sub-tab-btn" id="stab-rewards" onclick="switchChallengerSubTab('rewards')">الهدايا والوصولات</button>
+      </div>
+
+      <div id="chal-panel-available">
+        <div id="available-challenges-list"></div>
+      </div>
+
+      <div id="chal-panel-active" style="display:none;">
+        <div id="active-challenger-order-box"></div>
+      </div>
+
+      <div id="chal-panel-rewards" style="display:none;">
+        <div id="user-gifts-and-receipts-box"></div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button class="btn-soft" onclick="goScreen('screen-choice')">تغيير المسار</button>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -314,205 +786,870 @@
     import {
       getDatabase,
       ref,
+      set,
       push,
       onValue,
-      serverTimestamp
+      update,
+      runTransaction
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // إعدادات التطبيق الرئيسية (عدّلها في أي وقت)
-    const APP_CONFIG = {
-      appName: "Engz",
-      whatsappNumber: "", // مثال: "2010xxxxxxxx" (بدون علامة +)
-      databaseURL: "https://engz-2567e-default-rtdb.firebaseio.com"
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
+      authDomain: "engz-2567e.firebaseapp.com",
+      databaseURL: "https://engz-2567e-default-rtdb.firebaseio.com",
+      projectId: "engz-2567e",
+      storageBucket: "engz-2567e.firebasestorage.app",
+      messagingSenderId: "933265018725",
+      appId: "1:933265018725:web:279ba4bfb56489b895db8c",
+      measurementId: "G-RB49T4CWT3"
     };
 
-    document.title = APP_CONFIG.appName;
-    document.getElementById("app-heading").textContent = APP_CONFIG.appName;
-
-    const app = initializeApp({ databaseURL: APP_CONFIG.databaseURL });
+    const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const statusEl = document.getElementById("status-message");
-    const feedEl = document.getElementById("activity-feed");
-    const pointsEl = document.getElementById("total-points");
+    const DEFAULT_DEPARTMENTS = [
+      "كتابة وتلخيص",
+      "مطعم",
+      "سوبرمركت",
+      "خضار وفاكهه",
+      "توصيل عملاء",
+      "توصيل اغراض",
+      "خدمات الشراء والبيع"
+    ];
 
-    function setStatus(msg, isOk = false) {
-      statusEl.textContent = msg;
-      statusEl.className = isOk ? "alert ok" : "alert";
-    }
+    // عد تنازلي 30 ثانية بدون زر تخطي
+    (function runSplash30Sec() {
+      const totalSec = 30;
+      let remaining = totalSec;
+      const secEl = document.getElementById("splash-seconds");
+      const barEl = document.getElementById("splash-progress-bar");
+      const pctEl = document.getElementById("splash-percent");
 
-    window.switchTab = function (tabName) {
-      document.querySelectorAll(".tab-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.tab === tabName);
-      });
-      document.querySelectorAll(".panel").forEach((panel) => {
-        panel.classList.remove("active");
-      });
-      document.getElementById("panel-" + tabName).classList.add("active");
-    };
+      const timer = setInterval(() => {
+        remaining -= 1;
+        const clamped = Math.max(0, remaining);
+        const progress = Math.round(((totalSec - clamped) / totalSec) * 100);
 
-    window.saveOrder = async function (openWhatsApp) {
-      const customer = document.getElementById("order-customer").value.trim();
-      const category = document.getElementById("order-category").value;
-      const details = document.getElementById("order-details").value.trim();
-      const btn = document.getElementById("save-order-btn");
+        secEl.textContent = String(clamped);
+        barEl.style.width = progress + "%";
+        pctEl.textContent = progress + "%";
 
-      if (!customer || !details) {
-        setStatus("من فضلك أدخل الاسم أو رقم الهاتف وتفاصيل الطلب أولاً.");
-        return;
-      }
-
-      btn.disabled = true;
-      setStatus("جاري حفظ الطلب في قاعدة البيانات...");
-
-      const payload = {
-        kind: "order",
-        appName: APP_CONFIG.appName,
-        customer,
-        category,
-        details,
-        status: "جديد",
-        createdAt: serverTimestamp()
-      };
-
-      try {
-        await push(ref(db, "orders"), payload);
-        setStatus("تم حفظ الطلب بنجاح في قاعدة البيانات.", true);
-
-        if (openWhatsApp) {
-          const text = encodeURIComponent(
-            `*طلب جديد عبر ${APP_CONFIG.appName}*\n` +
-            `العميل: ${customer}\n` +
-            `النوع: ${category}\n` +
-            `التفاصيل: ${details}`
-          );
-          const url = APP_CONFIG.whatsappNumber
-            ? `https://wa.me/${APP_CONFIG.whatsappNumber}?text=${text}`
-            : `https://wa.me/?text=${text}`;
-          window.open(url, "_blank");
+        if (clamped <= 0) {
+          clearInterval(timer);
+          document.getElementById("splash-screen").style.display = "none";
+          document.getElementById("main-app").style.display = "block";
         }
+      }, 1000);
+    })();
 
-        document.getElementById("order-details").value = "";
-      } catch (err) {
-        setStatus("تعذر حفظ الطلب: " + err.message);
-      } finally {
-        btn.disabled = false;
+    // حالة التطبيق المحلية والبيانات اللحظية
+    const state = {
+      currentRole: null, // 'client' | 'challenger'
+      currentUser: null, // { id, name, phone, phone2, role, wallet, status }
+      selectedDept: null,
+      cart: [], // [{ uid, dept, title, price, isOffer, image }]
+      selectedCashPhone: null,
+      uploadedImages: { receipt: "", deliveryProof: "" },
+      db: {
+        users: {},
+        banned: {},
+        clientRegRequests: {},
+        challengerRegRequests: {},
+        departments: [],
+        products: {},
+        cashPhones: [],
+        orders: {},
+        challenges: {},
+        challengersList: {},
+        gifts: {},
+        receipts: {}
       }
     };
 
-    window.saveTask = async function () {
-      const user = document.getElementById("task-user").value.trim();
-      const rawTask = document.getElementById("task-type").value;
-      const proof = document.getElementById("task-proof").value.trim();
-      const btn = document.getElementById("save-task-btn");
-
-      if (!user || !proof) {
-        setStatus("من فضلك أدخل اسم العضو ووصف أو رابط الإثبات.");
-        return;
-      }
-
-      const [taskTitle, pointsStr] = rawTask.split("|");
-      const points = Number(pointsStr) || 0;
-
-      btn.disabled = true;
-      setStatus("جاري تسجيل المهمة وحساب النقاط...");
-
-      try {
-        await push(ref(db, "tasks"), {
-          kind: "task",
-          appName: APP_CONFIG.appName,
-          user,
-          taskTitle,
-          points,
-          proof,
-          createdAt: serverTimestamp()
-        });
-
-        document.getElementById("task-proof").value = "";
-        setStatus(`تم تسجيل المهمة وإضافة ${points} نقطة بنجاح.`, true);
-      } catch (err) {
-        setStatus("تعذر تسجيل المهمة: " + err.message);
-      } finally {
-        btn.disabled = false;
-      }
-    };
-
-    let latestOrders = [];
-    let latestTasks = [];
-
-    function renderFeed() {
-      let totalPoints = 0;
-      const combined = [];
-
-      latestOrders.forEach((item) => {
-        combined.push({
-          sortTime: item.createdAt || 0,
-          badge: item.category || "طلب",
-          title: item.customer || "مستخدم",
-          body: item.details || ""
-        });
-      });
-
-      latestTasks.forEach((item) => {
-        const pts = Number(item.points) || 0;
-        totalPoints += pts;
-        combined.push({
-          sortTime: item.createdAt || 0,
-          badge: `مهمة (+${pts} نقطة)`,
-          title: item.user || "عضو",
-          body: `${item.taskTitle || ""} — ${item.proof || ""}`
-        });
-      });
-
-      pointsEl.textContent = String(totalPoints);
-      combined.sort((a, b) => b.sortTime - a.sortTime);
-
-      if (combined.length === 0) {
-        feedEl.innerHTML = '<div class="empty-msg">لا توجد طلبات أو مهام مسجلة حتى الآن.</div>';
-        return;
-      }
-
-      feedEl.innerHTML = combined
-        .slice(0, 25)
-        .map(
-          (row) => `
-          <div class="feed-item">
-            <div class="feed-top">
-              <strong>${escapeHtml(row.title)}</strong>
-              <span class="tag">${escapeHtml(row.badge)}</span>
-            </div>
-            <div>${escapeHtml(row.body)}</div>
-          </div>
-        `
-        )
-        .join("");
+    function notify(msg, type = "info") {
+      const el = document.getElementById("global-notice");
+      el.style.display = "block";
+      el.className = "status-banner" + (type === "error" ? " error" : type === "success" ? " success" : "");
+      el.textContent = msg;
     }
 
-    function escapeHtml(str) {
-      return String(str)
+    function isValidEgyptianPhone(phone) {
+      return /^01[0125][0-9]{8}$/.test(String(phone || "").trim());
+    }
+
+    function esc(v) {
+      return String(v ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
     }
 
-    onValue(
-      ref(db, "orders"),
-      (snap) => {
-        const val = snap.val() || {};
-        latestOrders = Object.values(val);
-        setStatus("متصل بقاعدة البيانات بنجاح.", true);
-        renderFeed();
-      },
-      (err) => {
-        setStatus("خطأ في قراءة قاعدة البيانات: " + err.message);
-      }
-    );
+    window.goScreen = function (screenId) {
+      document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add("active");
+      if (screenId === "screen-orders-home") renderDepartments();
+      if (screenId === "screen-challenges-hub") renderChallengesHub();
+      if (screenId === "screen-payment") renderPaymentScreen();
+    };
 
-    onValue(ref(db, "tasks"), (snap) => {
-      const val = snap.val() || {};
-      latestTasks = Object.values(val);
-      renderFeed();
+    function syncUserHeader() {
+      const summary = document.getElementById("active-user-summary");
+      const walletEl = document.getElementById("user-wallet-display");
+      if (!state.currentUser) {
+        summary.textContent = state.currentRole === "challenger" ? "مسار التحدي" : "مسار العميل";
+        walletEl.textContent = "0";
+        return;
+      }
+      const latest = state.db.users[state.currentUser.id] || state.currentUser;
+      state.currentUser = { ...state.currentUser, ...latest };
+      const roleLabel = state.currentUser.role === "challenger" ? "متسابق مشترك" : "عميل";
+      summary.textContent = `${state.currentUser.name} (${roleLabel}) • ${state.currentUser.phone}`;
+      walletEl.textContent = String(Number(state.currentUser.wallet || 0));
+    }
+
+    function isNameTaken(name) {
+      const clean = name.trim().toLowerCase();
+      const inUsers = Object.values(state.db.users).some((u) => (u.name || "").trim().toLowerCase() === clean);
+      const inClientReq = Object.values(state.db.clientRegRequests).some((r) => (r.name || "").trim().toLowerCase() === clean);
+      const inChalReq = Object.values(state.db.challengerRegRequests).some((r) => (r.name || "").trim().toLowerCase() === clean);
+      return inUsers || inClientReq || inChalReq;
+    }
+
+    function isBanned(name, phone) {
+      return Object.values(state.db.banned).some(
+        (b) => (b.phone && b.phone === phone) || (b.name && b.name.trim().toLowerCase() === name.trim().toLowerCase())
+      );
+    }
+
+    // تسجيل عميل جديد -> يذهب لصفحة طلبات التسجيل في الأدمن
+    window.submitClientRegistration = async function () {
+      const name = document.getElementById("reg-client-name").value.trim();
+      const phone = document.getElementById("reg-client-phone").value.trim();
+
+      if (!name) return notify("من فضلك أدخل الاسم.", "error");
+      if (!isValidEgyptianPhone(phone)) return notify("رقم الموبايل يجب أن يكون رقماً مصرياً صحيحاً مكوناً من 11 رقماً (يبدأ بـ 010 أو 011 أو 012 أو 015).", "error");
+      if (isBanned(name, phone)) return notify("عذراً، هذه البيانات محظورة من الدخول.", "error");
+      if (isNameTaken(name)) return notify("هذا الاسم مستخدم بالفعل، اختر اسماً فريداً غير مكرر.", "error");
+
+      await push(ref(db, "clientRegRequests"), {
+        name,
+        phone,
+        role: "client",
+        status: "pending",
+        createdAt: Date.now()
+      });
+
+      document.getElementById("reg-client-name").value = "";
+      document.getElementById("reg-client-phone").value = "";
+      notify("تم إرسال طلب تسجيلك إلى صفحة طلبات التسجيل لدى الإدارة بنجاح.", "success");
+    };
+
+    // دخول مشترك (عميل مسجل من قبل أو اختيار اسم غير مكرر + ربط رقمي موبايل)
+    window.loginClientSubscriber = async function () {
+      const name = document.getElementById("sub-client-name").value.trim();
+      const phone1 = document.getElementById("sub-client-phone1").value.trim();
+      const phone2 = document.getElementById("sub-client-phone2").value.trim();
+
+      if (!name || !isValidEgyptianPhone(phone1)) {
+        return notify("أدخل اسماً ورقم موبايل مصرياً صحيحاً.", "error");
+      }
+      if (phone2 && !isValidEgyptianPhone(phone2)) {
+        return notify("الرقم الإضافي الثاني غير صالح للعمل في مصر.", "error");
+      }
+      if (isBanned(name, phone1) || (phone2 && isBanned(name, phone2))) {
+        return notify("عذراً، هذا الحساب محظور ولا يمكنه الدخول.", "error");
+      }
+
+      const existingEntry = Object.entries(state.db.users).find(
+        ([, u]) => (u.name || "").trim().toLowerCase() === name.toLowerCase()
+      );
+
+      if (existingEntry) {
+        const [uid, uData] = existingEntry;
+        if (uData.status === "rejected") {
+          return notify("تم رفض طلبك من الإدارة.", "error");
+        }
+        await update(ref(db, `users/${uid}`), {
+          phone: phone1,
+          phone2: phone2 || uData.phone2 || "",
+          lastLogin: Date.now()
+        });
+        state.currentUser = { id: uid, ...uData, phone: phone1, phone2: phone2 || uData.phone2 || "" };
+        state.currentRole = "client";
+        syncUserHeader();
+        goScreen("screen-orders-home");
+        return;
+      }
+
+      // اسم جديد غير مكرر مباشرة للمشترك
+      const newRef = push(ref(db, "users"));
+      const newUser = {
+        name,
+        phone: phone1,
+        phone2: phone2 || "",
+        role: "client",
+        status: "approved",
+        wallet: 0,
+        createdAt: Date.now()
+      };
+      await set(newRef, newUser);
+      state.currentUser = { id: newRef.key, ...newUser };
+      state.currentRole = "client";
+      syncUserHeader();
+      notify("تم تسجيل الدخول كمشترك بنجاح.", "success");
+      goScreen("screen-orders-home");
+    };
+
+    // تسجيل متسابق جديد -> يذهب لصفحة طلبات تسجيل المتسابقين في الأدمن
+    window.submitChallengerRegistration = async function () {
+      const name = document.getElementById("reg-chal-name").value.trim();
+      const phone = document.getElementById("reg-chal-phone").value.trim();
+
+      if (!name || !isValidEgyptianPhone(phone)) {
+        return notify("أدخل اسم مقدم الطلب ورقم موبايل مصري صحيح (11 رقماً).", "error");
+      }
+      if (isBanned(name, phone)) return notify("عذراً، هذه البيانات محظورة.", "error");
+      if (isNameTaken(name)) return notify("هذا الاسم مسجل بالفعل، اختر اسماً فريداً.", "error");
+
+      await push(ref(db, "challengerRegRequests"), {
+        name,
+        phone,
+        role: "challenger",
+        status: "pending",
+        createdAt: Date.now()
+      });
+
+      document.getElementById("reg-chal-name").value = "";
+      document.getElementById("reg-chal-phone").value = "";
+      notify("تم إرسال طلب تسجيل المتسابق إلى صفحة طلبات التسجيل في لوحة الإدارة.", "success");
+    };
+
+    // دخول متسابق مشترك
+    window.loginChallengerSubscriber = async function () {
+      const name = document.getElementById("sub-chal-name").value.trim();
+      const phone = document.getElementById("sub-chal-phone").value.trim();
+
+      if (!name || !isValidEgyptianPhone(phone)) {
+        return notify("أدخل اسم المتسابق ورقم موبايل مصري صحيح.", "error");
+      }
+      if (isBanned(name, phone)) {
+        return notify("عذراً، هذا الحساب محظور ولا يمكنه الدخول.", "error");
+      }
+
+      const found = Object.entries(state.db.users).find(
+        ([, u]) => (u.name || "").trim().toLowerCase() === name.toLowerCase()
+      );
+
+      if (!found) {
+        return notify("لم يتم العثور على حساب متسابق بهذا الاسم. يمكنك إرسال طلب تسجيل أولاً.", "error");
+      }
+
+      const [uid, uData] = found;
+      if (uData.status === "rejected") {
+        return notify("تم رفض طلبك", "error");
+      }
+      if (uData.status === "waiting") {
+        return notify("طلبك حالياً في قائمة الانتظار لدى الإدارة.", "info");
+      }
+      if (uData.role !== "challenger") {
+        return notify("هذا الحساب مسجل كعميل وليس متسابقاً.", "error");
+      }
+
+      state.currentUser = { id: uid, ...uData, phone };
+      state.currentRole = "challenger";
+      syncUserHeader();
+      goScreen("screen-challenges-hub");
+    };
+
+    // عرض الأقسام
+    function getAllDepartments() {
+      const extra = Array.isArray(state.db.departments) ? state.db.departments : [];
+      return [...new Set([...DEFAULT_DEPARTMENTS, ...extra])];
+    }
+
+    function renderDepartments() {
+      const container = document.getElementById("departments-container");
+      const depts = getAllDepartments();
+      container.innerHTML = depts
+        .map(
+          (d) => `<div class="dept-card" onclick="openDepartment('${esc(d)}')">${esc(d)}</div>`
+        )
+        .join("");
+    }
+
+    // ضغط 3 ثوانٍ لتحديد / إلغاء تحديد الصورة
+    const holdTimers = {};
+    window.startLongPress3Sec = function (itemKey, itemPayload) {
+      clearTimeout(holdTimers[itemKey]);
+      holdTimers[itemKey] = setTimeout(() => {
+        toggleCartSelection(itemPayload);
+      }, 3000);
+    };
+
+    window.cancelLongPress3Sec = function (itemKey) {
+      clearTimeout(holdTimers[itemKey]);
+    };
+
+    function toggleCartSelection(itemPayload) {
+      const idx = state.cart.findIndex((c) => c.uid === itemPayload.uid);
+      if (idx >= 0) {
+        state.cart.splice(idx, 1);
+        notify(`تم إلغاء تحديد: ${itemPayload.title}`, "info");
+      } else {
+        state.cart.push(itemPayload);
+        notify(`تمت إضافة (${itemPayload.title}) إلى عربة التسوق`, "success");
+      }
+      updateCartBadges();
+      if (state.selectedDept) renderDepartmentItems(state.selectedDept);
+    }
+
+    function updateCartBadges() {
+      const count = String(state.cart.length);
+      document.getElementById("cart-count-badge").textContent = count;
+      document.querySelectorAll(".cart-count-inline").forEach((el) => (el.textContent = count));
+    }
+
+    window.openDepartment = function (deptName) {
+      state.selectedDept = deptName;
+      document.getElementById("current-dept-title").textContent = deptName;
+      renderDepartmentItems(deptName);
+      goScreen("screen-department-view");
+    };
+
+    function renderDepartmentItems(deptName) {
+      const container = document.getElementById("dept-items-container");
+      const deptObj = state.db.products[deptName] || {};
+      const entries = Object.entries(deptObj);
+
+      if (!entries.length) {
+        container.innerHTML = `<div class="box-card">لا توجد سلع أو عروض مضافة في قسم (${esc(deptName)}) حالياً.</div>`;
+        return;
+      }
+
+      container.innerHTML = entries
+        .map(([id, item]) => {
+          const uid = `${deptName}__${id}`;
+          const isSelected = state.cart.some((c) => c.uid === uid);
+          const priceNum = Number(item.price) || 0;
+          const payloadStr = encodeURIComponent(
+            JSON.stringify({
+              uid,
+              dept: deptName,
+              title: item.title || "صنف",
+              price: priceNum,
+              isOffer: Boolean(item.isOffer),
+              image: item.image || ""
+            })
+          );
+
+          return `
+            <div class="product-card ${isSelected ? "selected" : ""}"
+                 onpointerdown="startLongPress3Sec('${esc(uid)}', JSON.parse(decodeURIComponent('${payloadStr}')))"
+                 onpointerup="cancelLongPress3Sec('${esc(uid)}')"
+                 onpointerleave="cancelLongPress3Sec('${esc(uid)}')">
+              <div class="product-img-wrap">
+                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" />` : ""}
+                ${item.isOffer ? `<div class="offer-ribbon">عرض خاص</div>` : ""}
+                <div class="select-indicator">${isSelected ? "محدد ✓" : "اضغط 3 ثوانٍ"}</div>
+                <div class="price-overlay">${priceNum} جنيه</div>
+              </div>
+              <div class="product-body">
+                <h3 class="product-title">${esc(item.title)}</h3>
+                ${item.desc ? `<p class="product-desc">${esc(item.desc)}</p>` : ""}
+                <div class="hold-hint">ضغط 3 ثوانٍ للتحديد / ضغطة أخرى للإلغاء</div>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    window.openCartScreen = function () {
+      const listEl = document.getElementById("cart-items-list");
+      const totalBox = document.getElementById("cart-total-box");
+
+      if (!state.cart.length) {
+        listEl.innerHTML = `<div class="box-card">عربة التسوق فارغة حالياً. حدد أي صنف بضغطة 3 ثوانٍ.</div>`;
+        totalBox.textContent = "الإجمالي: 0 جنيه";
+        goScreen("screen-cart");
+        return;
+      }
+
+      let total = 0;
+      listEl.innerHTML = state.cart
+        .map((item) => {
+          total += Number(item.price) || 0;
+          return `
+            <div class="box-card" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+              <div>
+                <strong>${esc(item.title)}</strong> <span style="font-size:12px; color:#64748b;">(${esc(item.dept)})</span><br/>
+                <span style="color:#be185d; font-weight:bold;">${Number(item.price) || 0} جنيه</span>
+              </div>
+              <button class="btn-soft" onclick="removeFromCart('${esc(item.uid)}')">إزالة</button>
+            </div>
+          `;
+        })
+        .join("");
+
+      totalBox.textContent = `الإجمالي: ${total} جنيه`;
+      goScreen("screen-cart");
+    };
+
+    window.removeFromCart = function (uid) {
+      state.cart = state.cart.filter((i) => i.uid !== uid);
+      updateCartBadges();
+      openCartScreen();
+    };
+
+    window.goToCheckoutConfirmation = function () {
+      if (!state.cart.length) {
+        return notify("اختر صنفاً واحداً على الأقل قبل التأكيد.", "error");
+      }
+      const grid = document.getElementById("confirm-cards-grid");
+      let total = 0;
+      grid.innerHTML = state.cart
+        .map((item) => {
+          total += Number(item.price) || 0;
+          return `
+            <div class="product-card selected">
+              <div class="product-img-wrap">
+                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" />` : ""}
+                <div class="price-overlay">${Number(item.price) || 0} جنيه</div>
+              </div>
+              <div class="product-body">
+                <h3 class="product-title">${esc(item.title)}</h3>
+                <p class="product-desc">${esc(item.dept)}</p>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      document.getElementById("confirm-total-line").textContent = `إجمالي المشتريات: ${total} جنيه`;
+      goScreen("screen-confirm-purchase");
+    };
+
+    function getCartTotal() {
+      return state.cart.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+    }
+
+    window.openPaymentMethodsScreen = function () {
+      goScreen("screen-payment");
+    };
+
+    function renderPaymentScreen() {
+      const total = getCartTotal();
+      document.getElementById("payment-amount-banner").textContent = `المبلغ المطلوب دفعه: ${total} جنيه`;
+      const listEl = document.getElementById("admin-cash-phones-list");
+      const phones = Array.isArray(state.db.cashPhones) ? state.db.cashPhones.slice(0, 5) : [];
+
+      if (!phones.length) {
+        listEl.innerHTML = `<div class="box-card">لم يتم تحديد أرقام كاش من الإدارة بعد.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = phones
+        .map(
+          (ph) => `
+          <div class="box-card" style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>${esc(ph)}</strong>
+            <button class="btn-dark" onclick="selectCashReceiver('${esc(ph)}')">اختيار هذا الرقم</button>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    window.selectCashReceiver = function (phone) {
+      state.selectedCashPhone = phone;
+      document.getElementById("same-or-other-box").style.display = "block";
+      document.getElementById("other-number-receipt-box").style.display = "none";
+      notify(`تم اختيار رقم الاستقبال: ${phone}. اختر الآن الدفع من نفس الرقم أو من رقم اخر.`, "info");
+    };
+
+    window.showOtherNumberReceiptBox = function () {
+      document.getElementById("other-number-receipt-box").style.display = "block";
+    };
+
+    // ضغط الصورة تلقائياً في المتصفح وتخزينها في قاعدة البيانات
+    window.previewCompressedImage = function (inputEl, previewImgId, key) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement("canvas");
+          const maxDim = 640;
+          let w = img.width;
+          let h = img.height;
+          if (w > h && w > maxDim) {
+            h = (h * maxDim) / w;
+            w = maxDim;
+          } else if (h > maxDim) {
+            w = (w * maxDim) / h;
+            h = maxDim;
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.65);
+          state.uploadedImages[key] = compressedDataUrl;
+
+          const prev = document.getElementById(previewImgId);
+          if (prev) {
+            prev.src = compressedDataUrl;
+            prev.style.display = "block";
+          }
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    async function createOrderRecord(paymentMethod, receiptImage) {
+      const total = getCartTotal();
+      const buyer = state.currentUser || {
+        id: "guest_" + Date.now(),
+        name: "عميل سريع",
+        phone: "01000000000",
+        role: "client"
+      };
+
+      const orderRef = push(ref(db, "orders"));
+      const orderData = {
+        id: orderRef.key,
+        buyerId: buyer.id,
+        buyerName: buyer.name,
+        buyerPhone: buyer.phone,
+        items: state.cart,
+        totalAmount: total,
+        cashReceiverPhone: state.selectedCashPhone || "",
+        paymentMethod,
+        receiptImage: receiptImage || "",
+        status: "جاري تنفيذ طلبك",
+        createdAt: Date.now()
+      };
+      await set(orderRef, orderData);
+
+      await push(ref(db, "receipts"), {
+        type: "وصل دفع واستلام",
+        userId: buyer.id,
+        userName: buyer.name,
+        phone: buyer.phone,
+        receiverPhone: state.selectedCashPhone || "",
+        amount: total,
+        method: paymentMethod,
+        receiptImage: receiptImage || "",
+        createdAt: Date.now()
+      });
+
+      state.cart = [];
+      updateCartBadges();
+      state.uploadedImages.receipt = "";
+
+      document.getElementById("payment-result-box").innerHTML = `
+        <div class="receipt-box">
+          <h3 style="margin-top:0; color:#065f46;">جارى تنفيذ طلبك</h3>
+          <p>تم تسجيل عملية الدفع وإصدار وصل الدفع والاستلام بقيمة <strong>${total} جنيه</strong>.</p>
+          <button class="btn-dark" onclick="goScreen('screen-orders-home')">عودة إلى الأقسام</button>
+        </div>
+      `;
+    }
+
+    // الدفع من نفس الرقم -> خصم تلقائي من رصيد العميل ووصول المبلغ لرقم الأدمن
+    window.handlePayFromSameNumber = async function () {
+      const total = getCartTotal();
+      if (!state.currentUser || !state.currentUser.id) {
+        return notify("سجل اسمك ورقمك أولاً لإتمام الدفع من نفس الرقم.", "error");
+      }
+
+      const userRef = ref(db, `users/${state.currentUser.id}/wallet`);
+      let paid = false;
+      await runTransaction(userRef, (currentBal) => {
+        const bal = Number(currentBal) || 0;
+        if (bal < total) {
+          return; // إلغاء المعاملة لعدم كفاية الرصيد
+        }
+        paid = true;
+        return bal - total;
+      });
+
+      if (!paid) {
+        return notify(`رصيدك الحالي غير كافٍ لإتمام عملية الدفع (${total} جنيه).`, "error");
+      }
+
+      await createOrderRecord("الدفع من نفس الرقم", "");
+      notify("تم خصم قيمة المشتريات تلقائياً من حسابك وتحويلها إلى الرقم المحدد.", "success");
+    };
+
+    window.submitOtherNumberReceipt = async function () {
+      if (!state.uploadedImages.receipt) {
+        return notify("من فضلك التقط صورة الإيصال أو اخترها من الاستوديو أولاً.", "error");
+      }
+      await createOrderRecord("الدفع من رقم اخر (إيصال مرفق)", state.uploadedImages.receipt);
+      notify("تم إرسال صورة الإيصال وتسجيل طلبك.", "success");
+    };
+
+    // صفحة التحديات للمتسابق
+    window.switchChallengerSubTab = function (tab) {
+      ["available", "active", "rewards"].forEach((t) => {
+        document.getElementById(`stab-${t}`).classList.toggle("active", t === tab);
+        document.getElementById(`chal-panel-${t}`).style.display = t === tab ? "block" : "none";
+      });
+      renderChallengesHub();
+    };
+
+    function renderChallengesHub() {
+      const chalId = state.currentUser ? state.currentUser.id : "";
+      const allOrders = Object.entries(state.db.orders || {}).map(([id, o]) => ({ id, ...o }));
+      const myActiveOrder = allOrders.find((o) => o.assignedChallengerId === chalId && o.stage === "active");
+
+      // قائمة التحديات (تختفي المهمة بعد قبولها، ويمكن للمتسابق اختيار مهمة واحدة فقط حتى تنتهي)
+      const availEl = document.getElementById("available-challenges-list");
+      const challenges = Object.entries(state.db.challenges || {})
+        .map(([id, c]) => ({ id, ...c }))
+        .filter((c) => !c.acceptedBy);
+
+      if (!challenges.length) {
+        availEl.innerHTML = `<div class="box-card">لا توجد تحديات متاحة حالياً.</div>`;
+      } else {
+        availEl.innerHTML = challenges
+          .map(
+            (c) => `
+            <div class="box-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>${esc(c.title)}</strong>
+                <span style="color:#059669; font-weight:bold;">مكافأة: ${Number(c.reward) || 0} جنيه</span>
+              </div>
+              <p style="margin:6px 0 10px;">${esc(c.details)}</p>
+              <button class="btn-success" ${myActiveOrder ? "disabled" : ""} onclick="acceptChallenge('${esc(c.id)}')">
+                ${myActiveOrder ? "أنهِ مهمتك النشطة أولاً" : "قبول"}
+              </button>
+            </div>
+          `
+          )
+          .join("");
+      }
+
+      // الطلبات النشطة
+      const activeBox = document.getElementById("active-challenger-order-box");
+      if (!myActiveOrder) {
+        activeBox.innerHTML = `<div class="box-card">لا يوجد طلب نشط لك حالياً.</div>`;
+      } else {
+        const otherChallengers = Object.values(state.db.users || {}).filter(
+          (u) => u.role === "challenger" && u.status === "approved" && u.id !== chalId
+        );
+        const itemsText = (myActiveOrder.items || [])
+          .map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`)
+          .join(" ، ");
+
+        activeBox.innerHTML = `
+          <div class="box-card">
+            <h3 style="margin-top:0;">مهمة / طلب نشط</h3>
+            <p><strong>اسم المتسابق:</strong> ${esc(myActiveOrder.assignedChallengerName)}</p>
+            <p><strong>رقم التلفون:</strong> ${esc(myActiveOrder.assignedChallengerPhone)}</p>
+            <p><strong>وقت تأكيد قبول المهمة:</strong> ${new Date(myActiveOrder.acceptedAt).toLocaleString("ar-EG")}</p>
+            <p><strong>قائمة المشتريات:</strong> ${itemsText || esc(myActiveOrder.challengeTitle || "مهمة تحدي")}</p>
+            <p><strong>رقم تلفون العميل:</strong> ${esc(myActiveOrder.buyerPhone || "غير متوفر")}</p>
+
+            ${
+              otherChallengers.length
+                ? `
+              <div class="form-group" style="margin-top:10px;">
+                <label>تحريك الأوردر إلى متسابق آخر</label>
+                <div style="display:flex; gap:8px;">
+                  <select id="transfer-chal-select">
+                    ${otherChallengers.map((oc) => `<option value="${esc(oc.id)}">${esc(oc.name)} (${esc(oc.phone)})</option>`).join("")}
+                  </select>
+                  <button class="btn-amber" onclick="transferOrderToOther('${esc(myActiveOrder.id)}')">تحويل</button>
+                </div>
+              </div>
+            `
+                : ""
+            }
+
+            <div class="form-group" style="margin-top:12px;">
+              <label>صورة تأكيد وصول الطلب (كاميرا / استوديو)</label>
+              <input type="file" accept="image/*" capture="environment" onchange="previewCompressedImage(this, 'delivery-proof-prev', 'deliveryProof')" />
+              <img id="delivery-proof-prev" class="thumb-preview" alt="صورة التسليم" />
+            </div>
+
+            <button class="btn-success" onclick="completeActiveOrder('${esc(myActiveOrder.id)}', '${esc(myActiveOrder.challengeId || "")}')">
+              تأكيد انتهاء المهمه
+            </button>
+          </div>
+        `;
+      }
+
+      // الهدايا والوصولات للمستخدم
+      const rewBox = document.getElementById("user-gifts-and-receipts-box");
+      const myGifts = Object.values(state.db.gifts || {}).filter(
+        (g) => !g.targetName || g.targetName.trim().toLowerCase() === (state.currentUser?.name || "").trim().toLowerCase()
+      );
+      const myReceipts = Object.values(state.db.receipts || {}).filter(
+        (r) => r.userId === chalId || r.userName === state.currentUser?.name
+      );
+
+      rewBox.innerHTML = `
+        <div class="box-card">
+          <h3 style="margin-top:0;">الهدايا والعروض والمكافآت</h3>
+          ${
+            myGifts.length
+              ? myGifts.map((g) => `<div style="padding:8px 0; border-bottom:1px solid #e2e8f0;">🎁 <strong>${esc(g.title)}</strong>: ${esc(g.details)}</div>`).join("")
+              : "<div>لا توجد هدايا مرسلة حالياً.</div>"
+          }
+        </div>
+        <div class="box-card">
+          <h3 style="margin-top:0;">وصولات الدفع والاستلام</h3>
+          ${
+            myReceipts.length
+              ? myReceipts
+                  .map(
+                    (r) =>
+                      `<div style="padding:8px 0; border-bottom:1px solid #e2e8f0;">🧾 ${esc(r.type)} • <strong>${Number(r.amount) || 0} جنيه</strong> • ${esc(r.method || "")}</div>`
+                  )
+                  .join("")
+              : "<div>لا توجد وصولات مسجلة حالياً.</div>"
+          }
+        </div>
+      `;
+    }
+
+    window.acceptChallenge = async function (challengeId) {
+      if (!state.currentUser) return notify("سجل دخولك كمتسابق أولاً.", "error");
+      const chal = state.db.challenges[challengeId];
+      if (!chal || chal.acceptedBy) return notify("هذا التحدي لم يعد متاحاً.", "error");
+
+      const now = Date.now();
+      await update(ref(db, `challenges/${challengeId}`), {
+        acceptedBy: state.currentUser.id,
+        acceptedByName: state.currentUser.name,
+        acceptedAt: now
+      });
+
+      const orderRef = push(ref(db, "orders"));
+      await set(orderRef, {
+        id: orderRef.key,
+        challengeId,
+        challengeTitle: chal.title,
+        buyerName: chal.buyerName || state.currentUser.name,
+        buyerPhone: chal.buyerPhone || state.currentUser.phone,
+        items: chal.items || [{ title: chal.title, price: chal.reward || 0 }],
+        totalAmount: Number(chal.reward) || 0,
+        assignedChallengerId: state.currentUser.id,
+        assignedChallengerName: state.currentUser.name,
+        assignedChallengerPhone: state.currentUser.phone,
+        acceptedAt: now,
+        stage: "active",
+        status: "نشط"
+      });
+
+      notify("تم قبول التحدي وإضافته إلى الطلبات النشطة.", "success");
+      switchChallengerSubTab("active");
+    };
+
+    window.transferOrderToOther = async function (orderId) {
+      const sel = document.getElementById("transfer-chal-select");
+      if (!sel) return;
+      const targetId = sel.value;
+      const targetUser = state.db.users[targetId];
+      if (!targetUser) return;
+
+      await update(ref(db, `orders/${orderId}`), {
+        assignedChallengerId: targetId,
+        assignedChallengerName: targetUser.name,
+        assignedChallengerPhone: targetUser.phone,
+        transferredAt: Date.now()
+      });
+      notify(`تم تحويل الأوردر إلى المتسابق ${targetUser.name}.`, "success");
+      renderChallengesHub();
+    };
+
+    window.completeActiveOrder = async function (orderId, challengeId) {
+      if (!state.uploadedImages.deliveryProof) {
+        return notify("يرجى التقاط أو اختيار صورة تأكيد وصول الطلب أولاً.", "error");
+      }
+
+      await update(ref(db, `orders/${orderId}`), {
+        stage: "completed",
+        status: "منتهي",
+        deliveryImage: state.uploadedImages.deliveryProof,
+        completedAt: Date.now()
+      });
+
+      if (challengeId && state.currentUser) {
+        const chalObj = state.db.challenges[challengeId] || {};
+        const reward = Number(chalObj.reward) || 0;
+        const statsRef = ref(db, `challengersStats/${state.currentUser.id}`);
+        await runTransaction(statsRef, (curr) => {
+          const prev = curr || { name: state.currentUser.name, completedCount: 0, totalEarned: 0 };
+          return {
+            name: state.currentUser.name,
+            completedCount: (Number(prev.completedCount) || 0) + 1,
+            totalEarned: (Number(prev.totalEarned) || 0) + reward,
+            lastCompletedAt: Date.now()
+          };
+        });
+      }
+
+      state.uploadedImages.deliveryProof = "";
+      notify("تم تأكيد انتهاء المهمة وإرسال الصورة إلى صفحة الطلبات المنتهية في الأدمن.", "success");
+      renderChallengesHub();
+    };
+
+    // مستمعات قاعدة البيانات اللحظية
+    onValue(ref(db, "users"), (s) => {
+      state.db.users = s.val() || {};
+      syncUserHeader();
+    });
+    onValue(ref(db, "banned"), (s) => (state.db.banned = s.val() || {}));
+    onValue(ref(db, "clientRegRequests"), (s) => (state.db.clientRegRequests = s.val() || {}));
+    onValue(ref(db, "challengerRegRequests"), (s) => (state.db.challengerRegRequests = s.val() || {}));
+    onValue(ref(db, "departments"), (s) => {
+      state.db.departments = s.val() || [];
+      if (document.getElementById("screen-orders-home").classList.contains("active")) {
+        renderDepartments();
+      }
+    });
+    onValue(ref(db, "products"), (s) => {
+      state.db.products = s.val() || {};
+      if (state.selectedDept && document.getElementById("screen-department-view").classList.contains("active")) {
+        renderDepartmentItems(state.selectedDept);
+      }
+    });
+    onValue(ref(db, "cashPhones"), (s) => {
+      state.db.cashPhones = s.val() || [];
+      if (document.getElementById("screen-payment").classList.contains("active")) {
+        renderPaymentScreen();
+      }
+    });
+    onValue(ref(db, "orders"), (s) => {
+      state.db.orders = s.val() || {};
+      if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
+        renderChallengesHub();
+      }
+    });
+    onValue(ref(db, "challenges"), (s) => {
+      state.db.challenges = s.val() || {};
+      if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
+        renderChallengesHub();
+      }
+    });
+    onValue(ref(db, "gifts"), (s) => {
+      state.db.gifts = s.val() || {};
+      if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
+        renderChallengesHub();
+      }
+    });
+    onValue(ref(db, "receipts"), (s) => {
+      state.db.receipts = s.val() || {};
+      if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
+        renderChallengesHub();
+      }
     });
   </script>
 </body>
