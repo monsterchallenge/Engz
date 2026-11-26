@@ -20,7 +20,7 @@
     }
 
     .container {
-      max-width: 1080px;
+      max-width: 1120px;
       margin: 0 auto;
     }
 
@@ -64,7 +64,7 @@
 
     @media (min-width: 720px) {
       .nav-grid {
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(4, 1fr);
       }
     }
 
@@ -122,30 +122,11 @@
       cursor: pointer;
     }
 
-    .btn-grad {
-      background: linear-gradient(135deg, #ec4899, #8b5cf6);
-      color: #ffffff;
-    }
-
-    .btn-green {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #ffffff;
-    }
-
-    .btn-red {
-      background: linear-gradient(135deg, #ef4444, #be123c);
-      color: #ffffff;
-    }
-
-    .btn-amber {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #ffffff;
-    }
-
-    .btn-cyan {
-      background: linear-gradient(135deg, #06b6d4, #0284c7);
-      color: #ffffff;
-    }
+    .btn-grad { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: #ffffff; }
+    .btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; }
+    .btn-red { background: linear-gradient(135deg, #ef4444, #be123c); color: #ffffff; }
+    .btn-amber { background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; }
+    .btn-cyan { background: linear-gradient(135deg, #06b6d4, #0284c7); color: #ffffff; }
 
     .notice {
       padding: 10px 14px;
@@ -191,7 +172,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- شاشة الدخول بكلمة السر -->
     <div id="admin-lock" class="lock-card">
       <h2 style="margin-top:0; color:#7c3aed;">لوحة إدارة انجز</h2>
       <p style="color:#64748b; font-size:14px;">أدخل كلمة السر للوصول إلى كافة إعدادات الإدارة</p>
@@ -200,12 +180,11 @@
       <div id="pin-error" style="color:#be123c; font-weight:bold; font-size:13px; margin-top:10px;"></div>
     </div>
 
-    <!-- واجهة الأدمن الكاملة -->
     <div id="admin-app" class="admin-shell">
       <div class="top-banner">
         <div>
           <h1 style="margin:0; font-size:22px;">إدارة تطبيق انجز</h1>
-          <div style="font-size:12px; opacity:0.95;">العملة: جنيه • جميع البيانات متصلة لحظياً بقاعدة البيانات</div>
+          <div style="font-size:12px; opacity:0.95;">العملة: جنيه • 1 point = 33.333333333333 جنيه</div>
         </div>
         <button class="btn-cyan" onclick="openImpersonateModal()">دخول إلى حساب مستخدم</button>
       </div>
@@ -214,9 +193,11 @@
 
       <div class="nav-grid">
         <button class="nav-btn active" data-p="client-reqs" onclick="showAdminPanel('client-reqs')">طلبات تسجيل العملاء</button>
-        <button class="nav-btn" data-p="clients-mgr" onclick="showAdminPanel('clients-mgr')">إعداد العملاء والرصيد</button>
+        <button class="nav-btn" data-p="clients-mgr" onclick="showAdminPanel('clients-mgr')">إعداد العملاء والنقاط والرصيد</button>
+        <button class="nav-btn" data-p="active-clients" onclick="showAdminPanel('active-clients')">العملاء النشطون</button>
         <button class="nav-btn" data-p="chal-reqs" onclick="showAdminPanel('chal-reqs')">طلبات تسجيل المتسابقين</button>
-        <button class="nav-btn" data-p="chal-mgr" onclick="showAdminPanel('chal-mgr')">إعداد المتسابقين</button>
+        <button class="nav-btn" data-p="chal-mgr" onclick="showAdminPanel('chal-mgr')">إعداد المتسابقين والنقاط</button>
+        <button class="nav-btn" data-p="active-challengers" onclick="showAdminPanel('active-challengers')">المتسابقون النشطون</button>
         <button class="nav-btn" data-p="waitlist" onclick="showAdminPanel('waitlist')">قائمة الانتظار</button>
         <button class="nav-btn" data-p="depts-items" onclick="showAdminPanel('depts-items')">الأقسام والسلع والعروض</button>
         <button class="nav-btn" data-p="cash-phones" onclick="showAdminPanel('cash-phones')">إعداد أرقام الاتصال</button>
@@ -231,31 +212,43 @@
         <div id="admin-client-requests-list"></div>
       </div>
 
-      <!-- 2. إعداد العملاء والرصيد والحذف -->
+      <!-- 2. إعداد العملاء والنقاط والرصيد والحذف -->
       <div id="panel-clients-mgr" class="panel">
-        <h3>إدارة العملاء وشحن الرصيد (جنيه) أو الحذف</h3>
+        <h3>إدارة العملاء والنقاط (point) والرصيد (جنيه) والحذف</h3>
         <div id="admin-clients-list"></div>
       </div>
 
-      <!-- 3. إعداد طلبات تسجيل المتسابقين -->
+      <!-- 3. العملاء النشطون: ترتيب تنازلي حسب ارتفاع سعر الشراء وعدد مرات الطلب + إحصائيات الروابط -->
+      <div id="panel-active-clients" class="panel">
+        <h3>العملاء النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد مرات الطلب)</h3>
+        <div id="admin-active-clients-list"></div>
+      </div>
+
+      <!-- 4. إعداد طلبات تسجيل المتسابقين -->
       <div id="panel-chal-reqs" class="panel">
         <h3>صفحة إعداد طلبات تسجيل المتسابقين</h3>
         <div id="admin-challenger-requests-list"></div>
       </div>
 
-      <!-- 4. إعداد المتسابقين مرتبين حسب النشاط وعدد التحديات + سجل الطلبات + حذف بتأكيد -->
+      <!-- 5. إعداد المتسابقين والنقاط -->
       <div id="panel-chal-mgr" class="panel">
-        <h3>صفحة إعداد المتسابقين (مرتبة حسب النشاط وعدد التحديات)</h3>
+        <h3>صفحة إعداد المتسابقين والنقاط (point)</h3>
         <div id="admin-challengers-list"></div>
       </div>
 
-      <!-- 5. قائمة الانتظار مرتبة تنازلياً حسب تاريخ تقديم الطلب -->
+      <!-- 6. المتسابقون النشطون: ترتيب تنازلي حسب قيمة الشراء/المكافآت وعدد مرات إتمام المهمة بنجاح -->
+      <div id="panel-active-challengers" class="panel">
+        <h3>المتسابقون النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد مرات إتمام المهمة بنجاح)</h3>
+        <div id="admin-active-challengers-list"></div>
+      </div>
+
+      <!-- 7. قائمة الانتظار مرتبة تنازلياً -->
       <div id="panel-waitlist" class="panel">
         <h3>قائمة الانتظار (ترتيب تنازلي حسب تاريخ تقديم الطلب)</h3>
         <div id="admin-waitlist-list"></div>
       </div>
 
-      <!-- 6. إعداد الأقسام والأنواع والسلع والعروض -->
+      <!-- 8. إعداد الأقسام والأنواع والسلع والعروض -->
       <div id="panel-depts-items" class="panel">
         <h3>إعداد الأقسام والأنواع والسلع والعروض (جنيه)</h3>
 
@@ -293,7 +286,7 @@
         <div id="admin-dept-products-preview"></div>
       </div>
 
-      <!-- 7. إعداد أرقام الاتصال (7 خانات + checkbox + زر + لإضافة أي عدد) -->
+      <!-- 9. إعداد أرقام الاتصال -->
       <div id="panel-cash-phones" class="panel">
         <h3>إعداد أرقام الاتصال لاستقبال الكاش</h3>
         <p style="font-size:13px; color:#475569;">7 خانات أساسية مع اختيار عبر checkbox، ويمكنك إضافة أي عدد إضافي بزر (+). يظهر للعميل حتى 5 أرقام مختارة.</p>
@@ -305,7 +298,7 @@
         <button class="btn-green" onclick="saveSelectedCashPhones()">حفظ أرقام الكاش المختارة</button>
       </div>
 
-      <!-- 8. إعداد التحديات -->
+      <!-- 10. إعداد التحديات -->
       <div id="panel-challenges-cfg" class="panel">
         <h3>صفحة إعداد التحديات</h3>
         <div class="card">
@@ -320,7 +313,7 @@
         <div id="admin-challenges-list"></div>
       </div>
 
-      <!-- 9. الطلبات النشطة والطلبات المنتهية -->
+      <!-- 11. الطلبات النشطة والطلبات المنتهية -->
       <div id="panel-active-done" class="panel">
         <h3>الطلبات النشطة</h3>
         <div id="admin-active-orders-list"></div>
@@ -328,7 +321,7 @@
         <div id="admin-completed-orders-list"></div>
       </div>
 
-      <!-- 10. إعداد إرسال هدية والوصولات -->
+      <!-- 12. إعداد إرسال هدية والوصولات -->
       <div id="panel-gifts-receipts" class="panel">
         <h3>صفحة إعداد إرسال هدية أو عرض أو مكافأة</h3>
         <div class="card">
@@ -376,6 +369,7 @@
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_PIN = "38512385";
+    const POINT_VALUE_EGP = 33.333333333333;
 
     const firebaseConfig = {
       apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
@@ -413,6 +407,8 @@
       challenges: {},
       orders: {},
       challengersStats: {},
+      clientActivity: {},
+      referrals: {},
       receipts: {},
       uploadedProductImg: "",
       uploadedDeptCoverImg: ""
@@ -433,6 +429,13 @@
       setTimeout(() => {
         el.style.display = "none";
       }, 4000);
+    }
+
+    function getReferralSummaryForUser(uid) {
+      const entries = Object.values(state.referrals[uid] || {});
+      const sentToCount = entries.length;
+      const completedFirstCount = entries.filter((x) => x.completedFirstAction === true).length;
+      return { sentToCount, completedFirstCount };
     }
 
     function compressFileToDataUrl(file, cb) {
@@ -511,6 +514,8 @@
         role: "client",
         status: "approved",
         wallet: 0,
+        points: 0,
+        invitedBy: reqData.invitedBy || "",
         createdAt: Date.now()
       });
       await remove(ref(db, `clientRegRequests/${reqId}`));
@@ -527,13 +532,14 @@
         role: "client",
         status: "rejected",
         wallet: 0,
+        points: 0,
         createdAt: Date.now()
       });
       await remove(ref(db, `clientRegRequests/${reqId}`));
       toast(`تم رفض طلب تسجيل العميل ${reqData.name}.`);
     };
 
-    // 2. إدارة العملاء
+    // 2. إدارة العملاء والنقاط والرصيد
     function renderClientsManager() {
       const el = document.getElementById("admin-clients-list");
       const clients = Object.entries(state.users || {}).filter(([, u]) => u.role === "client");
@@ -542,25 +548,38 @@
         return;
       }
       el.innerHTML = clients
-        .map(
-          ([uid, u]) => `
-          <div class="card">
-            <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الحالة: <strong>${esc(u.status || "approved")}</strong> — الرصيد الحالي: <strong>${Number(u.wallet) || 0} جنيه</strong></div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-              <input type="number" id="add-wal-${esc(uid)}" placeholder="إضافة رصيد (جنيه)" style="width:170px; margin:0;" />
-              <button class="btn-green" onclick="addClientWallet('${esc(uid)}')">إضافة رصيد</button>
-              <button class="btn-red" onclick="deleteClientAndBan('${esc(uid)}')">حذف العميل</button>
+        .map(([uid, u]) => {
+          const pts = Number(u.points) || 0;
+          const ptsMoney = (pts * POINT_VALUE_EGP).toFixed(2);
+          const refStats = getReferralSummaryForUser(uid);
+          return `
+            <div class="card">
+              <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الحالة: <strong>${esc(u.status || "approved")}</strong></div>
+              <div style="margin-top:4px;">الرصيد: <strong>${Number(u.wallet) || 0} جنيه</strong> • النقاط (point): <strong>${pts}</strong> (${ptsMoney} جنيه)</div>
+              <div style="font-size:12px; color:#0284c7; margin-top:4px;">أرسل الرابط لـ: <strong>${refStats.sentToCount}</strong> شخص • أتموا أول طلب/مهمة: <strong>${refStats.completedFirstCount}</strong></div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                <input type="number" step="any" id="set-pts-${esc(uid)}" value="${pts}" placeholder="تحديد point" style="width:130px; margin:0;" />
+                <button class="btn-cyan" onclick="saveUserPoints('${esc(uid)}')">حفظ النقاط</button>
+                <input type="number" step="any" id="add-wal-${esc(uid)}" placeholder="إضافة رصيد (جنيه)" style="width:150px; margin:0;" />
+                <button class="btn-green" onclick="addClientWallet('${esc(uid)}')">إضافة رصيد</button>
+                <button class="btn-red" onclick="deleteClientAndBan('${esc(uid)}')">حذف العميل</button>
+              </div>
             </div>
-          </div>
-        `
-        )
+          `;
+        })
         .join("");
     }
+
+    window.saveUserPoints = async function (uid) {
+      const newPts = Math.max(0, Number(document.getElementById("set-pts-" + uid).value) || 0);
+      await update(ref(db, `users/${uid}`), { points: newPts });
+      toast(`تم تحديث نقاط المستخدم إلى ${newPts} point.`);
+    };
 
     window.addClientWallet = async function (uid) {
       const amt = Number(document.getElementById("add-wal-" + uid).value) || 0;
       if (!amt) return;
-      await runTransaction(ref(db, `users/${uid}/wallet`), (cur) => (Number(cur) || 0) + amt);
+      await runTransaction(ref(db, `users/${uid}/wallet`), (cur) => Number(((Number(cur) || 0) + amt).toFixed(2)));
       toast(`تمت إضافة ${amt} جنيه للرصيد.`);
     };
 
@@ -574,7 +593,43 @@
       toast("تم حذف العميل وحظر دخوله بنفس البيانات.");
     };
 
-    // 3. طلبات تسجيل المتسابقين
+    // 3. العملاء النشطون: ترتيب تنازلي حسب ارتفاع سعر الشراء وعدد مرات الطلب
+    function renderActiveClients() {
+      const el = document.getElementById("admin-active-clients-list");
+      const clients = Object.entries(state.users || {})
+        .filter(([, u]) => u.role === "client" && u.status === "approved")
+        .map(([uid, u]) => {
+          const act = state.clientActivity[uid] || {};
+          const userOrders = Object.values(state.orders || {}).filter((o) => o.buyerId === uid);
+          const orderCount = Math.max(Number(act.orderCount) || 0, userOrders.length);
+          const totalSpent = Math.max(
+            Number(act.totalSpent) || 0,
+            userOrders.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0)
+          );
+          const refStats = getReferralSummaryForUser(uid);
+          return { uid, ...u, orderCount, totalSpent, refStats };
+        })
+        .sort((a, b) => b.totalSpent - a.totalSpent || b.orderCount - a.orderCount);
+
+      if (!clients.length) {
+        el.innerHTML = `<div class="card">لا يوجد عملاء نشطون بعد.</div>`;
+        return;
+      }
+
+      el.innerHTML = clients
+        .map(
+          (c, i) => `
+          <div class="card">
+            <div><strong>#${i + 1} — ${esc(c.name)}</strong> (${esc(c.phone)})</div>
+            <div>إجمالي قيمة الشراء: <strong style="color:#be185d;">${c.totalSpent} جنيه</strong> • عدد مرات الطلب: <strong>${c.orderCount}</strong></div>
+            <div style="font-size:12px; color:#0284c7;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    // 4. طلبات تسجيل المتسابقين
     function renderChallengerRequests() {
       const el = document.getElementById("admin-challenger-requests-list");
       const reqs = Object.entries(state.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -610,6 +665,8 @@
           role: "challenger",
           status: "approved",
           wallet: 0,
+          points: 0,
+          invitedBy: reqData.invitedBy || "",
           createdAt: Date.now()
         });
         toast(`تم قبول المتسابق ${reqData.name} وأصبح مشتركاً في صفحة التحديات.`);
@@ -635,18 +692,20 @@
       await remove(ref(db, `challengerRegRequests/${reqId}`));
     };
 
-    // 4. إعداد المتسابقين
+    // 5. إعداد المتسابقين والنقاط
     function renderChallengersManager() {
       const el = document.getElementById("admin-challengers-list");
       const challengers = Object.entries(state.users || {})
         .filter(([, u]) => u.role === "challenger" && u.status === "approved")
         .map(([id, u]) => {
-          const st = state.challengersStats[id] || { completedCount: 0 };
+          const st = state.challengersStats[id] || { completedCount: 0, totalEarned: 0 };
           const completedOrders = Object.values(state.orders || {}).filter(
             (o) => o.assignedChallengerId === id && o.stage === "completed"
           );
           const count = Math.max(Number(st.completedCount) || 0, completedOrders.length);
-          return { id, ...u, completedCount: count, completedOrders };
+          const pts = Number(u.points) || 0;
+          const refStats = getReferralSummaryForUser(id);
+          return { id, ...u, completedCount: count, pts, refStats };
         })
         .sort((a, b) => b.completedCount - a.completedCount);
 
@@ -658,15 +717,57 @@
       el.innerHTML = challengers
         .map(
           (c) => `
-          <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div class="card">
             <div>
               <strong>${esc(c.name)}</strong> (${esc(c.phone)}) —
-              <strong>عدد الطلبات المنفذة / التحديات:</strong> <span style="color:#059669; font-weight:bold;">${c.completedCount}</span>
+              <strong>عدد الطلبات المنفذة / التحديات:</strong> <span style="color:#059669; font-weight:bold;">${c.completedCount}</span> •
+              <strong>النقاط (point):</strong> <strong>${c.pts}</strong> (${(c.pts * POINT_VALUE_EGP).toFixed(2)} جنيه)
             </div>
-            <div style="display:flex; gap:8px;">
+            <div style="font-size:12px; color:#0284c7; margin-top:4px;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+              <input type="number" step="any" id="set-pts-${esc(c.id)}" value="${c.pts}" placeholder="تحديد point" style="width:130px; margin:0;" />
+              <button class="btn-cyan" onclick="saveUserPoints('${esc(c.id)}')">حفظ النقاط</button>
               <button class="btn-cyan" onclick="openChallengerHistory('${esc(c.id)}')">سجل الطلبات</button>
               <button class="btn-red" onclick="deleteChallengerWithConfirm('${esc(c.id)}')">حذف</button>
             </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    // 6. المتسابقون النشطون: ترتيب تنازلي حسب قيمة الشراء وعدد مرات إتمام المهمة بنجاح
+    function renderActiveChallengers() {
+      const el = document.getElementById("admin-active-challengers-list");
+      const list = Object.entries(state.users || {})
+        .filter(([, u]) => u.role === "challenger" && u.status === "approved")
+        .map(([uid, u]) => {
+          const st = state.challengersStats[uid] || {};
+          const doneOrders = Object.values(state.orders || {}).filter(
+            (o) => o.assignedChallengerId === uid && o.stage === "completed"
+          );
+          const successCount = Math.max(Number(st.completedCount) || 0, doneOrders.length);
+          const purchaseOrRewardValue = Math.max(
+            Number(st.totalEarned) || 0,
+            doneOrders.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0)
+          );
+          const refStats = getReferralSummaryForUser(uid);
+          return { uid, ...u, successCount, purchaseOrRewardValue, refStats };
+        })
+        .sort((a, b) => b.purchaseOrRewardValue - a.purchaseOrRewardValue || b.successCount - a.successCount);
+
+      if (!list.length) {
+        el.innerHTML = `<div class="card">لا يوجد متسابقون نشطون بعد.</div>`;
+        return;
+      }
+
+      el.innerHTML = list
+        .map(
+          (c, i) => `
+          <div class="card">
+            <div><strong>#${i + 1} — ${esc(c.name)}</strong> (${esc(c.phone)})</div>
+            <div>قيمة الشراء / المهام المنجزة: <strong style="color:#059669;">${c.purchaseOrRewardValue} جنيه</strong> • عدد مرات إتمام المهمة بنجاح: <strong>${c.successCount}</strong></div>
+            <div style="font-size:12px; color:#0284c7;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
           </div>
         `
         )
@@ -704,7 +805,7 @@
       toast("تم حذف المتسابق وتأكيد الحذف.");
     };
 
-    // 5. قائمة الانتظار مرتبة تنازلياً
+    // 7. قائمة الانتظار مرتبة تنازلياً
     let waitlistData = {};
     onValue(ref(db, "waitlist"), (s) => {
       waitlistData = s.val() || {};
@@ -730,7 +831,7 @@
         .join("");
     }
 
-    // 6. إعداد الأقسام وصورة القسم والأنواع المتاحة والأسعار والعروض والصور
+    // 8. إعداد الأقسام والأنواع والسلع والعروض
     function getAllDepts() {
       return [...new Set([...DEFAULT_DEPARTMENTS, ...(state.departments || [])])];
     }
@@ -788,7 +889,7 @@
       preview.innerHTML = depts
         .map((d) => {
           const items = Object.entries(state.products[d] || {});
-          const meta = state.db.departmentsMeta?.[d] || state.departmentsMeta[d] || {};
+          const meta = state.departmentsMeta[d] || {};
           const isSelectedDept = d === selDept;
 
           return `
@@ -870,7 +971,7 @@
       toast("تم حذف العنصر.");
     };
 
-    // 7. إعداد أرقام الاتصال
+    // 9. إعداد أرقام الاتصال
     function renderCashPhonesEditor() {
       const slotsEl = document.getElementById("cash-phones-slots");
       const activeSet = new Set(state.cashPhones || []);
@@ -917,7 +1018,7 @@
       toast(`تم حفظ ${selected.length} أرقام كاش للظهور في صفحة الدفع.`);
     };
 
-    // 8. إعداد التحديات
+    // 10. إعداد التحديات
     window.publishChallenge = async function () {
       const title = document.getElementById("chal-title-input").value.trim();
       const details = document.getElementById("chal-details-input").value.trim();
@@ -957,7 +1058,7 @@
       await remove(ref(db, `challenges/${id}`));
     };
 
-    // 9. الطلبات النشطة والطلبات المنتهية
+    // 11. الطلبات النشطة والطلبات المنتهية
     function renderOrdersPanels() {
       const all = Object.entries(state.orders || {}).map(([id, o]) => ({ id, ...o }));
       const activeList = all.filter((o) => o.stage === "active" || (!o.stage && o.status === "جاري تنفيذ طلبك"));
@@ -991,7 +1092,7 @@
         : `<div class="card">لا توجد طلبات منتهية بعد.</div>`;
     }
 
-    // 10. هدايا والوصولات
+    // 12. هدايا والوصولات
     window.sendGiftOrReward = async function () {
       const targetName = document.getElementById("gift-target-input").value.trim();
       const title = document.getElementById("gift-title-input").value.trim();
@@ -1063,7 +1164,7 @@
     window.impersonateUser = function (uid) {
       const u = state.users[uid];
       if (!u) return;
-      toast(`تم فتح حساب (${u.name}) - الصلاحية: ${u.role === "challenger" ? "متسابق" : "عميل"} - الرصيد: ${Number(u.wallet) || 0} جنيه.`);
+      toast(`تم فتح حساب (${u.name}) - الصلاحية: ${u.role === "challenger" ? "متسابق" : "عميل"} - الرصيد: ${Number(u.wallet) || 0} جنيه - النقاط: ${Number(u.points) || 0} point.`);
       closeImpersonateModal();
     };
 
@@ -1071,8 +1172,10 @@
       if (document.getElementById("admin-app").style.display !== "block") return;
       renderClientRequests();
       renderClientsManager();
+      renderActiveClients();
       renderChallengerRequests();
       renderChallengersManager();
+      renderActiveChallengers();
       renderWaitlist();
       renderDepartmentsAndProducts();
       renderCashPhonesEditor();
@@ -1119,6 +1222,14 @@
     });
     onValue(ref(db, "challengersStats"), (s) => {
       state.challengersStats = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "clientActivity"), (s) => {
+      state.clientActivity = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "referrals"), (s) => {
+      state.referrals = s.val() || {};
       renderAll();
     });
     onValue(ref(db, "receipts"), (s) => {
