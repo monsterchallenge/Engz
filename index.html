@@ -319,7 +319,7 @@
       color: #0f172a;
     }
 
-    /* شبكة الأقسام السبعة + الإضافية */
+    /* شبكة الأقسام السبعة + الإضافية بصورة تعبيرية */
     .dept-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -334,14 +334,27 @@
     }
 
     .dept-card {
-      padding: 18px 12px;
-      border-radius: 16px;
+      border-radius: 18px;
       color: #ffffff;
       text-align: center;
       font-weight: bold;
       font-size: 16px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
       cursor: pointer;
+      overflow: hidden;
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+    }
+
+    .dept-card-img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      display: block;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .dept-card-label {
+      padding: 12px 10px;
     }
 
     .dept-card:nth-child(5n+1) { background: linear-gradient(135deg, #ec4899, #f43f5e); }
@@ -349,6 +362,31 @@
     .dept-card:nth-child(5n+3) { background: linear-gradient(135deg, #06b6d4, #0284c7); }
     .dept-card:nth-child(5n+4) { background: linear-gradient(135deg, #10b981, #0d9488); }
     .dept-card:nth-child(5n+5) { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+
+    /* قائمة الأنواع المتاحة داخل القسم */
+    .types-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .type-chip {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .type-chip.active {
+      background: linear-gradient(90deg, #ec4899, #7c3aed);
+      color: #ffffff;
+      border-color: transparent;
+    }
 
     /* بطاقات السلع والعروض مع السعر كجزء واضح من الصورة */
     .items-grid {
@@ -630,7 +668,7 @@
     <!-- صفحة الطلبات والأقسام -->
     <div id="screen-orders-home" class="screen">
       <h2 class="screen-title">صفحة الطلبات والأقسام</h2>
-      <p class="screen-sub">اضغط على أي قسم لفتح منتجاته وعروضه، واضغط على أي صورة لمدة 3 ثوانٍ لتحديدها في عربة التسوق.</p>
+      <p class="screen-sub">اضغط على أي قسم لفتح أنواعه ومنتجاته وعروضه، واضغط على أي صورة لمدة 3 ثوانٍ لتحديدها في عربة التسوق.</p>
       <div id="departments-container" class="dept-grid"></div>
       <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-amber" onclick="openCartScreen()">عرض عربة التسوق (<span class="cart-count-inline">0</span>)</button>
@@ -647,7 +685,8 @@
           <button class="btn-soft" onclick="goScreen('screen-orders-home')">كل الأقسام</button>
         </div>
       </div>
-      <p class="screen-sub">اضغط مطولاً على أي صورة لمدة <strong>3 ثوانٍ</strong> لتحديدها أو إلغاء تحديدها.</p>
+      <div id="dept-types-bar" class="types-bar"></div>
+      <p class="screen-sub">الأنواع والأسعار والعروض المتاحة — اضغط مطولاً على أي صورة لمدة <strong>3 ثوانٍ</strong> لتحديدها أو إلغاء تحديدها.</p>
       <div id="dept-items-container" class="items-grid"></div>
     </div>
 
@@ -844,23 +883,25 @@
 
     // حالة التطبيق المحلية والبيانات اللحظية
     const state = {
-      currentRole: null, // 'client' | 'challenger'
-      currentUser: null, // { id, name, phone, phone2, role, wallet, status }
+      currentRole: null,
+      currentUser: null,
       selectedDept: null,
-      cart: [], // [{ uid, dept, title, price, isOffer, image }]
+      selectedTypeFilter: "الكل",
+      cart: [],
       selectedCashPhone: null,
       uploadedImages: { receipt: "", deliveryProof: "" },
+      trackedApplicant: null,
       db: {
         users: {},
         banned: {},
         clientRegRequests: {},
         challengerRegRequests: {},
+        departmentsMeta: {},
         departments: [],
         products: {},
         cashPhones: [],
         orders: {},
         challenges: {},
-        challengersList: {},
         gifts: {},
         receipts: {}
       }
@@ -883,6 +924,34 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+    }
+
+    function checkRegistrationStatusBanner() {
+      if (!state.trackedApplicant) return;
+      const { name, phone, kind } = state.trackedApplicant;
+      const cleanName = (name || "").trim().toLowerCase();
+
+      const pendingMap = kind === "challenger" ? state.db.challengerRegRequests : state.db.clientRegRequests;
+      const isPending = Object.values(pendingMap || {}).some(
+        (r) => (r.name || "").trim().toLowerCase() === cleanName && r.phone === phone && r.status === "pending"
+      );
+
+      if (isPending) {
+        notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
+        return;
+      }
+
+      const matchedUser = Object.values(state.db.users || {}).find(
+        (u) => (u.name || "").trim().toLowerCase() === cleanName && (!kind || u.role === kind)
+      );
+
+      if (matchedUser) {
+        if (matchedUser.status === "approved") {
+          notify("تم قبول طلب التسجيل الخاص بك بنجاح.", "success");
+        } else if (matchedUser.status === "rejected") {
+          notify("تم رفض طلب التسجيل الخاص بك.", "error");
+        }
+      }
     }
 
     window.goScreen = function (screenId) {
@@ -923,7 +992,7 @@
       );
     }
 
-    // تسجيل عميل جديد -> يذهب لصفحة طلبات التسجيل في الأدمن
+    // تسجيل عميل جديد -> يذهب لصفحة طلبات التسجيل في الأدمن وتظهر رسالة قيد المراجعة
     window.submitClientRegistration = async function () {
       const name = document.getElementById("reg-client-name").value.trim();
       const phone = document.getElementById("reg-client-phone").value.trim();
@@ -941,9 +1010,10 @@
         createdAt: Date.now()
       });
 
+      state.trackedApplicant = { name, phone, kind: "client" };
       document.getElementById("reg-client-name").value = "";
       document.getElementById("reg-client-phone").value = "";
-      notify("تم إرسال طلب تسجيلك إلى صفحة طلبات التسجيل لدى الإدارة بنجاح.", "success");
+      notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
     };
 
     // دخول مشترك (عميل مسجل من قبل أو اختيار اسم غير مكرر + ربط رقمي موبايل)
@@ -960,6 +1030,14 @@
       }
       if (isBanned(name, phone1) || (phone2 && isBanned(name, phone2))) {
         return notify("عذراً، هذا الحساب محظور ولا يمكنه الدخول.", "error");
+      }
+
+      const pendingClient = Object.values(state.db.clientRegRequests || {}).find(
+        (r) => (r.name || "").trim().toLowerCase() === name.toLowerCase() && r.status === "pending"
+      );
+      if (pendingClient) {
+        state.trackedApplicant = { name, phone: phone1, kind: "client" };
+        return notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
       }
 
       const existingEntry = Object.entries(state.db.users).find(
@@ -979,11 +1057,11 @@
         state.currentUser = { id: uid, ...uData, phone: phone1, phone2: phone2 || uData.phone2 || "" };
         state.currentRole = "client";
         syncUserHeader();
+        notify("تم قبول حسابك بنجاح، أهلاً بك في صفحة الطلبات.", "success");
         goScreen("screen-orders-home");
         return;
       }
 
-      // اسم جديد غير مكرر مباشرة للمشترك
       const newRef = push(ref(db, "users"));
       const newUser = {
         name,
@@ -998,11 +1076,11 @@
       state.currentUser = { id: newRef.key, ...newUser };
       state.currentRole = "client";
       syncUserHeader();
-      notify("تم تسجيل الدخول كمشترك بنجاح.", "success");
+      notify("تم قبول الدخول كمشترك بنجاح.", "success");
       goScreen("screen-orders-home");
     };
 
-    // تسجيل متسابق جديد -> يذهب لصفحة طلبات تسجيل المتسابقين في الأدمن
+    // تسجيل متسابق جديد -> يذهب لصفحة طلبات تسجيل المتسابقين في الأدمن وتظهر رسالة قيد المراجعة
     window.submitChallengerRegistration = async function () {
       const name = document.getElementById("reg-chal-name").value.trim();
       const phone = document.getElementById("reg-chal-phone").value.trim();
@@ -1021,12 +1099,13 @@
         createdAt: Date.now()
       });
 
+      state.trackedApplicant = { name, phone, kind: "challenger" };
       document.getElementById("reg-chal-name").value = "";
       document.getElementById("reg-chal-phone").value = "";
-      notify("تم إرسال طلب تسجيل المتسابق إلى صفحة طلبات التسجيل في لوحة الإدارة.", "success");
+      notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
     };
 
-    // دخول متسابق مشترك
+    // دخول متسابق مشترك مع إظهار حالة القبول أو الرفض أو قيد المراجعة
     window.loginChallengerSubscriber = async function () {
       const name = document.getElementById("sub-chal-name").value.trim();
       const phone = document.getElementById("sub-chal-phone").value.trim();
@@ -1036,6 +1115,14 @@
       }
       if (isBanned(name, phone)) {
         return notify("عذراً، هذا الحساب محظور ولا يمكنه الدخول.", "error");
+      }
+
+      const pendingChal = Object.values(state.db.challengerRegRequests || {}).find(
+        (r) => (r.name || "").trim().toLowerCase() === name.toLowerCase() && r.status === "pending"
+      );
+      if (pendingChal) {
+        state.trackedApplicant = { name, phone, kind: "challenger" };
+        return notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
       }
 
       const found = Object.entries(state.db.users).find(
@@ -1060,10 +1147,11 @@
       state.currentUser = { id: uid, ...uData, phone };
       state.currentRole = "challenger";
       syncUserHeader();
+      notify("تم قبول طلبك كمتسابق، مرحباً بك في صفحة التحديات.", "success");
       goScreen("screen-challenges-hub");
     };
 
-    // عرض الأقسام
+    // عرض الأقسام مع الصورة التعبيرية الخاصة بكل قسم
     function getAllDepartments() {
       const extra = Array.isArray(state.db.departments) ? state.db.departments : [];
       return [...new Set([...DEFAULT_DEPARTMENTS, ...extra])];
@@ -1073,9 +1161,16 @@
       const container = document.getElementById("departments-container");
       const depts = getAllDepartments();
       container.innerHTML = depts
-        .map(
-          (d) => `<div class="dept-card" onclick="openDepartment('${esc(d)}')">${esc(d)}</div>`
-        )
+        .map((d) => {
+          const meta = state.db.departmentsMeta[d] || {};
+          const imgHtml = meta.image ? `<img src="${meta.image}" alt="${esc(d)}" class="dept-card-img" />` : "";
+          return `
+            <div class="dept-card" onclick="openDepartment('${esc(d)}')">
+              ${imgHtml}
+              <div class="dept-card-label">${esc(d)}</div>
+            </div>
+          `;
+        })
         .join("");
     }
 
@@ -1113,22 +1208,42 @@
 
     window.openDepartment = function (deptName) {
       state.selectedDept = deptName;
+      state.selectedTypeFilter = "الكل";
       document.getElementById("current-dept-title").textContent = deptName;
       renderDepartmentItems(deptName);
       goScreen("screen-department-view");
     };
 
+    window.selectDepartmentTypeFilter = function (typeName) {
+      state.selectedTypeFilter = typeName;
+      if (state.selectedDept) renderDepartmentItems(state.selectedDept);
+    };
+
     function renderDepartmentItems(deptName) {
+      const typesBar = document.getElementById("dept-types-bar");
       const container = document.getElementById("dept-items-container");
       const deptObj = state.db.products[deptName] || {};
       const entries = Object.entries(deptObj);
 
-      if (!entries.length) {
-        container.innerHTML = `<div class="box-card">لا توجد سلع أو عروض مضافة في قسم (${esc(deptName)}) حالياً.</div>`;
+      const distinctTypes = ["الكل", ...new Set(entries.map(([, it]) => (it.type || it.title || "صنف").trim()).filter(Boolean))];
+      typesBar.innerHTML = distinctTypes
+        .map(
+          (tp) =>
+            `<button class="type-chip ${state.selectedTypeFilter === tp ? "active" : ""}" onclick="selectDepartmentTypeFilter('${esc(tp)}')">${esc(tp)}</button>`
+        )
+        .join("");
+
+      const filteredEntries =
+        state.selectedTypeFilter === "الكل"
+          ? entries
+          : entries.filter(([, it]) => ((it.type || it.title || "صنف").trim()) === state.selectedTypeFilter);
+
+      if (!filteredEntries.length) {
+        container.innerHTML = `<div class="box-card">لا توجد أنواع أو سلع أو عروض مضافة في قسم (${esc(deptName)}) حالياً.</div>`;
         return;
       }
 
-      container.innerHTML = entries
+      container.innerHTML = filteredEntries
         .map(([id, item]) => {
           const uid = `${deptName}__${id}`;
           const isSelected = state.cart.some((c) => c.uid === uid);
@@ -1137,7 +1252,7 @@
             JSON.stringify({
               uid,
               dept: deptName,
-              title: item.title || "صنف",
+              title: item.title || item.type || "صنف",
               price: priceNum,
               isOffer: Boolean(item.isOffer),
               image: item.image || ""
@@ -1156,7 +1271,8 @@
                 <div class="price-overlay">${priceNum} جنيه</div>
               </div>
               <div class="product-body">
-                <h3 class="product-title">${esc(item.title)}</h3>
+                <h3 class="product-title">${esc(item.title || item.type)}</h3>
+                ${item.type ? `<div style="font-size:12px; color:#7c3aed; font-weight:bold;">النوع: ${esc(item.type)}</div>` : ""}
                 ${item.desc ? `<p class="product-desc">${esc(item.desc)}</p>` : ""}
                 <div class="hold-hint">ضغط 3 ثوانٍ للتحديد / ضغطة أخرى للإلغاء</div>
               </div>
@@ -1372,7 +1488,7 @@
       await runTransaction(userRef, (currentBal) => {
         const bal = Number(currentBal) || 0;
         if (bal < total) {
-          return; // إلغاء المعاملة لعدم كفاية الرصيد
+          return;
         }
         paid = true;
         return bal - total;
@@ -1408,7 +1524,6 @@
       const allOrders = Object.entries(state.db.orders || {}).map(([id, o]) => ({ id, ...o }));
       const myActiveOrder = allOrders.find((o) => o.assignedChallengerId === chalId && o.stage === "active");
 
-      // قائمة التحديات (تختفي المهمة بعد قبولها، ويمكن للمتسابق اختيار مهمة واحدة فقط حتى تنتهي)
       const availEl = document.getElementById("available-challenges-list");
       const challenges = Object.entries(state.db.challenges || {})
         .map(([id, c]) => ({ id, ...c }))
@@ -1435,7 +1550,6 @@
           .join("");
       }
 
-      // الطلبات النشطة
       const activeBox = document.getElementById("active-challenger-order-box");
       if (!myActiveOrder) {
         activeBox.innerHTML = `<div class="box-card">لا يوجد طلب نشط لك حالياً.</div>`;
@@ -1485,7 +1599,6 @@
         `;
       }
 
-      // الهدايا والوصولات للمستخدم
       const rewBox = document.getElementById("user-gifts-and-receipts-box");
       const myGifts = Object.values(state.db.gifts || {}).filter(
         (g) => !g.targetName || g.targetName.trim().toLowerCase() === (state.currentUser?.name || "").trim().toLowerCase()
@@ -1605,12 +1718,25 @@
     onValue(ref(db, "users"), (s) => {
       state.db.users = s.val() || {};
       syncUserHeader();
+      checkRegistrationStatusBanner();
     });
     onValue(ref(db, "banned"), (s) => (state.db.banned = s.val() || {}));
-    onValue(ref(db, "clientRegRequests"), (s) => (state.db.clientRegRequests = s.val() || {}));
-    onValue(ref(db, "challengerRegRequests"), (s) => (state.db.challengerRegRequests = s.val() || {}));
+    onValue(ref(db, "clientRegRequests"), (s) => {
+      state.db.clientRegRequests = s.val() || {};
+      checkRegistrationStatusBanner();
+    });
+    onValue(ref(db, "challengerRegRequests"), (s) => {
+      state.db.challengerRegRequests = s.val() || {};
+      checkRegistrationStatusBanner();
+    });
     onValue(ref(db, "departments"), (s) => {
       state.db.departments = s.val() || [];
+      if (document.getElementById("screen-orders-home").classList.contains("active")) {
+        renderDepartments();
+      }
+    });
+    onValue(ref(db, "departmentsMeta"), (s) => {
+      state.db.departmentsMeta = s.val() || {};
       if (document.getElementById("screen-orders-home").classList.contains("active")) {
         renderDepartments();
       }
