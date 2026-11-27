@@ -20,7 +20,7 @@
     }
 
     .container {
-      max-width: 1120px;
+      max-width: 1140px;
       margin: 0 auto;
     }
 
@@ -62,7 +62,7 @@
       margin-bottom: 20px;
     }
 
-    @media (min-width: 720px) {
+    @media (min-width: 760px) {
       .nav-grid {
         grid-template-columns: repeat(4, 1fr);
       }
@@ -77,6 +77,19 @@
       font-weight: bold;
       font-size: 13px;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-count-badge {
+      background: #0f172a;
+      color: #fde047;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
     }
 
     .nav-btn.active {
@@ -191,40 +204,79 @@
 
       <div id="admin-toast" class="notice"></div>
 
+      <!-- أزرار الأقسام مع العداد فوق كل قسم -->
       <div class="nav-grid">
-        <button class="nav-btn active" data-p="client-reqs" onclick="showAdminPanel('client-reqs')">طلبات تسجيل العملاء</button>
-        <button class="nav-btn" data-p="clients-mgr" onclick="showAdminPanel('clients-mgr')">إعداد العملاء والنقاط والرصيد</button>
-        <button class="nav-btn" data-p="active-clients" onclick="showAdminPanel('active-clients')">العملاء النشطون</button>
-        <button class="nav-btn" data-p="chal-reqs" onclick="showAdminPanel('chal-reqs')">طلبات تسجيل المتسابقين</button>
-        <button class="nav-btn" data-p="chal-mgr" onclick="showAdminPanel('chal-mgr')">إعداد المتسابقين والنقاط</button>
-        <button class="nav-btn" data-p="active-challengers" onclick="showAdminPanel('active-challengers')">المتسابقون النشطون</button>
-        <button class="nav-btn" data-p="waitlist" onclick="showAdminPanel('waitlist')">قائمة الانتظار</button>
-        <button class="nav-btn" data-p="depts-items" onclick="showAdminPanel('depts-items')">الأقسام والسلع والعروض</button>
-        <button class="nav-btn" data-p="cash-phones" onclick="showAdminPanel('cash-phones')">إعداد أرقام الاتصال</button>
-        <button class="nav-btn" data-p="challenges-cfg" onclick="showAdminPanel('challenges-cfg')">إعداد التحديات</button>
-        <button class="nav-btn" data-p="active-done" onclick="showAdminPanel('active-done')">النشطة والمنتهية</button>
-        <button class="nav-btn" data-p="gifts-receipts" onclick="showAdminPanel('gifts-receipts')">هدايا والوصولات</button>
+        <button class="nav-btn active" data-p="client-reqs" onclick="showAdminPanel('client-reqs')">
+          <span class="nav-count-badge" id="cnt-client-reqs">0</span>
+          <span>طلبات التسجيل</span>
+        </button>
+        <button class="nav-btn" data-p="clients-mgr" onclick="showAdminPanel('clients-mgr')">
+          <span class="nav-count-badge" id="cnt-clients-mgr">0</span>
+          <span>إعداد العملاء والنقاط</span>
+        </button>
+        <button class="nav-btn" data-p="active-clients" onclick="showAdminPanel('active-clients')">
+          <span class="nav-count-badge" id="cnt-active-clients">0</span>
+          <span>العملاء النشطون</span>
+        </button>
+        <button class="nav-btn" data-p="chal-reqs" onclick="showAdminPanel('chal-reqs')">
+          <span class="nav-count-badge" id="cnt-chal-reqs">0</span>
+          <span>طلبات تسجيل المتسابقين</span>
+        </button>
+        <button class="nav-btn" data-p="chal-mgr" onclick="showAdminPanel('chal-mgr')">
+          <span class="nav-count-badge" id="cnt-chal-mgr">0</span>
+          <span>إعداد المتسابقين والنقاط</span>
+        </button>
+        <button class="nav-btn" data-p="active-challengers" onclick="showAdminPanel('active-challengers')">
+          <span class="nav-count-badge" id="cnt-active-challengers">0</span>
+          <span>المتسابقون النشطون</span>
+        </button>
+        <button class="nav-btn" data-p="waitlist" onclick="showAdminPanel('waitlist')">
+          <span class="nav-count-badge" id="cnt-waitlist">0</span>
+          <span>قائمة الانتظار</span>
+        </button>
+        <button class="nav-btn" data-p="depts-items" onclick="showAdminPanel('depts-items')">
+          <span class="nav-count-badge" id="cnt-depts-items">0</span>
+          <span>الأقسام والسلع والعروض</span>
+        </button>
+        <button class="nav-btn" data-p="cash-phones" onclick="showAdminPanel('cash-phones')">
+          <span class="nav-count-badge" id="cnt-cash-phones">0</span>
+          <span>إعداد أرقام الاتصال</span>
+        </button>
+        <button class="nav-btn" data-p="challenges-cfg" onclick="showAdminPanel('challenges-cfg')">
+          <span class="nav-count-badge" id="cnt-challenges-cfg">0</span>
+          <span>إعداد التحديات</span>
+        </button>
+        <button class="nav-btn" data-p="active-done" onclick="showAdminPanel('active-done')">
+          <span class="nav-count-badge" id="cnt-active-done">0</span>
+          <span>النشطة والمنتهية</span>
+        </button>
+        <button class="nav-btn" data-p="gifts-receipts" onclick="showAdminPanel('gifts-receipts')">
+          <span class="nav-count-badge" id="cnt-gifts-receipts">0</span>
+          <span>هدايا والوصولات</span>
+        </button>
       </div>
 
-      <!-- 1. طلبات تسجيل العملاء -->
+      <!-- 1. طلبات التسجيل -->
       <div id="panel-client-reqs" class="panel active">
         <h3>صفحة طلبات التسجيل (عملاء)</h3>
         <div id="admin-client-requests-list"></div>
       </div>
 
-      <!-- 2. إعداد العملاء والنقاط والرصيد والحذف -->
+      <!-- 2. إعداد العملاء والنقاط والرصيد -->
       <div id="panel-clients-mgr" class="panel">
         <h3>إدارة العملاء والنقاط (point) والرصيد (جنيه) والحذف</h3>
         <div id="admin-clients-list"></div>
       </div>
 
-      <!-- 3. العملاء النشطون: ترتيب تنازلي حسب ارتفاع سعر الشراء وعدد مرات الطلب + إحصائيات الروابط -->
+      <!-- 3. العملاء النشطون وقائمة المدعوين بالترتيب -->
       <div id="panel-active-clients" class="panel">
         <h3>العملاء النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد مرات الطلب)</h3>
         <div id="admin-active-clients-list"></div>
+        <h3 style="margin-top:20px;">قائمة الأشخاص المرسل لهم التطبيق وترتيبهم (حتى 1000+ رقم)</h3>
+        <div id="admin-invited-ranking-list"></div>
       </div>
 
-      <!-- 4. إعداد طلبات تسجيل المتسابقين -->
+      <!-- 4. طلبات تسجيل المتسابقين -->
       <div id="panel-chal-reqs" class="panel">
         <h3>صفحة إعداد طلبات تسجيل المتسابقين</h3>
         <div id="admin-challenger-requests-list"></div>
@@ -236,19 +288,19 @@
         <div id="admin-challengers-list"></div>
       </div>
 
-      <!-- 6. المتسابقون النشطون: ترتيب تنازلي حسب قيمة الشراء/المكافآت وعدد مرات إتمام المهمة بنجاح -->
+      <!-- 6. المتسابقون النشطون: ترتيب تنازلي حسب قيمة الشراء/المهام وعدد مرات النجاح والوقت المستغرق للتوصيل -->
       <div id="panel-active-challengers" class="panel">
-        <h3>المتسابقون النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد مرات إتمام المهمة بنجاح)</h3>
+        <h3>المتسابقون النشطون (ترتيب تنازلي حسب المبالغ وعدد مرات النجاح والوقت المستغرق لتوصيل الأوردر)</h3>
         <div id="admin-active-challengers-list"></div>
       </div>
 
-      <!-- 7. قائمة الانتظار مرتبة تنازلياً -->
+      <!-- 7. قائمة الانتظار -->
       <div id="panel-waitlist" class="panel">
         <h3>قائمة الانتظار (ترتيب تنازلي حسب تاريخ تقديم الطلب)</h3>
         <div id="admin-waitlist-list"></div>
       </div>
 
-      <!-- 8. إعداد الأقسام والأنواع والسلع والعروض -->
+      <!-- 8. إعداد الأقسام والأنواع والسلع والعروض مع زر إضافة لعدد لا نهائي -->
       <div id="panel-depts-items" class="panel">
         <h3>إعداد الأقسام والأنواع والسلع والعروض (جنيه)</h3>
 
@@ -265,7 +317,7 @@
         </div>
 
         <div class="card">
-          <label>اختر القسم لإضافة نوع أو سلعة أو عرض وسعره مع الصورة</label>
+          <label>اختر القسم لإضافة عدد لا نهائي من الأنواع والسلع والعروض</label>
           <select id="target-dept-select" onchange="renderDepartmentItemsTable()"></select>
           <input type="text" id="item-type-input" placeholder="النوع المتاح داخل القسم (مثال: بيتزا / تفاح / تلخيص جامعي)..." />
           <input type="text" id="item-title-input" placeholder="اسم الصنف أو العرض..." />
@@ -279,7 +331,7 @@
           <input type="file" id="item-image-file" accept="image/*" onchange="handleAdminImage(this, 'item-img-prev')" />
           <img id="item-img-prev" class="img-thumb" style="display:none;" alt="معاينة" />
           <div style="margin-top:10px;">
-            <button class="btn-green" onclick="addProductOrOffer()">حفظ النوع / السلعة / العرض في القسم</button>
+            <button class="btn-green" onclick="addProductOrOffer()">إضافة</button>
           </div>
         </div>
 
@@ -298,7 +350,7 @@
         <button class="btn-green" onclick="saveSelectedCashPhones()">حفظ أرقام الكاش المختارة</button>
       </div>
 
-      <!-- 10. إعداد التحديات -->
+      <!-- 10. إعداد التحديات مع زر كاميرا/استديو -->
       <div id="panel-challenges-cfg" class="panel">
         <h3>صفحة إعداد التحديات</h3>
         <div class="card">
@@ -308,7 +360,17 @@
           <textarea id="chal-details-input" placeholder="اكتب تفاصيل التحدي..."></textarea>
           <label>قيمة المكافأة (جنيه)</label>
           <input type="number" id="chal-reward-input" placeholder="مثال: 50" />
-          <button class="btn-green" onclick="publishChallenge()">تأكيد</button>
+          <label>صورة التحدي (كاميرا / استديو)</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <button type="button" class="btn-cyan" onclick="document.getElementById('chal-camera-file').click()">كاميرا</button>
+            <button type="button" class="btn-grad" onclick="document.getElementById('chal-gallery-file').click()">استديو</button>
+          </div>
+          <input type="file" id="chal-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleChallengeMedia(this)" />
+          <input type="file" id="chal-gallery-file" accept="image/*" style="display:none;" onchange="handleChallengeMedia(this)" />
+          <img id="chal-img-prev" class="img-thumb" style="display:none;" alt="صورة التحدي" />
+          <div style="margin-top:8px;">
+            <button class="btn-green" onclick="publishChallenge()">تأكيد</button>
+          </div>
         </div>
         <div id="admin-challenges-list"></div>
       </div>
@@ -317,18 +379,28 @@
       <div id="panel-active-done" class="panel">
         <h3>الطلبات النشطة</h3>
         <div id="admin-active-orders-list"></div>
-        <h3 style="margin-top:20px;">الطلبات المنتهية (مع صورة تأكيد الوصول)</h3>
+        <h3 style="margin-top:20px;">الطلبات المنتهية (مع صورة تأكيد الوصول والوقت المستغرق)</h3>
         <div id="admin-completed-orders-list"></div>
       </div>
 
-      <!-- 12. إعداد إرسال هدية والوصولات -->
+      <!-- 12. إعداد إرسال هدية والوصولات مع زر كاميرا/استديو -->
       <div id="panel-gifts-receipts" class="panel">
         <h3>صفحة إعداد إرسال هدية أو عرض أو مكافأة</h3>
         <div class="card">
           <input type="text" id="gift-target-input" placeholder="اسم العميل أو المتسابق (أو اتركه للجميع)" />
           <input type="text" id="gift-title-input" placeholder="اسم الهدية / العرض / المكافأة..." />
           <input type="text" id="gift-details-input" placeholder="تفاصيل المكافأة أو القيمة بالجنيه..." />
-          <button class="btn-grad" onclick="sendGiftOrReward()">إرسال الهدية / المكافأة</button>
+          <label>صورة الهدية / المكافأة (كاميرا / استديو)</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <button type="button" class="btn-cyan" onclick="document.getElementById('gift-camera-file').click()">كاميرا</button>
+            <button type="button" class="btn-grad" onclick="document.getElementById('gift-gallery-file').click()">استديو</button>
+          </div>
+          <input type="file" id="gift-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleGiftMedia(this)" />
+          <input type="file" id="gift-gallery-file" accept="image/*" style="display:none;" onchange="handleGiftMedia(this)" />
+          <img id="gift-img-prev" class="img-thumb" style="display:none;" alt="صورة الهدية" />
+          <div style="margin-top:8px;">
+            <button class="btn-grad" onclick="sendGiftOrReward()">إرسال الهدية / المكافأة</button>
+          </div>
         </div>
 
         <h3>وصولات الدفع والاستلام</h3>
@@ -410,8 +482,12 @@
       clientActivity: {},
       referrals: {},
       receipts: {},
+      gifts: {},
+      waitlist: {},
       uploadedProductImg: "",
-      uploadedDeptCoverImg: ""
+      uploadedDeptCoverImg: "",
+      uploadedChallengeImg: "",
+      uploadedGiftImg: ""
     };
 
     function esc(v) {
@@ -435,7 +511,7 @@
       const entries = Object.values(state.referrals[uid] || {});
       const sentToCount = entries.length;
       const completedFirstCount = entries.filter((x) => x.completedFirstAction === true).length;
-      return { sentToCount, completedFirstCount };
+      return { sentToCount, completedFirstCount, entries };
     }
 
     function compressFileToDataUrl(file, cb) {
@@ -481,7 +557,38 @@
       document.getElementById("panel-" + panelKey).classList.add("active");
     };
 
-    // 1. طلبات تسجيل العملاء
+    function updateSectionBadges() {
+      const pendingClientReqs = Object.values(state.clientRegRequests || {}).filter((r) => r.status === "pending").length;
+      const clientsCount = Object.values(state.users || {}).filter((u) => u.role === "client").length;
+      const pendingChalReqs = Object.values(state.challengerRegRequests || {}).filter((r) => r.status === "pending").length;
+      const challengersCount = Object.values(state.users || {}).filter((u) => u.role === "challenger" && u.status === "approved").length;
+      const waitCount = Object.keys(state.waitlist || {}).length;
+      const deptsCount = [...new Set([...DEFAULT_DEPARTMENTS, ...(state.departments || [])])].length;
+      const cashCount = (state.cashPhones || []).length;
+      const chalsCount = Object.keys(state.challenges || {}).length;
+      const ordersCount = Object.keys(state.orders || {}).length;
+      const giftsAndRecCount = Object.keys(state.gifts || {}).length + Object.keys(state.receipts || {}).length;
+
+      const setBadge = (id, n) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(n);
+      };
+
+      setBadge("cnt-client-reqs", pendingClientReqs);
+      setBadge("cnt-clients-mgr", clientsCount);
+      setBadge("cnt-active-clients", clientsCount);
+      setBadge("cnt-chal-reqs", pendingChalReqs);
+      setBadge("cnt-chal-mgr", challengersCount);
+      setBadge("cnt-active-challengers", challengersCount);
+      setBadge("cnt-waitlist", waitCount);
+      setBadge("cnt-depts-items", deptsCount);
+      setBadge("cnt-cash-phones", cashCount);
+      setBadge("cnt-challenges-cfg", chalsCount);
+      setBadge("cnt-active-done", ordersCount);
+      setBadge("cnt-gifts-receipts", giftsAndRecCount);
+    }
+
+    // 1. طلبات التسجيل
     function renderClientRequests() {
       const el = document.getElementById("admin-client-requests-list");
       const reqs = Object.entries(state.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -550,12 +657,11 @@
       el.innerHTML = clients
         .map(([uid, u]) => {
           const pts = Number(u.points) || 0;
-          const ptsMoney = (pts * POINT_VALUE_EGP).toFixed(2);
           const refStats = getReferralSummaryForUser(uid);
           return `
             <div class="card">
               <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الحالة: <strong>${esc(u.status || "approved")}</strong></div>
-              <div style="margin-top:4px;">الرصيد: <strong>${Number(u.wallet) || 0} جنيه</strong> • النقاط (point): <strong>${pts}</strong> (${ptsMoney} جنيه)</div>
+              <div style="margin-top:4px;">الرصيد: <strong>${Number(u.wallet) || 0} جنيه</strong> • عداد النقاط (point): <strong>${pts}</strong></div>
               <div style="font-size:12px; color:#0284c7; margin-top:4px;">أرسل الرابط لـ: <strong>${refStats.sentToCount}</strong> شخص • أتموا أول طلب/مهمة: <strong>${refStats.completedFirstCount}</strong></div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
                 <input type="number" step="any" id="set-pts-${esc(uid)}" value="${pts}" placeholder="تحديد point" style="width:130px; margin:0;" />
@@ -593,7 +699,7 @@
       toast("تم حذف العميل وحظر دخوله بنفس البيانات.");
     };
 
-    // 3. العملاء النشطون: ترتيب تنازلي حسب ارتفاع سعر الشراء وعدد مرات الطلب
+    // 3. العملاء النشطون وقائمة الأشخاص المرسل لهم التطبيق وترتيبهم
     function renderActiveClients() {
       const el = document.getElementById("admin-active-clients-list");
       const clients = Object.entries(state.users || {})
@@ -611,22 +717,72 @@
         })
         .sort((a, b) => b.totalSpent - a.totalSpent || b.orderCount - a.orderCount);
 
-      if (!clients.length) {
-        el.innerHTML = `<div class="card">لا يوجد عملاء نشطون بعد.</div>`;
-        return;
+      el.innerHTML = clients.length
+        ? clients
+            .map(
+              (c, i) => `
+              <div class="card">
+                <div><strong>#${i + 1} — ${esc(c.name)}</strong> (${esc(c.phone)})</div>
+                <div>إجمالي قيمة الشراء: <strong style="color:#be185d;">${c.totalSpent} جنيه</strong> • عدد مرات الطلب: <strong>${c.orderCount}</strong></div>
+                <div style="font-size:12px; color:#0284c7;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
+              </div>
+            `
+            )
+            .join("")
+        : `<div class="card">لا يوجد عملاء نشطون بعد.</div>`;
+
+      // قائمة الأشخاص المرسل لهم التطبيق (تدعم حتى 1000+ شخص) ومرتبة حسب المبالغ وعدد مرات الشراء/النجاح والوقت المستغرق
+      const invitedBox = document.getElementById("admin-invited-ranking-list");
+      const invitedRows = [];
+      for (const [referrerId, invitedMap] of Object.entries(state.referrals || {})) {
+        const sender = state.users[referrerId] || { name: referrerId };
+        for (const [invUid, rec] of Object.entries(invitedMap || {})) {
+          const invUser = state.users[invUid] || {};
+          const invOrders = Object.values(state.orders || {}).filter((o) => o.buyerId === invUid);
+          const invDoneTasks = Object.values(state.orders || {}).filter(
+            (o) => o.assignedChallengerId === invUid && o.stage === "completed"
+          );
+          const purchaseAmount = invOrders.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0);
+          const taskAmount = invDoneTasks.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0);
+          const totalAmount = Math.max(purchaseAmount, taskAmount);
+          const purchaseCount = invOrders.length;
+          const successCount = invDoneTasks.length;
+          const avgDurationSec = invDoneTasks.length
+            ? Math.round(invDoneTasks.reduce((s, o) => s + (Number(o.deliveryDurationSec) || 0), 0) / invDoneTasks.length)
+            : 0;
+
+          invitedRows.push({
+            senderName: sender.name || referrerId,
+            invitedName: rec.invitedName || invUser.name || invUid,
+            invitedPhone: invUser.phone || "",
+            totalAmount,
+            purchaseCount,
+            successCount,
+            avgDurationSec
+          });
+        }
       }
 
-      el.innerHTML = clients
-        .map(
-          (c, i) => `
-          <div class="card">
-            <div><strong>#${i + 1} — ${esc(c.name)}</strong> (${esc(c.phone)})</div>
-            <div>إجمالي قيمة الشراء: <strong style="color:#be185d;">${c.totalSpent} جنيه</strong> • عدد مرات الطلب: <strong>${c.orderCount}</strong></div>
-            <div style="font-size:12px; color:#0284c7;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
-          </div>
-        `
-        )
-        .join("");
+      invitedRows.sort(
+        (a, b) =>
+          b.totalAmount - a.totalAmount ||
+          (b.purchaseCount + b.successCount) - (a.purchaseCount + a.successCount) ||
+          a.avgDurationSec - b.avgDurationSec
+      );
+
+      invitedBox.innerHTML = invitedRows.length
+        ? invitedRows
+            .map(
+              (r, idx) => `
+              <div class="card">
+                <div><strong>#${idx + 1} — ${esc(r.invitedName)}</strong> ${r.invitedPhone ? `(${esc(r.invitedPhone)})` : ""} • بواسطة: <strong>${esc(r.senderName)}</strong></div>
+                <div>المبالغ المرتبطة: <strong style="color:#be185d;">${r.totalAmount} جنيه</strong> • عدد مرات الشراء: <strong>${r.purchaseCount}</strong> • مرات النجاح في المهمة: <strong>${r.successCount}</strong></div>
+                <div style="font-size:12px; color:#475569;">الوقت المستغرق لتوصيل الأوردر: <strong>${r.avgDurationSec} ثانية</strong></div>
+              </div>
+            `
+            )
+            .join("")
+        : `<div class="card">لا توجد بيانات لأشخاص منضمين عبر الروابط بعد.</div>`;
     }
 
     // 4. طلبات تسجيل المتسابقين
@@ -721,7 +877,7 @@
             <div>
               <strong>${esc(c.name)}</strong> (${esc(c.phone)}) —
               <strong>عدد الطلبات المنفذة / التحديات:</strong> <span style="color:#059669; font-weight:bold;">${c.completedCount}</span> •
-              <strong>النقاط (point):</strong> <strong>${c.pts}</strong> (${(c.pts * POINT_VALUE_EGP).toFixed(2)} جنيه)
+              <strong>عداد النقاط (point):</strong> <strong>${c.pts}</strong>
             </div>
             <div style="font-size:12px; color:#0284c7; margin-top:4px;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
@@ -736,7 +892,7 @@
         .join("");
     }
 
-    // 6. المتسابقون النشطون: ترتيب تنازلي حسب قيمة الشراء وعدد مرات إتمام المهمة بنجاح
+    // 6. المتسابقون النشطون: ترتيب تنازلي حسب قيمة الشراء وعدد مرات النجاح والوقت المستغرق لتوصيل الأوردر
     function renderActiveChallengers() {
       const el = document.getElementById("admin-active-challengers-list");
       const list = Object.entries(state.users || {})
@@ -751,10 +907,18 @@
             Number(st.totalEarned) || 0,
             doneOrders.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0)
           );
+          const totalSec = Number(st.totalDeliverySec) || doneOrders.reduce((s, o) => s + (Number(o.deliveryDurationSec) || 0), 0);
+          const samples = Number(st.deliverySamples) || doneOrders.length || 1;
+          const avgDeliverySec = successCount > 0 ? Math.round(totalSec / samples) : 0;
           const refStats = getReferralSummaryForUser(uid);
-          return { uid, ...u, successCount, purchaseOrRewardValue, refStats };
+          return { uid, ...u, successCount, purchaseOrRewardValue, avgDeliverySec, refStats };
         })
-        .sort((a, b) => b.purchaseOrRewardValue - a.purchaseOrRewardValue || b.successCount - a.successCount);
+        .sort(
+          (a, b) =>
+            b.purchaseOrRewardValue - a.purchaseOrRewardValue ||
+            b.successCount - a.successCount ||
+            a.avgDeliverySec - b.avgDeliverySec
+        );
 
       if (!list.length) {
         el.innerHTML = `<div class="card">لا يوجد متسابقون نشطون بعد.</div>`;
@@ -766,8 +930,8 @@
           (c, i) => `
           <div class="card">
             <div><strong>#${i + 1} — ${esc(c.name)}</strong> (${esc(c.phone)})</div>
-            <div>قيمة الشراء / المهام المنجزة: <strong style="color:#059669;">${c.purchaseOrRewardValue} جنيه</strong> • عدد مرات إتمام المهمة بنجاح: <strong>${c.successCount}</strong></div>
-            <div style="font-size:12px; color:#0284c7;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
+            <div>المبالغ المرتبطة بالمهام / الشراء: <strong style="color:#059669;">${c.purchaseOrRewardValue} جنيه</strong> • مرات النجاح في تحقيق المهمة: <strong>${c.successCount}</strong></div>
+            <div style="font-size:12px; color:#475569;">الوقت المستغرق لتوصيل الأوردر: <strong>${c.avgDeliverySec} ثانية</strong> • أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> (أتموا أول طلب/مهمة: <strong>${c.refStats.completedFirstCount}</strong>)</div>
           </div>
         `
         )
@@ -784,7 +948,7 @@
         ? list
             .map(
               (o) =>
-                `<div class="card"><strong>${esc(o.challengeTitle || "طلب")}</strong> — ${Number(o.totalAmount) || 0} جنيه<br/>العميل: ${esc(o.buyerName)} (${esc(o.buyerPhone)})</div>`
+                `<div class="card"><strong>${esc(o.challengeTitle || "طلب")}</strong> — ${Number(o.totalAmount) || 0} جنيه • الوقت المستغرق: <strong>${Number(o.deliveryDurationSec) || 0} ثانية</strong><br/>العميل: ${esc(o.buyerName)} (${esc(o.buyerPhone)})</div>`
             )
             .join("")
         : "<p>لا توجد طلبات مكتملة مسجلة لهذا المتسابق.</p>";
@@ -805,16 +969,10 @@
       toast("تم حذف المتسابق وتأكيد الحذف.");
     };
 
-    // 7. قائمة الانتظار مرتبة تنازلياً
-    let waitlistData = {};
-    onValue(ref(db, "waitlist"), (s) => {
-      waitlistData = s.val() || {};
-      renderWaitlist();
-    });
-
+    // 7. قائمة الانتظار
     function renderWaitlist() {
       const el = document.getElementById("admin-waitlist-list");
-      const rows = Object.values(waitlistData).sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
+      const rows = Object.values(state.waitlist || {}).sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
       if (!rows.length) {
         el.innerHTML = `<div class="card">قائمة الانتظار فارغة.</div>`;
         return;
@@ -831,7 +989,7 @@
         .join("");
     }
 
-    // 8. إعداد الأقسام والأنواع والسلع والعروض
+    // 8. إعداد الأقسام والأنواع والسلع والعروض (عدد لا نهائي عبر زر إضافة)
     function getAllDepts() {
       return [...new Set([...DEFAULT_DEPARTMENTS, ...(state.departments || [])])];
     }
@@ -961,9 +1119,10 @@
       document.getElementById("item-price-input").value = "";
       document.getElementById("item-desc-input").value = "";
       document.getElementById("item-is-offer").checked = false;
+      document.getElementById("item-image-file").value = "";
       state.uploadedProductImg = "";
       document.getElementById("item-img-prev").style.display = "none";
-      toast(`تمت إضافة العنصر والسعر إلى قسم ${dept}.`);
+      toast(`تمت إضافة (${title}) إلى قسم ${dept} — يمكنك إضافة المزيد فوراً.`);
     };
 
     window.deleteProductItem = async function (dept, pid) {
@@ -1018,7 +1177,18 @@
       toast(`تم حفظ ${selected.length} أرقام كاش للظهور في صفحة الدفع.`);
     };
 
-    // 10. إعداد التحديات
+    // 10. إعداد التحديات مع كاميرا / استديو
+    window.handleChallengeMedia = function (inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      compressFileToDataUrl(file, (dataUrl) => {
+        state.uploadedChallengeImg = dataUrl;
+        const prev = document.getElementById("chal-img-prev");
+        prev.src = dataUrl;
+        prev.style.display = "block";
+      });
+    };
+
     window.publishChallenge = async function () {
       const title = document.getElementById("chal-title-input").value.trim();
       const details = document.getElementById("chal-details-input").value.trim();
@@ -1030,12 +1200,15 @@
         title,
         details,
         reward,
+        image: state.uploadedChallengeImg || "",
         createdAt: Date.now()
       });
 
       document.getElementById("chal-title-input").value = "";
       document.getElementById("chal-details-input").value = "";
       document.getElementById("chal-reward-input").value = "";
+      state.uploadedChallengeImg = "";
+      document.getElementById("chal-img-prev").style.display = "none";
       toast("تم تأكيد نشر التحدي في صفحة التحديات للمتسابقين.");
     };
 
@@ -1045,8 +1218,11 @@
       el.innerHTML = list
         .map(
           ([id, c]) => `
-          <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <div><strong>${esc(c.title)}</strong> (${Number(c.reward) || 0} جنيه) — ${c.acceptedBy ? `مقبول بواسطة ${esc(c.acceptedByName)}` : "متاح"}</div>
+          <div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div>
+              <strong>${esc(c.title)}</strong> (${Number(c.reward) || 0} جنيه) — ${c.acceptedBy ? `مقبول بواسطة ${esc(c.acceptedByName)}` : "متاح"}
+              ${c.image ? `<div><img src="${c.image}" class="img-thumb" alt="صورة التحدي" /></div>` : ""}
+            </div>
             <button class="btn-red" onclick="deleteChallengeItem('${esc(id)}')">حذف</button>
           </div>
         `
@@ -1082,7 +1258,7 @@
             .map(
               (o) => `
               <div class="card">
-                <div><strong>${esc(o.challengeTitle || o.buyerName || "طلب منتهي")}</strong> — ${Number(o.totalAmount) || 0} جنيه</div>
+                <div><strong>${esc(o.challengeTitle || o.buyerName || "طلب منتهي")}</strong> — ${Number(o.totalAmount) || 0} جنيه • الوقت المستغرق: <strong>${Number(o.deliveryDurationSec) || 0} ثانية</strong></div>
                 <div>المتسابق: ${esc(o.assignedChallengerName)}</div>
                 ${o.deliveryImage ? `<img src="${o.deliveryImage}" class="img-thumb" alt="صورة التسليم" />` : ""}
               </div>
@@ -1092,7 +1268,18 @@
         : `<div class="card">لا توجد طلبات منتهية بعد.</div>`;
     }
 
-    // 12. هدايا والوصولات
+    // 12. إعداد إرسال هدية مع كاميرا / استديو + الوصولات
+    window.handleGiftMedia = function (inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      compressFileToDataUrl(file, (dataUrl) => {
+        state.uploadedGiftImg = dataUrl;
+        const prev = document.getElementById("gift-img-prev");
+        prev.src = dataUrl;
+        prev.style.display = "block";
+      });
+    };
+
     window.sendGiftOrReward = async function () {
       const targetName = document.getElementById("gift-target-input").value.trim();
       const title = document.getElementById("gift-title-input").value.trim();
@@ -1103,12 +1290,15 @@
         targetName,
         title,
         details,
+        image: state.uploadedGiftImg || "",
         createdAt: Date.now()
       });
 
       document.getElementById("gift-target-input").value = "";
       document.getElementById("gift-title-input").value = "";
       document.getElementById("gift-details-input").value = "";
+      state.uploadedGiftImg = "";
+      document.getElementById("gift-img-prev").style.display = "none";
       toast("تم إرسال الهدية / المكافأة.");
     };
 
@@ -1169,6 +1359,7 @@
     };
 
     function renderAll() {
+      updateSectionBadges();
       if (document.getElementById("admin-app").style.display !== "block") return;
       renderClientRequests();
       renderClientsManager();
@@ -1234,6 +1425,14 @@
     });
     onValue(ref(db, "receipts"), (s) => {
       state.receipts = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "gifts"), (s) => {
+      state.gifts = s.val() || {};
+      renderAll();
+    });
+    onValue(ref(db, "waitlist"), (s) => {
+      state.waitlist = s.val() || {};
       renderAll();
     });
   </script>
