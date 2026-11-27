@@ -567,13 +567,14 @@
     }
 
     .thumb-preview {
-      max-width: 240px;
-      max-height: 190px;
-      border-radius: 10px;
+      max-width: 260px;
+      max-height: 220px;
+      border-radius: 12px;
       margin-top: 8px;
       display: none;
-      border: 1px solid #cbd5e1;
-      object-fit: cover;
+      border: 2px solid #cbd5e1;
+      object-fit: contain;
+      background: #0f172a;
     }
 
     .preview-actions-row {
@@ -624,6 +625,35 @@
       padding: 18px;
       margin-top: 16px;
       text-align: center;
+    }
+
+    .payer-source-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .payer-source-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .source-choice-btn {
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .source-choice-btn.active {
+      border-color: #059669;
+      background: #ecfdf5;
+      color: #065f46;
     }
   </style>
 </head>
@@ -880,7 +910,7 @@
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">تأكيد الشراء</h2>
-      <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى صفحة الدفع من رقمك.</p>
+      <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى صفحة الدفع.</p>
       <div id="confirm-cards-grid" class="items-grid"></div>
       <div id="confirm-total-line" class="box-card" style="margin-top:14px; font-size:18px; font-weight:bold;"></div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -895,11 +925,61 @@
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة الدفع من رقمك</h2>
-      <p class="screen-sub">اختر رقم الاستقبال المحدد من الأدمن ثم أكد قرارك.</p>
+      <p class="screen-sub">اختر رقم الاستقبال المحدد من الأدمن، وحدد هل ستدفع من نفس الرقم أو من رقم آخر، ثم صوّر أو اختر إيصال الدفع وأرسله للأدمن.</p>
       <div id="payment-amount-banner" class="status-banner"></div>
+
       <div class="form-group">
-        <label>اختر رقم الكاش المحدد من الأدمن</label>
+        <label>1. اختر رقم الكاش المحدد من الأدمن</label>
         <div id="admin-cash-phones-list"></div>
+      </div>
+
+      <div class="box-card">
+        <label>2. هل ستدفع من نفس الرقم أم من رقم آخر؟</label>
+        <div class="payer-source-row">
+          <button type="button" id="payer-same-btn" class="source-choice-btn active" onclick="selectPaymentSource('same')">
+            الدفع من نفس الرقم
+          </button>
+          <button type="button" id="payer-other-btn" class="source-choice-btn" onclick="selectPaymentSource('other')">
+            الدفع من رقم آخر
+          </button>
+        </div>
+        <div id="payer-same-info" style="font-size:13px; color:#065f46; font-weight:bold;">
+          رقم الدفع المستخدم: <span id="same-payer-phone-display">رقم حسابك المسجل</span>
+        </div>
+        <div id="payer-other-box" style="display:none; margin-top:10px;">
+          <label for="other-payer-phone-input">اختر أو اكتب رقم الدفع الآخر (11 رقماً مصرياً)</label>
+          <input type="tel" id="other-payer-phone-input" placeholder="مثال: 01012345678" maxlength="11" />
+        </div>
+      </div>
+
+      <div class="box-card">
+        <label>3. تصوير أو سحب صورة إيصال الدفع وإرسالها للأدمن</label>
+        <p style="font-size:13px; color:#475569; margin:0 0 10px;">
+          يمكنك فتح الكاميرا لتصوير الإيصال مباشرة أو اختيار صورة من الاستوديو، ثم الضغط على <strong>إرسال الإيصال إلى الأدمن</strong>.
+        </p>
+
+        <input type="file" id="receipt-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePaymentReceiptFile(this)" />
+        <input type="file" id="receipt-gallery-input" accept="image/*" style="display:none;" onchange="handlePaymentReceiptFile(this)" />
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn-dark" onclick="document.getElementById('receipt-camera-input').click()">
+            📷 كاميرا (تصوير الإيصال)
+          </button>
+          <button type="button" class="btn-amber" onclick="document.getElementById('receipt-gallery-input').click()">
+            🖼️ استوديو (اختيار صورة)
+          </button>
+          <button type="button" class="btn-success" onclick="sendPaymentReceiptToAdmin()">
+            📤 إرسال الإيصال إلى الأدمن
+          </button>
+        </div>
+
+        <div class="preview-actions-row">
+          <img id="payment-receipt-preview" class="thumb-preview" alt="معاينة إيصال الدفع" />
+          <button type="button" id="delete-payment-receipt-btn" class="btn-danger" style="display:none;" onclick="clearPaymentReceiptImage()">
+            حذف الصورة
+          </button>
+        </div>
+        <div id="receipt-send-status" style="font-size:13px; font-weight:bold; color:#059669; margin-top:8px;"></div>
       </div>
 
       <div id="confirm-purchase-prompt-box" class="box-card">
@@ -1226,7 +1306,8 @@
       selectedTypeFilter: "الكل",
       cart: loadSavedCart(),
       selectedCashPhone: null,
-      uploadedImages: { deliveryProof: "" },
+      paymentSourceType: "same",
+      uploadedImages: { deliveryProof: "", paymentReceipt: "" },
       trackedApplicant: null,
       db: {
         users: {},
@@ -2021,6 +2102,157 @@
       return state.cart.reduce((sum, item) => sum + Math.max(0, Number(item.price) || 0), 0);
     }
 
+    window.selectPaymentSource = function (mode) {
+      state.paymentSourceType = mode === "other" ? "other" : "same";
+      document.getElementById("payer-same-btn").classList.toggle("active", state.paymentSourceType === "same");
+      document.getElementById("payer-other-btn").classList.toggle("active", state.paymentSourceType === "other");
+      document.getElementById("payer-same-info").style.display = state.paymentSourceType === "same" ? "block" : "none";
+      document.getElementById("payer-other-box").style.display = state.paymentSourceType === "other" ? "block" : "none";
+    };
+
+    function getActivePayerPhone() {
+      if (state.paymentSourceType === "other") {
+        return (document.getElementById("other-payer-phone-input").value || "").trim();
+      }
+      return (state.currentUser && state.currentUser.phone) || "";
+    }
+
+    function encodeHighQualityImage(file, cb, maxDim = 1600, quality = 0.92) {
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const img = new Image();
+        img.onload = function () {
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, 0, 0, w, h);
+          const isPng = file.type === "image/png";
+          let dataUrl = isPng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", quality);
+          let q = quality;
+          while (!isPng && dataUrl.length > 1800000 && q > 0.7) {
+            q = Number((q - 0.05).toFixed(2));
+            dataUrl = canvas.toDataURL("image/jpeg", q);
+          }
+          cb(dataUrl);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    window.handlePaymentReceiptFile = function (inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      encodeHighQualityImage(file, (highResDataUrl) => {
+        state.uploadedImages.paymentReceipt = highResDataUrl;
+        const prev = document.getElementById("payment-receipt-preview");
+        if (prev) {
+          prev.src = highResDataUrl;
+          prev.style.display = "block";
+        }
+        const delBtn = document.getElementById("delete-payment-receipt-btn");
+        if (delBtn) delBtn.style.display = "inline-block";
+        document.getElementById("receipt-send-status").textContent = "تم تجهيز صورة الإيصال — اضغط (إرسال الإيصال إلى الأدمن).";
+      });
+    };
+
+    window.clearPaymentReceiptImage = function () {
+      state.uploadedImages.paymentReceipt = "";
+      document.getElementById("receipt-camera-input").value = "";
+      document.getElementById("receipt-gallery-input").value = "";
+      const prev = document.getElementById("payment-receipt-preview");
+      if (prev) {
+        prev.src = "";
+        prev.style.display = "none";
+      }
+      const delBtn = document.getElementById("delete-payment-receipt-btn");
+      if (delBtn) delBtn.style.display = "none";
+      document.getElementById("receipt-send-status").textContent = "";
+      notify("تم حذف صورة الإيصال.", "info");
+    };
+
+    window.sendPaymentReceiptToAdmin = async function () {
+      const total = getCartTotal();
+      if (total <= 0) return notify("عربة التسوق فارغة، اختر أصنافاً أولاً.", "error");
+
+      const phones = Array.isArray(state.db.cashPhones) ? state.db.cashPhones.slice(0, 5) : [];
+      const receiverPhone = state.selectedCashPhone || phones[0] || "";
+      if (!receiverPhone) {
+        return notify("يرجى اختيار رقم الكاش المحدد من الأدمن أولاً.", "error");
+      }
+
+      const payerPhone = getActivePayerPhone();
+      if (!isValidEgyptianPhone(payerPhone)) {
+        return notify(
+          state.paymentSourceType === "other"
+            ? "أدخل رقم الدفع الآخر بشكل صحيح (11 رقماً مصرياً)."
+            : "لا يوجد رقم مسجل لحسابك حالياً، اختر (الدفع من رقم آخر) وأدخل الرقم.",
+          "error"
+        );
+      }
+
+      if (!state.uploadedImages.paymentReceipt) {
+        return notify("صوّر الإيصال بالكاميرا أو اختر صورته من الاستوديو أولاً.", "error");
+      }
+
+      const now = Date.now();
+      const buyerName = state.currentUser?.name || "مستخدم";
+      const buyerPhone = state.currentUser?.phone || payerPhone;
+      const buyerId = state.currentUser?.id || "";
+
+      const orderRef = push(ref(db, "orders"));
+      await set(orderRef, {
+        id: orderRef.key,
+        buyerId,
+        buyerName,
+        buyerPhone,
+        payerPhone,
+        paymentSourceType: state.paymentSourceType,
+        items: state.cart,
+        totalAmount: total,
+        cashReceiverPhone: receiverPhone,
+        receiptImage: state.uploadedImages.paymentReceipt,
+        paymentConfirmed: false,
+        paymentStatus: "pending_review",
+        status: "تم إرسال الإيصال وبانتظار تأكيد الأدمن",
+        createdAt: now
+      });
+
+      const receiptRef = push(ref(db, "paymentReceipts"));
+      await set(receiptRef, {
+        id: receiptRef.key,
+        orderId: orderRef.key,
+        buyerId,
+        buyerName,
+        buyerPhone,
+        payerPhone,
+        paymentSourceType: state.paymentSourceType,
+        cashReceiverPhone: receiverPhone,
+        totalAmount: total,
+        receiptImage: state.uploadedImages.paymentReceipt,
+        paymentStatus: "pending_review",
+        createdAt: now
+      });
+
+      document.getElementById("receipt-send-status").textContent =
+        `تم إرسال إيصال الدفع إلى الأدمن بنجاح (رقم الدفع: ${payerPhone} • استقبال: ${receiverPhone}).`;
+      notify("تم إرسال صورة الإيصال إلى الأدمن وسيظهر طلبك فوراً في لوحة الأدمن.", "success");
+    };
+
     window.openPaymentMethodsScreen = function () {
       document.getElementById("payment-result-box").innerHTML = "";
       window.goScreen("screen-payment");
@@ -2028,13 +2260,22 @@
 
     function renderPaymentScreen() {
       const total = getCartTotal();
-      document.getElementById("payment-amount-banner").textContent = `المبلغ المطلوب دفعه من حسابك: ${total} جنيه`;
+      document.getElementById("payment-amount-banner").textContent = `المبلغ المطلوب دفعه: ${total} جنيه`;
+      const samePhoneEl = document.getElementById("same-payer-phone-display");
+      if (samePhoneEl) {
+        samePhoneEl.textContent = (state.currentUser && state.currentUser.phone) || "غير مسجل (اختر الدفع من رقم آخر)";
+      }
+
       const listEl = document.getElementById("admin-cash-phones-list");
       const phones = Array.isArray(state.db.cashPhones) ? state.db.cashPhones.slice(0, 5) : [];
 
       if (!phones.length) {
         listEl.innerHTML = `<div class="box-card">لم يتم تحديد أرقام كاش من الإدارة بعد.</div>`;
         return;
+      }
+
+      if (!state.selectedCashPhone && phones[0]) {
+        state.selectedCashPhone = phones[0];
       }
 
       listEl.innerHTML = phones
@@ -2073,6 +2314,11 @@
         return notify("يرجى اختيار رقم الاستقبال المحدد من الأدمن أولاً.", "error");
       }
 
+      const payerPhone = getActivePayerPhone();
+      if (!isValidEgyptianPhone(payerPhone)) {
+        return notify("يرجى التأكد من رقم الدفع (11 رقماً مصرياً) قبل تأكيد الطلب.", "error");
+      }
+
       if (!state.currentUser || !state.currentUser.id) {
         return notify("يرجى تسجيل الدخول كعميل أولاً ليتم الخصم من حسابك.", "error");
       }
@@ -2096,13 +2342,34 @@
         buyerId: state.currentUser.id,
         buyerName: state.currentUser.name,
         buyerPhone: state.currentUser.phone,
+        payerPhone,
+        paymentSourceType: state.paymentSourceType,
         items: state.cart,
         totalAmount: total,
         cashReceiverPhone: receiverPhone,
-        paymentMethod: "خصم من حساب العميل إلى رقم الأدمن",
-        status: "جاري تنفيذ طلبك",
+        receiptImage: state.uploadedImages.paymentReceipt || "",
+        paymentMethod: state.paymentSourceType === "other" ? "دفع من رقم آخر" : "دفع من نفس الرقم",
+        paymentConfirmed: false,
+        paymentStatus: "pending_review",
+        status: "جاري تنفيذ طلبك (بانتظار تأكيد الدفع من الأدمن)",
         createdAt: Date.now()
       });
+
+      if (state.uploadedImages.paymentReceipt) {
+        await set(push(ref(db, "paymentReceipts")), {
+          orderId: orderRef.key,
+          buyerId: state.currentUser.id,
+          buyerName: state.currentUser.name,
+          buyerPhone: state.currentUser.phone,
+          payerPhone,
+          paymentSourceType: state.paymentSourceType,
+          cashReceiverPhone: receiverPhone,
+          totalAmount: total,
+          receiptImage: state.uploadedImages.paymentReceipt,
+          paymentStatus: "pending_review",
+          createdAt: Date.now()
+        });
+      }
 
       await runTransaction(ref(db, `clientActivity/${state.currentUser.id}`), (curr) => {
         const prev = curr || {
@@ -2128,10 +2395,10 @@
         type: "وصل دفع واستلام",
         userId: state.currentUser.id,
         userName: state.currentUser.name,
-        phone: state.currentUser.phone,
+        phone: payerPhone,
         receiverPhone,
         amount: total,
-        method: "من حساب العميل إلى رقم الأدمن",
+        method: state.paymentSourceType === "other" ? "من رقم آخر إلى رقم الأدمن" : "من نفس الرقم إلى رقم الأدمن",
         createdAt: Date.now()
       });
 
@@ -2141,50 +2408,13 @@
 
       document.getElementById("payment-result-box").innerHTML = `
         <div class="receipt-box">
-          <h3 style="margin-top:0; color:#065f46;">تم تأكيد طلب الشراء وإرسال المبلغ</h3>
-          <p>تم خصم <strong>${total} جنيه</strong> من حسابك وإرسالها إلى رقم الأدمن: <strong>${esc(receiverPhone)}</strong>.</p>
+          <h3 style="margin-top:0; color:#065f46;">تم إرسال طلب الشراء إلى الأدمن</h3>
+          <p>المبلغ: <strong>${total} جنيه</strong> • رقم الدفع: <strong>${esc(payerPhone)}</strong> • رقم الاستقبال: <strong>${esc(receiverPhone)}</strong>.</p>
           <button type="button" class="btn-dark" onclick="goScreen('screen-orders-home')">العودة إلى الأقسام</button>
         </div>
       `;
-      notify("تم تأكيد طلب الشراء وإرسال المبلغ بنجاح.", "success");
+      notify("تم تأكيد طلب الشراء وإرساله للأدمن بنجاح.", "success");
     };
-
-    function encodeHighQualityImage(file, cb, maxDim = 1600, quality = 0.92) {
-      const reader = new FileReader();
-      reader.onload = function (ev) {
-        const img = new Image();
-        img.onload = function () {
-          let w = img.width;
-          let h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w >= h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
-          }
-          const canvas = document.createElement("canvas");
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = "high";
-          ctx.drawImage(img, 0, 0, w, h);
-          const isPng = file.type === "image/png";
-          let dataUrl = isPng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", quality);
-          let q = quality;
-          while (!isPng && dataUrl.length > 1800000 && q > 0.7) {
-            q = Number((q - 0.05).toFixed(2));
-            dataUrl = canvas.toDataURL("image/jpeg", q);
-          }
-          cb(dataUrl);
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
 
     window.clearPreviewImage = function (inputId, previewImgId, delBtnId, key) {
       state.uploadedImages[key] = "";
