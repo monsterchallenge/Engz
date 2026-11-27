@@ -573,6 +573,11 @@
       border-color: #86efac;
     }
 
+    .box-card.history-card {
+      background: #eff6ff;
+      border-color: #93c5fd;
+    }
+
     .status-banner {
       padding: 12px 14px;
       border-radius: 12px;
@@ -956,11 +961,16 @@
       <div id="departments-container" class="dept-grid"></div>
 
       <div id="client-orders-tracker-section" style="margin-top:22px;">
-        <h3 style="margin:0 0 10px; color:#1e1b4b;">طلباتي الحالية</h3>
+        <h3 style="margin:0 0 10px; color:#1e1b4b;">الطلبات النشطة للعميل</h3>
         <div id="client-active-orders-list"></div>
 
         <h3 style="margin:18px 0 10px; color:#166534;">الطلبات المنتهية</h3>
         <div id="client-completed-orders-list"></div>
+
+        <h3 style="margin:18px 0 10px; color:#1e40af;">سجل طلبات العميل (بالتاريخ والوقت)</h3>
+        <div id="client-order-history-list"></div>
+
+        <div id="client-admin-inbox-section" style="margin-top:18px;"></div>
       </div>
 
       <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
@@ -1090,26 +1100,26 @@
       <div id="payment-result-box"></div>
     </div>
 
-    <!-- صفحة التحديات -->
+    <!-- صفحة التحديات وسجل المتسابق -->
     <div id="screen-challenges-hub" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
-      <h2 class="screen-title">صفحة التحديات</h2>
-      <p class="screen-sub">يمكنك اختيار مهمة واحدة نشطة في كل مرة حتى يتم تأكيد انتهائها.</p>
+      <h2 class="screen-title">صفحة التحديات وسجل المتسابق</h2>
+      <p class="screen-sub">يمكنك اختيار مهمة واحدة نشطة في كل مرة، والضغط على <strong>تم التوصيل</strong> لنقلها إلى سجل المهام المكتملة.</p>
 
       <div class="sub-tabs">
-        <button type="button" class="sub-tab-btn active" id="stab-available" onclick="switchChallengerSubTab('available')">قائمة التحديات</button>
-        <button type="button" class="sub-tab-btn" id="stab-active" onclick="switchChallengerSubTab('active')">المهام المعلّقة / النشطة</button>
-        <button type="button" class="sub-tab-btn" id="stab-completed" onclick="switchChallengerSubTab('completed')">المهام المكتملة</button>
+        <button type="button" class="sub-tab-btn" id="stab-available" onclick="switchChallengerSubTab('available')">قائمة التحديات</button>
+        <button type="button" class="sub-tab-btn active" id="stab-active" onclick="switchChallengerSubTab('active')">المهام النشطة</button>
+        <button type="button" class="sub-tab-btn" id="stab-completed" onclick="switchChallengerSubTab('completed')">سجل المتسابق (المهام المكتملة)</button>
         <button type="button" class="sub-tab-btn" id="stab-rewards" onclick="switchChallengerSubTab('rewards')">الهدايا والوصولات</button>
       </div>
 
-      <div id="chal-panel-available">
+      <div id="chal-panel-available" style="display:none;">
         <div id="available-challenges-list"></div>
       </div>
 
-      <div id="chal-panel-active" style="display:none;">
+      <div id="chal-panel-active">
         <div id="active-challenger-order-box"></div>
       </div>
 
@@ -1147,6 +1157,7 @@
     window.__engzChalMode = "register";
     window.__engzSplashTimer = null;
     window.__engzSplashRunning = false;
+    window.__engzNoticeTimer = null;
 
     document.addEventListener("click", function (ev) {
       var btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
@@ -1159,12 +1170,20 @@
       }, 260);
     }, true);
 
-    window.engzNotify = function (msg, type) {
+    window.engzNotify = function (msg, type, durationMs) {
+      if (durationMs === undefined) durationMs = 8000;
       var el = document.getElementById("global-notice");
       if (!el) return;
+      if (window.__engzNoticeTimer) clearTimeout(window.__engzNoticeTimer);
       el.style.display = "block";
       el.className = "status-banner" + (type === "error" ? " error" : type === "success" ? " success" : "");
       el.textContent = msg;
+      if (durationMs > 0) {
+        window.__engzNoticeTimer = setTimeout(function () {
+          el.style.display = "none";
+          el.textContent = "";
+        }, durationMs);
+      }
     };
 
     window.engzActivateScreen = function (screenId) {
@@ -1414,6 +1433,8 @@
     let currentZoomUid = null;
     const seenConfirmedOrderIds = new Set();
     const clientOrderProofs = {};
+    let execBannerTimer = null;
+    let delivBannerTimer = null;
 
     const locks = {
       cartStep: false,
@@ -1442,6 +1463,10 @@
         products: {},
         cashPhones: [],
         orders: {},
+        userOrderHistory: {},
+        userOrderHistoryByName: {},
+        challengerHistory: {},
+        userMessages: {},
         challenges: {},
         gifts: {},
         receipts: {},
@@ -1469,8 +1494,8 @@
       }
     };
 
-    function notify(msg, type = "info") {
-      window.engzNotify(msg, type);
+    function notify(msg, type = "info", durationMs = 8000) {
+      window.engzNotify(msg, type, durationMs);
     }
 
     function isOrderCompleted(o) {
@@ -1480,33 +1505,71 @@
         o.deliveryStatus === "completed" ||
         o.orderCompleted === true ||
         o.status === "منتهي" ||
+        o.status === "تم التوصيل" ||
         o.status === "تم وصول الطلب"
       );
+    }
+
+    function formatDuration(sec) {
+      const s = Math.max(0, Number(sec) || 0);
+      const mins = Math.floor(s / 60);
+      const rem = s % 60;
+      return mins > 0 ? `${mins} دقيقة و ${rem} ثانية` : `${rem} ثانية`;
+    }
+
+    function showTemporaryArrivalAlert(orderId, durationMs = 8000) {
+      const execBanner = document.getElementById("admin-approval-banner");
+      const delivBanner = document.getElementById("delivery-status-banner");
+      if (execBannerTimer) clearTimeout(execBannerTimer);
+      if (delivBannerTimer) clearTimeout(delivBannerTimer);
+      const suffix = orderId ? ` • رقم الطلب #${String(orderId).slice(-6)}` : "";
+
+      if (execBanner) {
+        execBanner.textContent = `تم التوصيل${suffix}`;
+        execBanner.style.display = "block";
+        execBannerTimer = setTimeout(() => {
+          execBanner.style.display = "none";
+          execBanner.textContent = "";
+        }, durationMs);
+      }
+      if (delivBanner) {
+        delivBanner.textContent = `تم نقل العملية إلى السجل بنجاح${suffix}`;
+        delivBanner.style.display = "block";
+        delivBannerTimer = setTimeout(() => {
+          delivBanner.style.display = "none";
+          delivBanner.textContent = "";
+        }, durationMs);
+      }
+
+      notify(`تم التوصيل${suffix}`, "success", durationMs);
     }
 
     function showExecutionAndDeliveryAlerts(orderId) {
       const execBanner = document.getElementById("admin-approval-banner");
       const delivBanner = document.getElementById("delivery-status-banner");
+      if (execBannerTimer) clearTimeout(execBannerTimer);
+      if (delivBannerTimer) clearTimeout(delivBannerTimer);
       const suffix = orderId ? ` • رقم الطلب #${String(orderId).slice(-6)}` : "";
 
       if (execBanner) {
         execBanner.textContent = `جارى تنفيذ طلبك${suffix}`;
         execBanner.style.display = "block";
+        execBannerTimer = setTimeout(() => {
+          execBanner.style.display = "none";
+        }, 8000);
       }
       if (delivBanner) {
         delivBanner.textContent = `جارى التوصيل${suffix}`;
         delivBanner.style.display = "block";
-        delivBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        delivBannerTimer = setTimeout(() => {
+          delivBanner.style.display = "none";
+        }, 8000);
       }
 
-      notify("جارى تنفيذ طلبك", "success");
+      notify("جارى تنفيذ طلبك", "success", 8000);
       setTimeout(() => {
-        notify("جارى التوصيل", "success");
+        notify("جارى التوصيل", "success", 8000);
       }, 450);
-
-      if (navigator.vibrate) {
-        try { navigator.vibrate([120, 60, 120]); } catch {}
-      }
     }
 
     function monitorConfirmedOrdersForUser() {
@@ -2057,7 +2120,7 @@
       encodeHighQualityImage(file, (dataUrl) => {
         clientOrderProofs[orderId] = dataUrl;
         renderClientOrdersTracker();
-        notify("تم إرفاق صورة تأكيد وصول الطلب.", "success");
+        notify("تم إرفاق صورة تأكيد التوصيل.", "success");
       });
     };
 
@@ -2071,56 +2134,109 @@
       notify("تم حذف الصورة.", "info");
     };
 
+    async function archiveOrderToUserHistory(orderId, ord, customDateMs = Date.now()) {
+      if (!ord) return;
+      const startTs = Number(ord.deliveryStartAt || ord.acceptedAt || ord.createdAt) || customDateMs;
+      const durationSec = Math.max(1, Math.round((customDateMs - startTs) / 1000));
+      const historyPayload = {
+        orderId,
+        buyerId: ord.buyerId || state.currentUser?.id || "",
+        buyerName: ord.buyerName || state.currentUser?.name || "مستخدم",
+        buyerPhone: ord.buyerPhone || ord.payerPhone || state.currentUser?.phone || "",
+        assignedChallengerId: ord.assignedChallengerId || "",
+        assignedChallengerName: ord.assignedChallengerName || "",
+        items: ord.items || [],
+        challengeTitle: ord.challengeTitle || "",
+        totalAmount: Number(ord.totalAmount) || 0,
+        status: "تم التوصيل",
+        createdAt: ord.createdAt || customDateMs,
+        deliveredAt: customDateMs,
+        completedAt: customDateMs,
+        deliveryDurationSec: durationSec,
+        archivedAt: customDateMs,
+        dateTimeText: new Date(customDateMs).toLocaleString("ar-EG")
+      };
+
+      const targetUid = ord.buyerId || state.currentUser?.id || "";
+      if (targetUid) {
+        await set(ref(db, `userOrderHistory/${targetUid}/${orderId}`), historyPayload);
+      }
+      const cleanName = (ord.buyerName || state.currentUser?.name || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+      if (cleanName) {
+        await set(ref(db, `userOrderHistoryByName/${cleanName}/${orderId}`), historyPayload);
+      }
+      if (ord.assignedChallengerId) {
+        await set(ref(db, `challengerHistory/${ord.assignedChallengerId}/${orderId}`), historyPayload);
+      }
+    }
+
     window.markOrderArrivedClient = async function (orderId) {
       const ord = state.db.orders[orderId];
       if (!ord) return notify("الطلب غير موجود.", "error");
 
       const photoData = clientOrderProofs[orderId] || ord.deliveryImage || ord.receiptImage || "";
       if (state.db.appSettings?.requireDeliveryPhoto && !photoData) {
-        return notify("تصوير أو اختيار صورة (كاميرا / استوديو) مطلوب قبل الضغط على تم وصول الطلب.", "error");
+        return notify("تصوير أو اختيار صورة (كاميرا / استوديو) مطلوب قبل الضغط على تم التوصيل.", "error");
       }
 
       const now = Date.now();
+      const startTs = Number(ord.deliveryStartAt || ord.acceptedAt || ord.createdAt) || now;
+      const elapsedSec = Math.max(1, Math.round((now - startTs) / 1000));
+
       await update(ref(db, `orders/${orderId}`), {
         stage: "completed",
         orderCompleted: true,
         deliveryStatus: "completed",
-        status: "تم وصول الطلب",
-        userAlertMessage: "تم وصول الطلب",
+        status: "تم التوصيل",
+        userAlertMessage: "تم التوصيل",
         deliveryImage: photoData,
+        deliveredAt: now,
+        deliveredAtFormatted: new Date(now).toLocaleString("ar-EG"),
+        deliveryDurationSec: elapsedSec,
         completedAt: now,
+        completedAtFormatted: new Date(now).toLocaleString("ar-EG"),
         completedBy: "client"
       });
+
+      await archiveOrderToUserHistory(orderId, { ...ord, completedAt: now }, now);
 
       if (ord.challengeId) {
         await update(ref(db, `challenges/${ord.challengeId}`), {
           completed: true,
           status: "مكتملة",
+          deliveredAt: now,
           completedAt: now
         });
       }
 
       delete clientOrderProofs[orderId];
-      notify("تم وصول الطلب بنجاح وانتقل إلى الطلبات المنتهية.", "success");
+      showTemporaryArrivalAlert(orderId, 8000);
       renderClientOrdersTracker();
     };
 
     window.deleteCompletedOrderClient = async function (orderId) {
-      const ok = confirm("هل تريد حذف هذا الطلب من قائمة الطلبات المنتهية؟ (نعم / لا)");
+      const ok = confirm("هل تريد حذف هذا الطلب من قائمة الطلبات المنتهية؟ (سيبقى في سجل طلباتك بالتاريخ والوقت)");
       if (!ok) return;
+      const ord = state.db.orders[orderId];
+      if (ord) {
+        await archiveOrderToUserHistory(orderId, ord, Date.now());
+      }
       await remove(ref(db, `orders/${orderId}`));
-      notify("تم حذف الطلب بنجاح.", "success");
+      notify("تم حذف الطلب من قائمة المنتهية وبقي في سجل طلباتك.", "success", 8000);
       renderClientOrdersTracker();
     };
 
     function renderClientOrdersTracker() {
       const activeBox = document.getElementById("client-active-orders-list");
       const completedBox = document.getElementById("client-completed-orders-list");
-      if (!activeBox || !completedBox) return;
+      const historyBox = document.getElementById("client-order-history-list");
+      const inboxBox = document.getElementById("client-admin-inbox-section");
+      if (!activeBox || !completedBox || !historyBox) return;
 
       const uid = state.currentUser?.id || "";
       const phone = state.currentUser?.phone || "";
       const name = (state.currentUser?.name || "").trim().toLowerCase();
+      const safeNameKey = name.replace(/[.#$[\]]/g, "_");
 
       const myOrders = Object.entries(state.db.orders || {})
         .filter(([, o]) => {
@@ -2157,15 +2273,15 @@
                   <button type="button" class="btn-amber" onclick="triggerClientOrderPhoto('${esc(id)}', 'gallery')">🖼️ استوديو</button>
                   ${proof ? `<button type="button" class="btn-danger" onclick="clearClientOrderPhoto('${esc(id)}')">🗑️ حذف الصورة</button>` : ""}
                 </div>
-                ${proof ? `<img src="${proof}" class="thumb-preview" style="display:block;" alt="صورة وصول الطلب" />` : ""}
+                ${proof ? `<img src="${proof}" class="thumb-preview" style="display:block;" alt="صورة التوصيل" />` : ""}
 
                 <div style="margin-top:10px;">
-                  <button type="button" class="btn-success" onclick="markOrderArrivedClient('${esc(id)}')">تم وصول الطلب</button>
+                  <button type="button" class="btn-success" onclick="markOrderArrivedClient('${esc(id)}')">تم التوصيل</button>
                 </div>
               </div>
             `;
           }).join("")
-        : `<div class="box-card">لا توجد طلبات حالية.</div>`;
+        : `<div class="box-card">لا توجد طلبات نشطة حالياً.</div>`;
 
       completedBox.innerHTML = completedList.length
         ? completedList.map(([id, o]) => {
@@ -2176,7 +2292,7 @@
             return `
               <div class="box-card completed-card" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
                 <div>
-                  <strong>طلب #${esc(id.slice(-6))}</strong> • <strong style="color:#166534;">تم وصول الطلب ✓</strong><br/>
+                  <strong>طلب #${esc(id.slice(-6))}</strong> • <strong style="color:#166534;">تم التوصيل ✓</strong><br/>
                   <span style="font-size:13px; color:#334155;">${itemsText} • الإجمالي: <strong>${Number(o.totalAmount) || 0} جنيه</strong></span>
                 </div>
                 <button type="button" class="btn-danger" onclick="deleteCompletedOrderClient('${esc(id)}')">حذف الطلب</button>
@@ -2184,6 +2300,67 @@
             `;
           }).join("")
         : `<div class="box-card">لا توجد طلبات منتهية بعد.</div>`;
+
+      const historyMap = {};
+      if (uid && state.db.userOrderHistory && state.db.userOrderHistory[uid]) {
+        Object.assign(historyMap, state.db.userOrderHistory[uid]);
+      }
+      if (safeNameKey && state.db.userOrderHistoryByName && state.db.userOrderHistoryByName[safeNameKey]) {
+        Object.assign(historyMap, state.db.userOrderHistoryByName[safeNameKey]);
+      }
+      for (const [id, o] of completedList) {
+        if (!historyMap[id]) {
+          const ts = o.completedAt || o.deliveredAt || o.createdAt || Date.now();
+          historyMap[id] = {
+            orderId: id,
+            items: o.items || [],
+            challengeTitle: o.challengeTitle || "",
+            totalAmount: Number(o.totalAmount) || 0,
+            status: "تم التوصيل",
+            deliveryDurationSec: o.deliveryDurationSec || 0,
+            dateTimeText: new Date(ts).toLocaleString("ar-EG"),
+            archivedAt: ts
+          };
+        }
+      }
+
+      const historyEntries = Object.entries(historyMap).sort(
+        (a, b) => (b[1]?.archivedAt || b[1]?.completedAt || 0) - (a[1]?.archivedAt || a[1]?.completedAt || 0)
+      );
+
+      historyBox.innerHTML = historyEntries.length
+        ? historyEntries.map(([id, h]) => {
+            const itemsText = Array.isArray(h.items) && h.items.length
+              ? h.items.map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ")
+              : esc(h.challengeTitle || "طلب");
+            const dtText = h.dateTimeText || new Date(h.archivedAt || h.completedAt || Date.now()).toLocaleString("ar-EG");
+            const durText = h.deliveryDurationSec ? ` • وقت التوصيل: ${formatDuration(h.deliveryDurationSec)}` : "";
+
+            return `
+              <div class="box-card history-card">
+                <div><strong>طلب #${esc(String(h.orderId || id).slice(-6))}</strong> • <strong style="color:#1e40af;">${esc(h.status || "تم التوصيل")}</strong></div>
+                <div style="font-size:13px; color:#334155; margin-top:4px;">الأصناف: ${itemsText} • الإجمالي: <strong>${Number(h.totalAmount) || 0} جنيه</strong></div>
+                <div style="font-size:12px; color:#1d4ed8; font-weight:bold; margin-top:4px;">التاريخ والوقت: ${esc(dtText)}${durText}</div>
+              </div>
+            `;
+          }).join("")
+        : `<div class="box-card">لا يوجد سجل طلبات منتهية بعد.</div>`;
+
+      if (inboxBox && uid) {
+        const msgs = Object.values(state.db.userMessages?.[uid] || {}).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        inboxBox.innerHTML = msgs.length
+          ? `
+            <h3 style="margin:18px 0 10px; color:#0f766e;">الرسائل والصور والنقاط المرسلة من الأدمن</h3>
+            ${msgs.map((m) => `
+              <div class="box-card">
+                <div style="font-weight:bold;">${esc(m.text || m.caption || "")}</div>
+                <div style="font-size:12px; color:#64748b;">${esc(m.dateTimeText || "")}</div>
+                ${m.image ? `<img src="${m.image}" class="thumb-preview" style="display:block; cursor:zoom-in;" onclick="openImageZoomModal('${esc(m.caption || "صورة من الأدمن")}', '${m.image}', '')" alt="صورة من الأدمن" />` : ""}
+              </div>
+            `).join("")}
+          `
+          : "";
+      }
     }
 
     window.openImageZoomModal = function (title, imgSrc, priceText, uid = null) {
@@ -2766,6 +2943,7 @@
             name: state.currentUser.name,
             phone: state.currentUser.phone,
             orderCount: 0,
+            completedOrdersCount: 0,
             totalSpent: 0
           };
           return {
@@ -2773,6 +2951,7 @@
             name: state.currentUser.name,
             phone: state.currentUser.phone,
             orderCount: (Number(prev.orderCount) || 0) + 1,
+            completedOrdersCount: Number(prev.completedOrdersCount) || 0,
             totalSpent: Number(((Number(prev.totalSpent) || 0) + total).toFixed(2)),
             lastOrderAt: Date.now()
           };
@@ -2859,8 +3038,21 @@
       const myActiveOrder = allOrders.find(
         (o) => o.assignedChallengerId === chalId && !isOrderCompleted(o)
       );
-      const myCompletedOrders = allOrders.filter(
+
+      const completedFromOrders = allOrders.filter(
         (o) => o.assignedChallengerId === chalId && isOrderCompleted(o)
+      );
+      const completedFromHistMap = {};
+      if (chalId && state.db.challengerHistory?.[chalId]) {
+        Object.assign(completedFromHistMap, state.db.challengerHistory[chalId]);
+      }
+      for (const co of completedFromOrders) {
+        if (!completedFromHistMap[co.id]) {
+          completedFromHistMap[co.id] = { ...co, orderId: co.id };
+        }
+      }
+      const myCompletedList = Object.entries(completedFromHistMap).sort(
+        (a, b) => (b[1]?.completedAt || b[1]?.deliveredAt || 0) - (a[1]?.completedAt || a[1]?.deliveredAt || 0)
       );
 
       const availEl = document.getElementById("available-challenges-list");
@@ -2892,7 +3084,7 @@
 
       const activeBox = document.getElementById("active-challenger-order-box");
       if (!myActiveOrder) {
-        activeBox.innerHTML = `<div class="box-card">لا توجد مهام معلّقة / نشطة لك حالياً.</div>`;
+        activeBox.innerHTML = `<div class="box-card">لا توجد مهام نشطة لك حالياً.</div>`;
       } else {
         const otherChallengers = Object.values(state.db.users || {}).filter(
           (u) => u.role === "challenger" && u.status === "approved" && u.id !== chalId
@@ -2903,11 +3095,11 @@
 
         activeBox.innerHTML = `
           <div class="box-card">
-            <h3 style="margin-top:0;">مهمة / طلب معلّق</h3>
+            <h3 style="margin-top:0;">مهمة / طلب نشط</h3>
             <p><strong>اسم المتسابق:</strong> ${esc(myActiveOrder.assignedChallengerName)}</p>
             <p><strong>رقم التلفون:</strong> ${esc(myActiveOrder.assignedChallengerPhone)}</p>
             <p><strong>وقت بدء التوصيل / القبول:</strong> ${new Date(myActiveOrder.deliveryStartAt || myActiveOrder.acceptedAt).toLocaleString("ar-EG")}</p>
-            <p><strong>قائمة المشتريات:</strong> ${itemsText || esc(myActiveOrder.challengeTitle || "مهمة تحدي")}</p>
+            <p><strong>قائمة المشتريات / المهمة:</strong> ${itemsText || esc(myActiveOrder.challengeTitle || "مهمة تحدي")}</p>
             <p><strong>رقم تلفون العميل:</strong> ${esc(myActiveOrder.buyerPhone || "غير متوفر")}</p>
 
             ${
@@ -2927,7 +3119,7 @@
             }
 
             <div class="form-group" style="margin-top:12px;">
-              <label>صورة تأكيد وصول الطلب (اختياري للزيادة والتأكيد${state.db.appSettings?.requireDeliveryPhoto ? " — إجباري حالياً من الأدمن" : ""})</label>
+              <label>صورة تأكيد التوصيل (اختياري${state.db.appSettings?.requireDeliveryPhoto ? " — إجباري حالياً من الأدمن" : ""})</label>
               <input type="file" id="delivery-proof-camera" accept="image/*" capture="environment" style="display:none;" onchange="previewCompressedImage(this, 'delivery-proof-prev', 'deliveryProof', 'del-delivery-proof-btn')" />
               <input type="file" id="delivery-proof-gallery" accept="image/*" style="display:none;" onchange="previewCompressedImage(this, 'delivery-proof-prev', 'deliveryProof', 'del-delivery-proof-btn')" />
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -2942,7 +3134,7 @@
 
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
               <button type="button" class="btn-success" onclick="completeActiveOrder('${esc(myActiveOrder.id)}', '${esc(myActiveOrder.challengeId || "")}')">
-                تم وصول الطلب
+                تم التوصيل
               </button>
             </div>
           </div>
@@ -2950,14 +3142,19 @@
       }
 
       const compBox = document.getElementById("completed-challenger-orders-box");
-      compBox.innerHTML = myCompletedOrders.length
-        ? myCompletedOrders.map((o) => `
-          <div class="box-card completed-card">
-            <strong>مهمة / طلب #${esc(o.id.slice(-6))}</strong> • <strong style="color:#166534;">مكتملة ✓</strong><br/>
-            <span style="font-size:13px; color:#334155;">${esc(o.challengeTitle || (o.items || []).map((i) => i.title).join(" ، ") || "مهمة")}</span>
-          </div>
-        `).join("")
-        : `<div class="box-card">لا توجد مهام مكتملة بعد.</div>`;
+      compBox.innerHTML = myCompletedList.length
+        ? myCompletedList.map(([id, o]) => {
+            const dt = o.dateTimeText || (o.completedAt ? new Date(o.completedAt).toLocaleString("ar-EG") : "");
+            const durText = o.deliveryDurationSec ? ` • وقت التوصيل: ${formatDuration(o.deliveryDurationSec)}` : "";
+            return `
+              <div class="box-card completed-card">
+                <strong>مهمة / طلب #${esc(String(o.orderId || id).slice(-6))}</strong> • <strong style="color:#166534;">تم التوصيل ✓</strong><br/>
+                <span style="font-size:13px; color:#334155;">${esc(o.challengeTitle || (o.items || []).map((i) => i.title).join(" ، ") || "مهمة")}</span><br/>
+                <span style="font-size:12px; color:#1d4ed8; font-weight:bold;">التاريخ والوقت: ${esc(dt)}${durText}</span>
+              </div>
+            `;
+          }).join("")
+        : `<div class="box-card">لا توجد مهام منتهية في سجلك بعد.</div>`;
 
       const rewBox = document.getElementById("user-gifts-and-receipts-box");
       const myGifts = Object.values(state.db.gifts || {}).filter(
@@ -2966,8 +3163,22 @@
       const myReceipts = Object.values(state.db.receipts || {}).filter(
         (r) => r.userId === chalId || r.userName === state.currentUser?.name
       );
+      const myMsgs = chalId ? Object.values(state.db.userMessages?.[chalId] || {}) : [];
 
       rewBox.innerHTML = `
+        <div class="box-card">
+          <h3 style="margin-top:0;">الرسائل والصور والنقاط من الأدمن</h3>
+          ${
+            myMsgs.length
+              ? myMsgs.map((m) => `
+                  <div style="padding:8px 0; border-bottom:1px solid #e2e8f0;">
+                    <strong>${esc(m.text || m.caption || "")}</strong> • <span style="font-size:12px; color:#64748b;">${esc(m.dateTimeText || "")}</span>
+                    ${m.image ? `<div><img src="${m.image}" class="thumb-preview" style="display:block; cursor:zoom-in;" onclick="openImageZoomModal('${esc(m.caption || "صورة من الأدمن")}', '${m.image}', '')" alt="صورة من الأدمن" /></div>` : ""}
+                  </div>
+                `).join("")
+              : "<div>لا توجد رسائل أو صور جديدة من الأدمن.</div>"
+          }
+        </div>
         <div class="box-card">
           <h3 style="margin-top:0;">الهدايا والعروض والمكافآت</h3>
           ${
@@ -2977,7 +3188,6 @@
                     (g) => `
                   <div style="padding:10px 0; border-bottom:1px solid #e2e8f0;">
                     🎁 <strong>${esc(g.title)}</strong>: ${esc(g.details)}
-                    ${g.image ? `<div><img src="${g.image}" class="thumb-preview" style="display:block; cursor:zoom-in;" onclick="openImageZoomModal('${esc(g.title)}', '${g.image}', '${esc(g.details)}')" alt="هدية" /></div>` : ""}
                   </div>
                 `
                   )
@@ -3031,7 +3241,7 @@
         status: "نشط"
       });
 
-      notify("تم قبول التحدي وإضافته إلى المهام المعلّقة / النشطة.", "success");
+      notify("تم قبول التحدي وإضافته إلى المهام النشطة.", "success");
       switchChallengerSubTab("active");
     };
 
@@ -3082,11 +3292,11 @@
       const proofImg = state.uploadedImages.deliveryProof || orderObj.deliveryImage || "";
 
       if (state.db.appSettings?.requireDeliveryPhoto && !proofImg) {
-        return notify("تصوير أو اختيار صورة (كاميرا / استوديو) مطلوب قبل تأكيد وصول الطلب.", "error");
+        return notify("تصوير أو اختيار صورة (كاميرا / استوديو) مطلوب قبل تأكيد التوصيل.", "error");
       }
 
       const now = Date.now();
-      const startTs = Number(orderObj.deliveryStartAt || orderObj.acceptedAt) || now;
+      const startTs = Number(orderObj.deliveryStartAt || orderObj.acceptedAt || orderObj.createdAt) || now;
       const elapsedSec = Math.max(1, Math.round((now - startTs) / 1000));
       const rewardVal = Math.max(0, Number(orderObj.totalAmount) || Number(state.db.challenges[challengeId]?.reward) || 0);
 
@@ -3094,17 +3304,23 @@
         stage: "completed",
         orderCompleted: true,
         deliveryStatus: "completed",
-        status: "تم وصول الطلب",
-        userAlertMessage: "تم وصول الطلب",
+        status: "تم التوصيل",
+        userAlertMessage: "تم التوصيل",
         deliveryImage: proofImg,
+        deliveredAt: now,
+        deliveredAtFormatted: new Date(now).toLocaleString("ar-EG"),
         completedAt: now,
+        completedAtFormatted: new Date(now).toLocaleString("ar-EG"),
         deliveryDurationSec: elapsedSec
       });
+
+      await archiveOrderToUserHistory(orderId, { ...orderObj, completedAt: now }, now);
 
       if (challengeId) {
         await update(ref(db, `challenges/${challengeId}`), {
           completed: true,
           status: "مكتملة",
+          deliveredAt: now,
           completedAt: now
         });
       }
@@ -3135,7 +3351,7 @@
       }
 
       state.uploadedImages.deliveryProof = "";
-      notify(`تم وصول الطلب وانتقلت المهمة إلى المهام المكتملة والطلبات المنتهية.`, "success");
+      showTemporaryArrivalAlert(orderId, 8000);
       switchChallengerSubTab("completed");
     };
 
@@ -3147,9 +3363,10 @@
       tryApplyAdminUserAccess();
       syncUserHeader();
       checkRegistrationStatusBanner();
-      monitorConfirmedOrdersForUser();
     });
-    onValue(ref(db, "banned"), (s) => { state.db.banned = s.val() || {}; });
+    onValue(ref(db, "banned"), (s) => {
+      state.db.banned = s.val() || {};
+    });
     onValue(ref(db, "clientRegRequests"), (s) => {
       state.db.clientRegRequests = s.val() || {};
       checkRegistrationStatusBanner();
@@ -3158,57 +3375,57 @@
       state.db.challengerRegRequests = s.val() || {};
       checkRegistrationStatusBanner();
     });
-    onValue(ref(db, "departments"), (s) => {
-      state.db.departments = s.val() || [];
-      if (document.getElementById("screen-orders-home").classList.contains("active")) {
-        renderDepartments();
-      }
-    });
     onValue(ref(db, "departmentsMeta"), (s) => {
       state.db.departmentsMeta = s.val() || {};
-      if (document.getElementById("screen-orders-home").classList.contains("active")) {
-        renderDepartments();
-      }
+      renderDepartments();
+    });
+    onValue(ref(db, "departments"), (s) => {
+      state.db.departments = s.val() || [];
+      renderDepartments();
     });
     onValue(ref(db, "products"), (s) => {
       state.db.products = s.val() || {};
-      if (state.selectedDept && document.getElementById("screen-department-view").classList.contains("active")) {
-        renderDepartmentItems(state.selectedDept);
-      }
+      if (state.selectedDept) renderDepartmentItems(state.selectedDept);
     });
     onValue(ref(db, "cashPhones"), (s) => {
       state.db.cashPhones = s.val() || [];
-      if (document.getElementById("screen-payment").classList.contains("active")) {
-        renderPaymentScreen();
-      }
+      renderPaymentScreen();
     });
     onValue(ref(db, "orders"), (s) => {
       state.db.orders = s.val() || {};
       monitorConfirmedOrdersForUser();
-      if (document.getElementById("screen-orders-home").classList.contains("active")) {
-        renderClientOrdersTracker();
-      }
-      if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
-        renderChallengesHub();
-      }
+      renderClientOrdersTracker();
+      renderChallengesHub();
+    });
+    onValue(ref(db, "userOrderHistory"), (s) => {
+      state.db.userOrderHistory = s.val() || {};
+      renderClientOrdersTracker();
+    });
+    onValue(ref(db, "userOrderHistoryByName"), (s) => {
+      state.db.userOrderHistoryByName = s.val() || {};
+      renderClientOrdersTracker();
+    });
+    onValue(ref(db, "challengerHistory"), (s) => {
+      state.db.challengerHistory = s.val() || {};
+      renderChallengesHub();
+    });
+    onValue(ref(db, "userMessages"), (s) => {
+      state.db.userMessages = s.val() || {};
+      syncUserHeader();
+      renderClientOrdersTracker();
+      renderChallengesHub();
     });
     onValue(ref(db, "challenges"), (s) => {
       state.db.challenges = s.val() || {};
-      if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
-        renderChallengesHub();
-      }
+      renderChallengesHub();
     });
     onValue(ref(db, "gifts"), (s) => {
       state.db.gifts = s.val() || {};
-      if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
-        renderChallengesHub();
-      }
+      renderChallengesHub();
     });
     onValue(ref(db, "receipts"), (s) => {
       state.db.receipts = s.val() || {};
-      if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
-        renderChallengesHub();
-      }
+      renderChallengesHub();
     });
     onValue(ref(db, "referrals"), (s) => {
       state.db.referrals = s.val() || {};
