@@ -216,8 +216,10 @@
 
     .screen-top-bar {
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
       margin-bottom: 12px;
     }
 
@@ -399,13 +401,17 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
-      touch-action: manipulation;
       transition: border-color 0.2s ease, transform 0.15s ease;
     }
 
     .product-card.selected {
       border-color: #10b981;
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.28);
+    }
+
+    .product-card.holding-3s {
+      border-color: #f59e0b;
+      transform: scale(0.99);
     }
 
     .product-img-wrap {
@@ -416,6 +422,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
+      cursor: zoom-in;
     }
 
     .product-img-wrap img {
@@ -441,6 +448,7 @@
       border-radius: 12px;
       border: 2px solid rgba(253, 224, 71, 0.75);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
     }
 
     .offer-ribbon {
@@ -453,18 +461,20 @@
       font-weight: bold;
       padding: 4px 10px;
       border-radius: 999px;
+      pointer-events: none;
     }
 
     .select-indicator {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: rgba(15, 23, 42, 0.78);
+      background: rgba(15, 23, 42, 0.82);
       color: #ffffff;
       font-size: 12px;
       font-weight: bold;
       padding: 4px 10px;
       border-radius: 999px;
+      pointer-events: none;
     }
 
     .product-card.selected .select-indicator {
@@ -571,6 +581,39 @@
       flex-wrap: wrap;
       margin-top: 8px;
     }
+
+    .zoom-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(9, 13, 22, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .zoom-modal-card {
+      width: 100%;
+      max-width: 720px;
+      background: #0f172a;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    .zoom-modal-img {
+      max-width: 100%;
+      max-height: 68vh;
+      border-radius: 14px;
+      object-fit: contain;
+      background: #020617;
+      display: block;
+      margin: 0 auto 12px;
+    }
   </style>
 </head>
 <body>
@@ -629,7 +672,7 @@
 
     <div id="screen-choice" class="screen active">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">اختر مسارك داخل تطبيق انجز</h2>
       <p class="screen-sub">يمكنك الدخول كعميل لطلب المنتجات والخدمات أو الدخول كمتسابق لتنفيذ التحديات.</p>
@@ -641,7 +684,7 @@
 
     <div id="screen-client-entry" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">صفحة العميل</h2>
       <p class="screen-sub">اختر تسجيل حساب جديد أو الدخول كمشترك مسجل من قبل.</p>
@@ -649,12 +692,12 @@
         <button class="big-choice-btn btn-client" onclick="goScreen('screen-client-register')">تسجيل</button>
         <button class="big-choice-btn btn-amber" onclick="goScreen('screen-client-subscriber')">مشترك</button>
       </div>
-      <button class="btn-soft" onclick="goScreen('screen-choice')">رجوع لصفحة الاختيار</button>
+      <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
     </div>
 
     <div id="screen-client-register" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">تسجيل عميل جديد</h2>
       <p class="screen-sub">الاسم يجب أن يكون فريداً ورقم الموبايل يجب أن يكون مرتبطاً بمستخدم وحيد (11 رقماً مصرياً).</p>
@@ -668,13 +711,13 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="submitClientRegistration()">تأكيد</button>
-        <button class="btn-soft" onclick="goScreen('screen-client-entry')">رجوع</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
     </div>
 
     <div id="screen-client-subscriber" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">دخول المشتركين (عميل)</h2>
       <p class="screen-sub">كل رقم موبايل مرتبط بمستخدم وحيد ولا يمكن تكراره لحساب آخر.</p>
@@ -692,58 +735,56 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="loginClientSubscriber()">تأكيد</button>
-        <button class="btn-soft" onclick="goScreen('screen-client-entry')">رجوع</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
     </div>
 
     <div id="screen-orders-home" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">صفحة الطلبات والأقسام</h2>
-      <p class="screen-sub">اضغط على أي قسم لفتح أنواعه ومنتجاته وعروضه، واضغط على أي صورة لمدة 3 ثوانٍ لتحديدها في عربة التسوق.</p>
+      <p class="screen-sub">اضغط على أي قسم لفتح أنواعه ومنتجاته وعروضه — ضغطة واحدة على الصورة لتكبيرها، وضغط 3 ثوانٍ على الكارت لتحديد أو إلغاء تحديد الصنف في العربة.</p>
       <div id="departments-container" class="dept-grid"></div>
       <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-amber" onclick="openCartScreen()">عرض عربة التسوق (<span class="cart-count-inline">0</span>)</button>
-        <button class="btn-soft" onclick="goScreen('screen-choice')">تغيير المسار</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
     </div>
 
     <div id="screen-department-view" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-        <h2 class="screen-title" id="current-dept-title" style="margin:0;">القسم</h2>
-        <div style="display:flex; gap:8px;">
+        <button class="btn-soft" onclick="goBackInsideDepartment()">رجوع خطوة للخلف</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button class="btn-amber" onclick="openCartScreen()">عربة التسوق (<span class="cart-count-inline">0</span>)</button>
           <button class="btn-soft" onclick="goScreen('screen-orders-home')">كل الأقسام</button>
         </div>
       </div>
+      <h2 class="screen-title" id="current-dept-title" style="margin:0 0 10px;">القسم</h2>
       <div id="dept-types-bar" class="types-bar"></div>
-      <p class="screen-sub">الأنواع والأسعار والعروض المتاحة — اضغط مطولاً على أي صورة لمدة <strong>3 ثوانٍ</strong> لتحديدها أو إلغاء تحديدها.</p>
+      <p class="screen-sub">ضغطة واحدة على الصورة لتكبيرها • ضغط مطول لمدة <strong>3 ثوانٍ</strong> على الصنف لتحديده أو إلغاء تحديده وتعديل اختياراتك بحرية.</p>
       <div id="dept-items-container" class="items-grid"></div>
     </div>
 
     <div id="screen-cart" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">عربة التسوق</h2>
-      <p class="screen-sub">الأصناف والعروض والخدمات المحددة من مختلف الأقسام.</p>
+      <p class="screen-sub">الأصناف والعروض والخدمات المحددة من مختلف الأقسام — يمكنك إزالة أو تعديل اختياراتك في أي وقت.</p>
       <div id="cart-items-list"></div>
       <div id="cart-total-box" class="box-card" style="font-size:18px; font-weight:bold; color:#0f172a;">
         الإجمالي: 0 جنيه
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="goToCheckoutConfirmation()">تأكيد</button>
-        <button class="btn-soft" onclick="goScreen('screen-orders-home')">عودة</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
     </div>
 
     <div id="screen-confirm-purchase" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">تأكيد الشراء</h2>
       <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى صفحة الدفع من رقمك.</p>
@@ -751,13 +792,13 @@
       <div id="confirm-total-line" class="box-card" style="margin-top:14px; font-size:18px; font-weight:bold;"></div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="openPaymentMethodsScreen()">تأكيد</button>
-        <button class="btn-soft" onclick="openCartScreen()">عودة</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
     </div>
 
     <div id="screen-payment" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">صفحة الدفع من رقمك</h2>
       <p class="screen-sub">اختر رقم الاستقبال المحدد من الأدمن ثم أكد قرارك.</p>
@@ -780,7 +821,7 @@
 
     <div id="screen-challenger-entry" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">صفحة المتسابق (تحدى)</h2>
       <p class="screen-sub">اختر تسجيل كمتسابق جديد أو الدخول كمتسابق مشترك.</p>
@@ -788,12 +829,12 @@
         <button class="big-choice-btn btn-challenge" onclick="goScreen('screen-challenger-register')">تسجيل</button>
         <button class="big-choice-btn btn-amber" onclick="goScreen('screen-challenger-subscriber')">مشترك</button>
       </div>
-      <button class="btn-soft" onclick="goScreen('screen-choice')">رجوع لصفحة الاختيار</button>
+      <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
     </div>
 
     <div id="screen-challenger-register" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">تسجيل متسابق جديد</h2>
       <div class="form-group">
@@ -806,13 +847,13 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="submitChallengerRegistration()">تأكيد</button>
-        <button class="btn-soft" onclick="goScreen('screen-challenger-entry')">رجوع</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
     </div>
 
     <div id="screen-challenger-subscriber" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">دخول متسابق مشترك</h2>
       <div class="form-group">
@@ -825,13 +866,13 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="loginChallengerSubscriber()">تأكيد</button>
-        <button class="btn-soft" onclick="goScreen('screen-challenger-entry')">رجوع</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
     </div>
 
     <div id="screen-challenges-hub" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackScreen()">عودة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
       </div>
       <h2 class="screen-title">صفحة التحديات</h2>
       <p class="screen-sub">يمكنك اختيار مهمة واحدة نشطة في كل مرة حتى يتم تأكيد انتهائها.</p>
@@ -855,7 +896,20 @@
       </div>
 
       <div style="margin-top:16px;">
-        <button class="btn-soft" onclick="goScreen('screen-choice')">تغيير المسار</button>
+        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة تكبير الصورة عند الضغط لمرة واحدة -->
+  <div id="image-zoom-modal" class="zoom-modal-backdrop" onclick="closeImageZoomModal()">
+    <div class="zoom-modal-card" onclick="event.stopPropagation()">
+      <h3 id="zoom-modal-title" style="margin:0 0 10px;">معاينة الصورة</h3>
+      <img id="zoom-modal-img" class="zoom-modal-img" alt="صورة مكبرة" />
+      <div id="zoom-modal-meta" style="font-size:14px; color:#fde047; font-weight:bold; margin-bottom:12px;"></div>
+      <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+        <button id="zoom-modal-toggle-cart-btn" class="btn-success" style="display:none;" onclick="toggleCartFromZoomModal()">تحديد / إلغاء في العربة</button>
+        <button class="btn-soft" onclick="closeImageZoomModal()">إغلاق</button>
       </div>
     </div>
   </div>
@@ -873,6 +927,7 @@
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const POINT_VALUE_EGP = 33.333333333333;
+    const CART_STORAGE_KEY = "engz_persistent_cart_v1";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
@@ -925,15 +980,34 @@
       }, 1000);
     })();
 
+    function loadSavedCart() {
+      try {
+        const raw = localStorage.getItem(CART_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCartToStorage(cartArr) {
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartArr || []));
+      } catch {}
+    }
+
     let autoRedirectedAfterApproval = false;
     const screenHistory = ["screen-choice"];
+    const deptFilterHistory = ["الكل"];
+    const productsCatalog = {};
+    let currentZoomUid = null;
 
     const state = {
       currentRole: null,
       currentUser: null,
       selectedDept: null,
       selectedTypeFilter: "الكل",
-      cart: [],
+      cart: loadSavedCart(),
       selectedCashPhone: null,
       uploadedImages: { deliveryProof: "" },
       trackedApplicant: null,
@@ -953,6 +1027,8 @@
         referrals: {}
       }
     };
+
+    updateCartBadges();
 
     function notify(msg, type = "info") {
       const el = document.getElementById("global-notice");
@@ -1198,7 +1274,7 @@
       activateScreenWithoutHistory(screenId);
     };
 
-    window.goBackScreen = function () {
+    window.goBackOneStep = function () {
       if (screenHistory.length > 1) {
         screenHistory.pop();
         const prevScreen = screenHistory[screenHistory.length - 1];
@@ -1206,6 +1282,18 @@
       } else {
         activateScreenWithoutHistory("screen-choice");
       }
+    };
+
+    window.goBackInsideDepartment = function () {
+      if (deptFilterHistory.length > 1) {
+        deptFilterHistory.pop();
+        state.selectedTypeFilter = deptFilterHistory[deptFilterHistory.length - 1];
+        if (state.selectedDept) {
+          renderDepartmentItems(state.selectedDept);
+          return;
+        }
+      }
+      window.goBackOneStep();
     };
 
     function syncUserHeader() {
@@ -1454,16 +1542,85 @@
         .join("");
     }
 
+    // تكبير الصورة عند الضغط لمرة واحدة
+    window.openImageZoomModal = function (title, imgSrc, priceText, uid = null) {
+      if (!imgSrc) return;
+      currentZoomUid = uid;
+      document.getElementById("zoom-modal-title").textContent = title || "معاينة الصورة";
+      const imgEl = document.getElementById("zoom-modal-img");
+      imgEl.src = imgSrc;
+      document.getElementById("zoom-modal-meta").textContent = priceText ? `السعر: ${priceText}` : "";
+
+      const toggleBtn = document.getElementById("zoom-modal-toggle-cart-btn");
+      if (uid && productsCatalog[uid]) {
+        const isSel = state.cart.some((c) => c.uid === uid);
+        toggleBtn.style.display = "inline-block";
+        toggleBtn.textContent = isSel ? "إلغاء التحديد من العربة" : "تحديد في العربة";
+      } else {
+        toggleBtn.style.display = "none";
+      }
+
+      document.getElementById("image-zoom-modal").style.display = "flex";
+    };
+
+    window.closeImageZoomModal = function () {
+      document.getElementById("image-zoom-modal").style.display = "none";
+      currentZoomUid = null;
+    };
+
+    window.toggleCartFromZoomModal = function () {
+      if (!currentZoomUid || !productsCatalog[currentZoomUid]) return;
+      toggleCartSelection(productsCatalog[currentZoomUid]);
+      const isSel = state.cart.some((c) => c.uid === currentZoomUid);
+      document.getElementById("zoom-modal-toggle-cart-btn").textContent = isSel ? "إلغاء التحديد من العربة" : "تحديد في العربة";
+    };
+
+    // ضغط 3 ثوانٍ لتحديد أو إلغاء التحديد مع إلغاء تلقائي عند السحب
     const holdTimers = {};
-    window.startLongPress3Sec = function (itemKey, itemPayload) {
-      clearTimeout(holdTimers[itemKey]);
-      holdTimers[itemKey] = setTimeout(() => {
-        toggleCartSelection(itemPayload);
+    const holdStartCoords = {};
+
+    window.onProductPointerDown = function (ev, uid) {
+      if (ev.button !== undefined && ev.button !== 0 && ev.pointerType === "mouse") return;
+      clearTimeout(holdTimers[uid]);
+      holdStartCoords[uid] = { x: ev.clientX, y: ev.clientY, triggered: false };
+
+      const cardEl = document.getElementById("prod-card-" + uid);
+      if (cardEl) cardEl.classList.add("holding-3s");
+
+      holdTimers[uid] = setTimeout(() => {
+        if (holdStartCoords[uid]) holdStartCoords[uid].triggered = true;
+        if (cardEl) cardEl.classList.remove("holding-3s");
+        const itemPayload = productsCatalog[uid];
+        if (itemPayload) toggleCartSelection(itemPayload);
       }, 3000);
     };
 
-    window.cancelLongPress3Sec = function (itemKey) {
-      clearTimeout(holdTimers[itemKey]);
+    window.onProductPointerMove = function (ev, uid) {
+      const start = holdStartCoords[uid];
+      if (!start || start.triggered) return;
+      const dx = Math.abs((ev.clientX || 0) - start.x);
+      const dy = Math.abs((ev.clientY || 0) - start.y);
+      if (dx > 12 || dy > 12) {
+        cancelProductHold(uid);
+      }
+    };
+
+    window.cancelProductHold = function (uid) {
+      clearTimeout(holdTimers[uid]);
+      const cardEl = document.getElementById("prod-card-" + uid);
+      if (cardEl) cardEl.classList.remove("holding-3s");
+    };
+
+    window.onProductImageSingleClick = function (ev, uid) {
+      ev.stopPropagation();
+      const rec = holdStartCoords[uid];
+      if (rec && rec.triggered) {
+        rec.triggered = false;
+        return;
+      }
+      const item = productsCatalog[uid];
+      if (!item || !item.image) return;
+      openImageZoomModal(item.title, item.image, `${item.price} جنيه`, uid);
     };
 
     function toggleCartSelection(itemPayload) {
@@ -1475,6 +1632,7 @@
         state.cart.push(itemPayload);
         notify(`تمت إضافة (${itemPayload.title}) إلى عربة التسوق`, "success");
       }
+      saveCartToStorage(state.cart);
       updateCartBadges();
       if (state.selectedDept) renderDepartmentItems(state.selectedDept);
     }
@@ -1488,6 +1646,8 @@
     window.openDepartment = function (deptName) {
       state.selectedDept = deptName;
       state.selectedTypeFilter = "الكل";
+      deptFilterHistory.length = 0;
+      deptFilterHistory.push("الكل");
       document.getElementById("current-dept-title").textContent = deptName;
       renderDepartmentItems(deptName);
       goScreen("screen-department-view");
@@ -1495,6 +1655,9 @@
 
     window.selectDepartmentTypeFilter = function (typeName) {
       state.selectedTypeFilter = typeName;
+      if (deptFilterHistory[deptFilterHistory.length - 1] !== typeName) {
+        deptFilterHistory.push(typeName);
+      }
       if (state.selectedDept) renderDepartmentItems(state.selectedDept);
     };
 
@@ -1525,36 +1688,38 @@
       container.innerHTML = filteredEntries
         .map(([id, item]) => {
           const uid = `${deptName}__${id}`;
-          const isSelected = state.cart.some((c) => c.uid === uid);
           const priceNum = Math.max(0, Number(item.price) || 0);
-          const payloadStr = encodeURIComponent(
-            JSON.stringify({
-              uid,
-              dept: deptName,
-              title: item.title || item.type || "صنف",
-              price: priceNum,
-              isOffer: Boolean(item.isOffer),
-              image: item.image || ""
-            })
-          );
+          productsCatalog[uid] = {
+            uid,
+            dept: deptName,
+            title: item.title || item.type || "صنف",
+            price: priceNum,
+            isOffer: Boolean(item.isOffer),
+            image: item.image || ""
+          };
+          const isSelected = state.cart.some((c) => c.uid === uid);
 
           return `
-            <div class="product-card ${isSelected ? "selected" : ""}"
+            <div id="prod-card-${esc(uid)}"
+                 class="product-card ${isSelected ? "selected" : ""}"
                  oncontextmenu="return false;"
-                 onpointerdown="startLongPress3Sec('${esc(uid)}', JSON.parse(decodeURIComponent('${payloadStr}')))"
-                 onpointerup="cancelLongPress3Sec('${esc(uid)}')"
-                 onpointerleave="cancelLongPress3Sec('${esc(uid)}')">
-              <div class="product-img-wrap" oncontextmenu="return false;">
+                 onpointerdown="onProductPointerDown(event, '${esc(uid)}')"
+                 onpointermove="onProductPointerMove(event, '${esc(uid)}')"
+                 onpointerup="cancelProductHold('${esc(uid)}')"
+                 onpointercancel="cancelProductHold('${esc(uid)}')">
+              <div class="product-img-wrap"
+                   oncontextmenu="return false;"
+                   onclick="onProductImageSingleClick(event, '${esc(uid)}')">
                 ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" draggable="false" oncontextmenu="return false;" />` : ""}
                 ${item.isOffer ? `<div class="offer-ribbon">عرض خاص</div>` : ""}
-                <div class="select-indicator">${isSelected ? "محدد ✓" : "اضغط 3 ثوانٍ"}</div>
+                <div class="select-indicator">${isSelected ? "محدد ✓" : "ضغط 3 ثوانٍ"}</div>
                 <div class="price-overlay">${priceNum} جنيه</div>
               </div>
               <div class="product-body">
                 <h3 class="product-title">${esc(item.title || item.type)}</h3>
                 ${item.type ? `<div style="font-size:12px; color:#7c3aed; font-weight:bold;">النوع: ${esc(item.type)}</div>` : ""}
                 ${item.desc ? `<p class="product-desc">${esc(item.desc)}</p>` : ""}
-                <div class="hold-hint">ضغط 3 ثوانٍ للتحديد / ضغطة أخرى للإلغاء</div>
+                <div class="hold-hint">ضغطة على الصورة للتكبير • ضغط 3 ثوانٍ لتحديد أو إلغاء التحديد</div>
               </div>
             </div>
           `;
@@ -1567,7 +1732,7 @@
       const totalBox = document.getElementById("cart-total-box");
 
       if (!state.cart.length) {
-        listEl.innerHTML = `<div class="box-card">عربة التسوق فارغة حالياً. حدد أي صنف بضغطة 3 ثوانٍ.</div>`;
+        listEl.innerHTML = `<div class="box-card">عربة التسوق فارغة حالياً. حدد أي صنف بضغط 3 ثوانٍ.</div>`;
         totalBox.textContent = "الإجمالي: 0 جنيه";
         goScreen("screen-cart");
         return;
@@ -1595,6 +1760,7 @@
 
     window.removeFromCart = function (uid) {
       state.cart = state.cart.filter((i) => i.uid !== uid);
+      saveCartToStorage(state.cart);
       updateCartBadges();
       openCartScreen();
     };
@@ -1611,7 +1777,9 @@
           total += p;
           return `
             <div class="product-card selected" oncontextmenu="return false;">
-              <div class="product-img-wrap" oncontextmenu="return false;">
+              <div class="product-img-wrap"
+                   oncontextmenu="return false;"
+                   onclick="openImageZoomModal('${esc(item.title)}', '${item.image || ""}', '${p} جنيه')">
                 ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" draggable="false" oncontextmenu="return false;" />` : ""}
                 <div class="price-overlay">${p} جنيه</div>
               </div>
@@ -1747,6 +1915,7 @@
       });
 
       state.cart = [];
+      saveCartToStorage([]);
       updateCartBadges();
 
       document.getElementById("payment-result-box").innerHTML = `
@@ -1854,7 +2023,7 @@
           .map(
             (c) => `
             <div class="box-card">
-              ${c.image ? `<img src="${c.image}" class="thumb-preview" style="display:block; margin-bottom:10px;" alt="صورة التحدي" />` : ""}
+              ${c.image ? `<img src="${c.image}" class="thumb-preview" style="display:block; margin-bottom:10px; cursor:zoom-in;" onclick="openImageZoomModal('${esc(c.title)}', '${c.image}', 'مكافأة: ${Number(c.reward) || 0} جنيه')" alt="صورة التحدي" />` : ""}
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <strong>${esc(c.title)}</strong>
                 <span style="color:#059669; font-weight:bold;">مكافأة: ${Number(c.reward) || 0} جنيه</span>
@@ -1939,7 +2108,7 @@
                     (g) => `
                   <div style="padding:10px 0; border-bottom:1px solid #e2e8f0;">
                     🎁 <strong>${esc(g.title)}</strong>: ${esc(g.details)}
-                    ${g.image ? `<div><img src="${g.image}" class="thumb-preview" style="display:block;" alt="هدية" /></div>` : ""}
+                    ${g.image ? `<div><img src="${g.image}" class="thumb-preview" style="display:block; cursor:zoom-in;" onclick="openImageZoomModal('${esc(g.title)}', '${g.image}', '${esc(g.details)}')" alt="هدية" /></div>` : ""}
                   </div>
                 `
                   )
