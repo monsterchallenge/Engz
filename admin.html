@@ -731,7 +731,6 @@
             .join("")
         : `<div class="card">لا يوجد عملاء نشطون بعد.</div>`;
 
-      // قائمة الأشخاص المرسل لهم التطبيق (تدعم حتى 1000+ شخص) ومرتبة حسب المبالغ وعدد مرات الشراء/النجاح والوقت المستغرق
       const invitedBox = document.getElementById("admin-invited-ranking-list");
       const invitedRows = [];
       for (const [referrerId, invitedMap] of Object.entries(state.referrals || {})) {
@@ -835,7 +834,7 @@
           status: "rejected",
           createdAt: Date.now()
         });
-        toast(`تم رفض طلب ${reqData.name} (تم رفض طلبك).`);
+        toast(`تم رفض طلب ${reqData.name}.`);
       } else if (decision === "waiting") {
         await push(ref(db, "waitlist"), {
           name: reqData.name,
@@ -892,7 +891,7 @@
         .join("");
     }
 
-    // 6. المتسابقون النشطون: ترتيب تنازلي حسب قيمة الشراء وعدد مرات النجاح والوقت المستغرق لتوصيل الأوردر
+    // 6. المتسابقون النشطون
     function renderActiveChallengers() {
       const el = document.getElementById("admin-active-challengers-list");
       const list = Object.entries(state.users || {})
