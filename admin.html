@@ -161,11 +161,12 @@
     }
 
     .img-thumb {
-      max-width: 140px;
-      max-height: 110px;
+      max-width: 220px;
+      max-height: 175px;
       border-radius: 10px;
       margin-top: 6px;
       border: 1px solid #cbd5e1;
+      object-fit: cover;
     }
 
     .img-box-inline {
@@ -324,7 +325,7 @@
         <div id="admin-waitlist-list"></div>
       </div>
 
-      <!-- 8. إعداد الأقسام والأنواع والسلع والعروض مع أزرار كاميرا/استوديو وحذف صورة -->
+      <!-- 8. إعداد الأقسام والأنواع والسلع والعروض مع أزرار كاميرا/استوديو وحذف صورة وأداة Gemini -->
       <div id="panel-depts-items" class="panel">
         <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>إعداد الأقسام والأنواع والسلع والعروض (جنيه)</h3>
@@ -332,7 +333,7 @@
         <div class="card">
           <label>إضافة قسم جديد أو تحديث صورة تعبيرية لأي قسم</label>
           <input type="text" id="new-dept-name" placeholder="اسم القسم الجديد..." />
-          <label>صورة القسم (كاميرا / استوديو)</label>
+          <label>صورة القسم (كاميرا / استوديو - جودة عالية)</label>
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <button type="button" class="btn-cyan" onclick="document.getElementById('dept-camera-file').click()">كاميرا</button>
             <button type="button" class="btn-grad" onclick="document.getElementById('dept-gallery-file').click()">استوديو</button>
@@ -352,7 +353,7 @@
         <div class="card">
           <label>اختر القسم لإضافة عدد لا نهائي من الأنواع والسلع والعروض</label>
           <select id="target-dept-select" onchange="renderDepartmentItemsTable()"></select>
-          <input type="text" id="item-type-input" placeholder="النوع المتاح داخل القسم (مثال: بيتزا / تفاح / تلخيص جامعي)..." />
+          <input type="text" id="item-type-input" placeholder="النوع المتاح داخل القسم (مثال: بيتزا / بسكوت / تلخيص جامعي)..." />
           <input type="text" id="item-title-input" placeholder="اسم الصنف أو العرض..." />
           <input type="number" id="item-price-input" placeholder="السعر بالجنيه (مثال: 150)" />
           <input type="text" id="item-desc-input" placeholder="وصف مختصر أو تفاصيل العرض..." />
@@ -360,10 +361,11 @@
             <input type="checkbox" id="item-is-offer" style="width:auto; margin-left:6px;" />
             اعتبار هذا العنصر عرضاً خاصاً
           </label>
-          <label>صورة الصنف أو العرض (كاميرا / استوديو)</label>
+          <label>صورة الصنف أو العرض (كاميرا / استوديو - جودة عالية)</label>
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <button type="button" class="btn-cyan" onclick="document.getElementById('item-camera-file').click()">كاميرا</button>
             <button type="button" class="btn-grad" onclick="document.getElementById('item-gallery-file').click()">استوديو</button>
+            <button type="button" class="btn-amber" onclick="copyGeminiPromptForItem()">نسخ برومبت لـ Gemini</button>
           </div>
           <input type="file" id="item-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleAdminImage(this, 'item-img-prev')" />
           <input type="file" id="item-gallery-file" accept="image/*" style="display:none;" onchange="handleAdminImage(this, 'item-img-prev')" />
@@ -403,7 +405,7 @@
           <textarea id="chal-details-input" placeholder="اكتب تفاصيل التحدي..."></textarea>
           <label>قيمة المكافأة (جنيه)</label>
           <input type="number" id="chal-reward-input" placeholder="مثال: 50" />
-          <label>صورة التحدي (كاميرا / استوديو)</label>
+          <label>صورة التحدي (كاميرا / استوديو - جودة عالية)</label>
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <button type="button" class="btn-cyan" onclick="document.getElementById('chal-camera-file').click()">كاميرا</button>
             <button type="button" class="btn-grad" onclick="document.getElementById('chal-gallery-file').click()">استوديو</button>
@@ -438,7 +440,7 @@
           <input type="text" id="gift-target-input" placeholder="اسم العميل أو المتسابق (أو اتركه للجميع)" />
           <input type="text" id="gift-title-input" placeholder="اسم الهدية / العرض / المكافأة..." />
           <input type="text" id="gift-details-input" placeholder="تفاصيل المكافأة أو القيمة بالجنيه..." />
-          <label>صورة الهدية / المكافأة (كاميرا / استوديو)</label>
+          <label>صورة الهدية / المكافأة (كاميرا / استوديو - جودة عالية)</label>
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <button type="button" class="btn-cyan" onclick="document.getElementById('gift-camera-file').click()">كاميرا</button>
             <button type="button" class="btn-grad" onclick="document.getElementById('gift-gallery-file').click()">استوديو</button>
@@ -557,8 +559,21 @@
       el.textContent = msg;
       setTimeout(() => {
         el.style.display = "none";
-      }, 4000);
+      }, 4500);
     }
+
+    window.copyGeminiPromptForItem = function () {
+      const dept = document.getElementById("target-dept-select").value || "منتج";
+      const typeVal = document.getElementById("item-type-input").value.trim();
+      const titleVal = document.getElementById("item-title-input").value.trim() || typeVal || "صنف";
+      const priceVal = document.getElementById("item-price-input").value.trim();
+      const promptText = `اكتب وصفاً تسويقياً جذاباً ومختصراً بالعربية لصنف (${titleVal}) ضمن قسم (${dept})${typeVal ? ` ونوع (${typeVal})` : ""}${priceVal ? ` بسعر ${priceVal} جنيه` : ""}، واقتراح وصف لصورة منتج واضحة بإضاءة احترافية وخلفية نظيفة.`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(promptText).catch(() => {});
+      }
+      toast("تم نسخ برومبت Gemini — الصقه في Gemini ثم ارفع الصورة الناتجة عبر زر (استوديو).");
+    };
 
     function getReferralSummaryForUser(uid) {
       const entries = Object.values(state.referrals[uid] || {});
@@ -567,26 +582,44 @@
       return { sentToCount, completedFirstCount, entries };
     }
 
-    function compressFileToDataUrl(file, cb) {
+    function compressFileToDataUrl(file, cb, options = {}) {
+      const maxDim = options.maxDim || 1600;
+      const quality = options.quality || 0.92;
+
       const reader = new FileReader();
       reader.onload = (ev) => {
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const maxDim = 640;
           let w = img.width;
           let h = img.height;
-          if (w > h && w > maxDim) {
-            h = (h * maxDim) / w;
-            w = maxDim;
-          } else if (h > maxDim) {
-            w = (w * maxDim) / h;
-            h = maxDim;
+
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
           }
+
+          const canvas = document.createElement("canvas");
           canvas.width = w;
           canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          cb(canvas.toDataURL("image/jpeg", 0.65));
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, 0, 0, w, h);
+
+          const isPng = file.type === "image/png";
+          let dataUrl = isPng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", quality);
+
+          let q = quality;
+          while (!isPng && dataUrl.length > 1800000 && q > 0.7) {
+            q = Number((q - 0.05).toFixed(2));
+            dataUrl = canvas.toDataURL("image/jpeg", q);
+          }
+          cb(dataUrl);
         };
         img.src = ev.target.result;
       };
@@ -721,7 +754,7 @@
       if (!file || !uid) return;
       compressFileToDataUrl(file, async (dataUrl) => {
         await update(ref(db, `users/${uid}`), { avatar: dataUrl });
-        toast("تم حفظ صورة العميل بنجاح.");
+        toast("تم حفظ صورة العميل بجودة عالية.");
       });
     };
 
