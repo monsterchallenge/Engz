@@ -208,7 +208,7 @@
       <div class="nav-grid">
         <button class="nav-btn active" data-p="client-reqs" onclick="showAdminPanel('client-reqs')">
           <span class="nav-count-badge" id="cnt-client-reqs">0</span>
-          <span>طلبات التسجيل</span>
+          <span>إعدادات طلبات التسجيل</span>
         </button>
         <button class="nav-btn" data-p="clients-mgr" onclick="showAdminPanel('clients-mgr')">
           <span class="nav-count-badge" id="cnt-clients-mgr">0</span>
@@ -220,7 +220,7 @@
         </button>
         <button class="nav-btn" data-p="chal-reqs" onclick="showAdminPanel('chal-reqs')">
           <span class="nav-count-badge" id="cnt-chal-reqs">0</span>
-          <span>طلبات تسجيل المتسابقين</span>
+          <span>إعدادات طلبات المتسابقين</span>
         </button>
         <button class="nav-btn" data-p="chal-mgr" onclick="showAdminPanel('chal-mgr')">
           <span class="nav-count-badge" id="cnt-chal-mgr">0</span>
@@ -256,9 +256,9 @@
         </button>
       </div>
 
-      <!-- 1. طلبات التسجيل -->
+      <!-- 1. إعدادات طلبات التسجيل (عملاء) -->
       <div id="panel-client-reqs" class="panel active">
-        <h3>صفحة طلبات التسجيل (عملاء)</h3>
+        <h3>صفحة إعدادات طلبات التسجيل (عملاء)</h3>
         <div id="admin-client-requests-list"></div>
       </div>
 
@@ -276,9 +276,9 @@
         <div id="admin-invited-ranking-list"></div>
       </div>
 
-      <!-- 4. طلبات تسجيل المتسابقين -->
+      <!-- 4. إعدادات طلبات تسجيل المتسابقين -->
       <div id="panel-chal-reqs" class="panel">
-        <h3>صفحة إعداد طلبات تسجيل المتسابقين</h3>
+        <h3>صفحة إعدادات طلبات تسجيل المتسابقين</h3>
         <div id="admin-challenger-requests-list"></div>
       </div>
 
@@ -288,7 +288,7 @@
         <div id="admin-challengers-list"></div>
       </div>
 
-      <!-- 6. المتسابقون النشطون: ترتيب تنازلي حسب قيمة الشراء/المهام وعدد مرات النجاح والوقت المستغرق للتوصيل -->
+      <!-- 6. المتسابقون النشطون -->
       <div id="panel-active-challengers" class="panel">
         <h3>المتسابقون النشطون (ترتيب تنازلي حسب المبالغ وعدد مرات النجاح والوقت المستغرق لتوصيل الأوردر)</h3>
         <div id="admin-active-challengers-list"></div>
@@ -588,7 +588,7 @@
       setBadge("cnt-gifts-receipts", giftsAndRecCount);
     }
 
-    // 1. طلبات التسجيل
+    // 1. إعدادات طلبات التسجيل (عملاء) — أزرار موافق ورفض
     function renderClientRequests() {
       const el = document.getElementById("admin-client-requests-list");
       const reqs = Object.entries(state.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -602,7 +602,7 @@
           <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div><strong>العميل:</strong> ${esc(r.name)} — <strong>موبايل:</strong> ${esc(r.phone)}</div>
             <div style="display:flex; gap:8px;">
-              <button class="btn-green" onclick="approveClientRequest('${esc(id)}')">قبول</button>
+              <button class="btn-green" onclick="approveClientRequest('${esc(id)}')">موافق</button>
               <button class="btn-red" onclick="rejectClientRequest('${esc(id)}')">رفض</button>
             </div>
           </div>
@@ -626,7 +626,7 @@
         createdAt: Date.now()
       });
       await remove(ref(db, `clientRegRequests/${reqId}`));
-      toast(`تم قبول العميل ${reqData.name} وأصبح مشتركاً.`);
+      toast(`تمت الموافقة على طلب العميل ${reqData.name} وأصبح مشتركاً.`);
     };
 
     window.rejectClientRequest = async function (reqId) {
@@ -643,7 +643,7 @@
         createdAt: Date.now()
       });
       await remove(ref(db, `clientRegRequests/${reqId}`));
-      toast(`تم رفض طلب تسجيل العميل ${reqData.name}.`);
+      toast(`تم رفض طلب ${reqData.name}.`);
     };
 
     // 2. إدارة العملاء والنقاط والرصيد
@@ -784,7 +784,7 @@
         : `<div class="card">لا توجد بيانات لأشخاص منضمين عبر الروابط بعد.</div>`;
     }
 
-    // 4. طلبات تسجيل المتسابقين
+    // 4. إعدادات طلبات تسجيل المتسابقين — أزرار موافق ورفض وwaiting
     function renderChallengerRequests() {
       const el = document.getElementById("admin-challenger-requests-list");
       const reqs = Object.entries(state.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -798,7 +798,7 @@
           <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div><strong>مقدم الطلب:</strong> ${esc(r.name)} — <strong>موبايل:</strong> ${esc(r.phone)}</div>
             <div style="display:flex; gap:8px;">
-              <button class="btn-green" onclick="decideChallenger('${esc(id)}', 'approved')">قبول</button>
+              <button class="btn-green" onclick="decideChallenger('${esc(id)}', 'approved')">موافق</button>
               <button class="btn-red" onclick="decideChallenger('${esc(id)}', 'rejected')">رفض</button>
               <button class="btn-amber" onclick="decideChallenger('${esc(id)}', 'waiting')">waiting</button>
             </div>
@@ -824,7 +824,7 @@
           invitedBy: reqData.invitedBy || "",
           createdAt: Date.now()
         });
-        toast(`تم قبول المتسابق ${reqData.name} وأصبح مشتركاً في صفحة التحديات.`);
+        toast(`تمت الموافقة على طلب المتسابق ${reqData.name} وأصبح مشتركاً في صفحة التحديات.`);
       } else if (decision === "rejected") {
         const uRef = push(ref(db, "users"));
         await set(uRef, {
@@ -1176,7 +1176,7 @@
       toast(`تم حفظ ${selected.length} أرقام كاش للظهور في صفحة الدفع.`);
     };
 
-    // 10. إعداد التحديات مع كاميرا / استديو
+    // 10. إعداد التحديات مع زر كاميرا / استديو
     window.handleChallengeMedia = function (inputEl) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
