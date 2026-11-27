@@ -6,14 +6,11 @@
   <title>انجز - للخصومات والمهام والمكافآت</title>
   <style>
     :root {
-      --bg-grad-1: #0f172a;
-      --bg-grad-2: #1e1b4b;
       --accent-pink: #ec4899;
       --accent-amber: #f59e0b;
       --accent-teal: #06b6d4;
       --accent-violet: #8b5cf6;
       --accent-emerald: #10b981;
-      --accent-rose: #f43f5e;
       --surface: #ffffff;
       --surface-soft: #f8fafc;
       --text-dark: #0f172a;
@@ -40,7 +37,7 @@
       position: fixed;
       inset: 0;
       z-index: 9999;
-      display: flex;
+      display: none;
       flex-direction: column;
       justify-content: center;
       align-items: center;
@@ -138,7 +135,7 @@
     }
 
     #main-app {
-      display: none;
+      display: block;
       max-width: 920px;
       margin: 0 auto;
       padding: 16px 14px 48px;
@@ -633,7 +630,6 @@
   </style>
 </head>
 <body>
-  <!-- شاشة التحميل 30 ثانية -->
   <div id="splash-screen">
     <div class="splash-card">
       <div class="splash-badge">تطبيق انجز • ENGZ</div>
@@ -688,7 +684,7 @@
     </div>
 
     <!-- 1. صفحة البداية: عميل أم تحدى -->
-    <div id="screen-choice" class="screen active">
+    <div id="screen-choice" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
@@ -713,7 +709,7 @@
     </div>
 
     <!-- 2. صفحة التسجيل والمشاركة (عميل) -->
-    <div id="screen-client-entry" class="screen">
+    <div id="screen-client-entry" class="screen active">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
@@ -964,9 +960,8 @@
     </div>
   </div>
 
-  <!-- سكريبت فوري للتنقل والأزرار وشاشة الـ 30 ثانية -->
   <script>
-    window.__engzHistory = ["screen-choice"];
+    window.__engzHistory = ["screen-choice", "screen-client-entry"];
     window.__engzDeptHistory = ["الكل"];
     window.__engzHomePath = "client";
     window.__engzClientMode = "register";
@@ -986,10 +981,12 @@
       var screens = document.querySelectorAll(".screen");
       for (var i = 0; i < screens.length; i++) {
         screens[i].classList.remove("active");
+        screens[i].style.display = "none";
       }
       var target = document.getElementById(screenId);
       if (target) {
         target.classList.add("active");
+        target.style.display = "block";
         target.scrollIntoView({ behavior: "smooth", block: "start" });
       }
       if (typeof window.__engzOnScreenChange === "function") {
@@ -1059,9 +1056,11 @@
 
     window.confirmEntryModeSelection = function (role) {
       if (role === "challenger") {
-        window.goScreen(window.__engzChalMode === "subscriber" ? "screen-challenger-subscriber" : "screen-challenger-register");
+        var targetChal = window.__engzChalMode === "subscriber" ? "screen-challenger-subscriber" : "screen-challenger-register";
+        window.goScreen(targetChal);
       } else {
-        window.goScreen(window.__engzClientMode === "subscriber" ? "screen-client-subscriber" : "screen-client-register");
+        var targetClient = window.__engzClientMode === "subscriber" ? "screen-client-subscriber" : "screen-client-register";
+        window.goScreen(targetClient);
       }
     };
 
@@ -1103,7 +1102,7 @@
 
     window.handleExitYes = function () {
       try {
-        localStorage.setItem("engz_exited_flag_v1", "1");
+        localStorage.removeItem("engz_exited_flag_v1");
       } catch (e) {}
       try {
         if (window.AndroidInterface && typeof window.AndroidInterface.exitApp === "function") {
@@ -1120,7 +1119,7 @@
         window.close();
       } catch (e) {}
       document.getElementById("main-app").innerHTML =
-        '<div class="screen active" style="text-align:center; padding:36px 20px;">' +
+        '<div class="screen active" style="display:block; text-align:center; padding:36px 20px;">' +
         '<h2 class="screen-title" style="color:#be123c;">تم الخروج من التطبيق</h2>' +
         '<p class="screen-sub">للدخول مرة أخرى وبدء شريط التحميل 30 ثانية كاملة، أعد فتح التطبيق أو اضغط إعادة الفتح.</p>' +
         '<button type="button" class="btn-success" onclick="window.location.reload()">إعادة فتح التطبيق (30 ثانية)</button>' +
@@ -1136,16 +1135,7 @@
       });
     };
 
-    try {
-      if (localStorage.getItem("engz_exited_flag_v1") === "1") {
-        localStorage.removeItem("engz_exited_flag_v1");
-      }
-    } catch (e) {}
-
-    window.startFull30SecSplash(function () {
-      window.__engzHistory = ["screen-choice"];
-      window.engzActivateScreen("screen-choice");
-    });
+    window.engzActivateScreen("screen-client-entry");
 
     window.addEventListener("popstate", function () {
       if (!window.__engzSplashRunning) {
@@ -1154,6 +1144,7 @@
     });
 
     document.addEventListener("DOMContentLoaded", function () {
+      window.engzActivateScreen("screen-client-entry");
       var b1 = document.getElementById("btn-confirm-client-entry");
       if (b1) b1.addEventListener("click", function () { window.confirmEntryModeSelection("client"); });
 
@@ -1165,7 +1156,6 @@
     });
   </script>
 
-  <!-- سكريبت Firebase الكامل لجميع الشاشات والعمليات -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
