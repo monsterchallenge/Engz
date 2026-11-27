@@ -36,7 +36,7 @@
       line-height: 1.65;
     }
 
-    /* شاشة البداية - 30 ثانية بدون تخطي */
+    /* شاشة البداية - 30 ثانية بدون تخطي وبدون إظهار قيمة النقطة */
     #splash-screen {
       position: fixed;
       inset: 0;
@@ -263,6 +263,7 @@
     .btn-dark { background: #1e293b; color: #ffffff; }
     .btn-soft { background: #e2e8f0; color: #0f172a; }
     .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #be123c); color: #ffffff; }
 
     button {
       font-family: inherit;
@@ -542,7 +543,7 @@
   </style>
 </head>
 <body>
-  <!-- 1. شاشة البداية: عد تنازلي 30 ثانية بدون زر تخطي -->
+  <!-- 1. شاشة البداية: عد تنازلي 30 ثانية بدون تخطي وبدون إظهار قيمة النقطة -->
   <div id="splash-screen">
     <div class="splash-card">
       <div class="splash-badge">تطبيق انجز • ENGZ</div>
@@ -567,8 +568,9 @@
       <div>
         <h1 class="brand-name">انجز • ENGZ</h1>
         <div id="active-user-summary" style="font-size:13px; opacity:0.95;">زائر</div>
-        <div id="user-points-summary" style="font-size:12px; margin-top:2px; color:#fde047; font-weight:bold;">
-          نقاطي (point): 0 • قيمة النقطة = 33.333333333333 جنيه
+        <!-- عداد النقاط يظهر في صفحة العميل وصفحة المتسابق فقط بعد الدخول -->
+        <div id="user-points-counter" style="display:none; font-size:13px; margin-top:3px; color:#fde047; font-weight:bold;">
+          عداد النقاط (point): <span id="user-points-value">0</span>
         </div>
       </div>
       <div class="header-actions">
@@ -581,7 +583,7 @@
 
     <div id="global-notice" class="status-banner" style="display:none;"></div>
 
-    <!-- رابط الدعوة الخاص بالمستخدم + تحويل النقاط إلى فلوس للعميل -->
+    <!-- شريط رابط الدعوة الخاص بالمستخدم + تحويل النقاط للعميل -->
     <div id="personal-referral-wallet-bar" class="box-card" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div>
@@ -590,9 +592,9 @@
           <div id="my-referral-stats-text" style="font-size:12px; color:#475569; margin-top:4px;"></div>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-cyan" onclick="copyMyReferralLink()">نسخ رابطي</button>
+          <button class="btn-dark" onclick="copyMyReferralLink()">نسخ رابطي</button>
           <button id="convert-points-btn" class="btn-success" style="display:none;" onclick="convertClientPointsToMoney()">
-            تحويل النقاط إلى فلوس (1 point = 33.333333333333 جنيه)
+            تحويل النقاط إلى رصيد
           </button>
         </div>
       </div>
@@ -622,7 +624,7 @@
     <!-- صفحة تسجيل العميل -->
     <div id="screen-client-register" class="screen">
       <h2 class="screen-title">تسجيل عميل جديد</h2>
-      <p class="screen-sub">الاسم يجب أن يكون فريداً ورقم الموبايل يجب أن يكون رقماً مصرياً صحيحاً.</p>
+      <p class="screen-sub">الاسم يجب أن يكون فريداً ورقم الموبايل يجب أن يكون مرتبطاً بمستخدم وحيد (11 رقماً مصرياً).</p>
       <div class="form-group">
         <label for="reg-client-name">الاسم (فريد غير مكرر)</label>
         <input type="text" id="reg-client-name" placeholder="مثال: أحمد محمود" />
@@ -637,10 +639,10 @@
       </div>
     </div>
 
-    <!-- صفحة المشتركين (عميل مسجل من قبل مع إمكانية ربط رقمي موبايل) -->
+    <!-- صفحة المشتركين (عميل مسجل من قبل) -->
     <div id="screen-client-subscriber" class="screen">
       <h2 class="screen-title">دخول المشتركين (عميل)</h2>
-      <p class="screen-sub">اختر اسماً غير مكرر ورقم موبايل مصري صالح، ويمكن ربط الاسم برقمي موبايل.</p>
+      <p class="screen-sub">كل رقم موبايل مرتبط بمستخدم وحيد ولا يمكن تكراره لحساب آخر.</p>
       <div class="form-group">
         <label for="sub-client-name">الاسم المسجل / غير المكرر</label>
         <input type="text" id="sub-client-name" placeholder="اكتب اسمك..." />
@@ -650,7 +652,7 @@
         <input type="tel" id="sub-client-phone1" placeholder="01xxxxxxxxx" maxlength="11" />
       </div>
       <div class="form-group">
-        <label for="sub-client-phone2">رقم موبايل إضافي مرتبط بالاسم (اختياري - مصر)</label>
+        <label for="sub-client-phone2">رقم موبايل إضافي مرتبط بنفس الحساب (اختياري - مصر)</label>
         <input type="tel" id="sub-client-phone2" placeholder="01xxxxxxxxx" maxlength="11" />
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -701,7 +703,7 @@
     <!-- صفحة تأكيد الشراء -->
     <div id="screen-confirm-purchase" class="screen">
       <h2 class="screen-title">تأكيد الشراء</h2>
-      <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى طرق الدفع.</p>
+      <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى صفحة الدفع من رقمك.</p>
       <div id="confirm-cards-grid" class="items-grid"></div>
       <div id="confirm-total-line" class="box-card" style="margin-top:14px; font-size:18px; font-weight:bold;"></div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -710,30 +712,21 @@
       </div>
     </div>
 
-    <!-- صفحة طرق الدفع -->
+    <!-- صفحة الدفع من رقم العميل مع رسالة: هل تريد تأكيد طلب الشراء (نعم / لا) -->
     <div id="screen-payment" class="screen">
-      <h2 class="screen-title">صفحة طرق الدفع (كاش)</h2>
-      <p class="screen-sub">اختر أحد أرقام استقبال الكاش المتاحة ثم حدد طريقة الدفع.</p>
+      <h2 class="screen-title">صفحة الدفع من رقمك</h2>
+      <p class="screen-sub">اختر رقم الاستقبال المحدد من الأدمن ثم أكد قرارك.</p>
       <div id="payment-amount-banner" class="status-banner"></div>
       <div class="form-group">
-        <label>اختر رقم الكاش المراد التحويل إليه</label>
+        <label>اختر رقم الكاش المحدد من الأدمن</label>
         <div id="admin-cash-phones-list"></div>
       </div>
 
-      <div id="same-or-other-box" class="box-card" style="display:none;">
-        <p style="font-weight:bold; margin-top:0;">اختر طريقة الدفع:</p>
+      <div id="confirm-purchase-prompt-box" class="box-card">
+        <p style="font-size:17px; font-weight:bold; color:#1e1b4b; margin-top:0;">هل تريد تأكيد طلب الشراء</p>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn-success" onclick="handlePayFromSameNumber()">الدفع من نفس الرقم</button>
-          <button class="btn-amber" onclick="showOtherNumberReceiptBox()">الدفع من رقم اخر</button>
-        </div>
-      </div>
-
-      <div id="other-number-receipt-box" class="box-card" style="display:none;">
-        <label>التقط صورة الإيصال بالكاميرا أو اخترها من الاستوديو</label>
-        <input type="file" id="receipt-file-input" accept="image/*" capture="environment" onchange="previewCompressedImage(this, 'receipt-preview', 'receipt')" />
-        <img id="receipt-preview" class="thumb-preview" alt="معاينة الإيصال" />
-        <div style="margin-top:12px;">
-          <button class="btn-success" onclick="submitOtherNumberReceipt()">إرسال الإيصال وتأكيد الطلب</button>
+          <button class="btn-success" onclick="confirmPurchaseYes()">نعم</button>
+          <button class="btn-danger" onclick="confirmPurchaseNo()">لا</button>
         </div>
       </div>
 
@@ -852,11 +845,9 @@
       "خدمات الشراء والبيع"
     ];
 
-    // قراءة كود الإحالة من الرابط المخصص (?ref=USER_ID)
     const urlParams = new URLSearchParams(window.location.search);
     const incomingRefCode = (urlParams.get("ref") || "").trim();
 
-    // عد تنازلي 30 ثانية بدون زر تخطي
     (function runSplash30Sec() {
       const totalSec = 30;
       let remaining = totalSec;
@@ -888,7 +879,7 @@
       selectedTypeFilter: "الكل",
       cart: [],
       selectedCashPhone: null,
-      uploadedImages: { receipt: "", deliveryProof: "" },
+      uploadedImages: { deliveryProof: "" },
       trackedApplicant: null,
       db: {
         users: {},
@@ -926,6 +917,27 @@
         .replace(/"/g, "&quot;");
     }
 
+    // التحقق من أن رقم الموبايل مرتبط بمستخدم وحيد فقط
+    function isPhoneBoundToAnotherUser(phone, excludeUserId = null) {
+      const p = String(phone || "").trim();
+      if (!p) return false;
+
+      const inUsers = Object.entries(state.db.users || {}).some(
+        ([uid, u]) => uid !== excludeUserId && (u.phone === p || u.phone2 === p)
+      );
+      if (inUsers) return true;
+
+      const inClientReqs = Object.values(state.db.clientRegRequests || {}).some(
+        (r) => r.status === "pending" && r.phone === p
+      );
+      if (inClientReqs) return true;
+
+      const inChalReqs = Object.values(state.db.challengerRegRequests || {}).some(
+        (r) => r.status === "pending" && r.phone === p
+      );
+      return inChalReqs;
+    }
+
     function buildPersonalReferralUrl(userId) {
       const base = window.location.origin + window.location.pathname;
       return `${base}?ref=${encodeURIComponent(userId)}`;
@@ -942,12 +954,13 @@
 
     function renderReferralAndWalletBar() {
       const bar = document.getElementById("personal-referral-wallet-bar");
-      const pointsSummary = document.getElementById("user-points-summary");
+      const pointsCounterBox = document.getElementById("user-points-counter");
+      const pointsValEl = document.getElementById("user-points-value");
       const convertBtn = document.getElementById("convert-points-btn");
 
       if (!state.currentUser || !state.currentUser.id) {
         bar.style.display = "none";
-        pointsSummary.textContent = `نقاطي (point): 0 • قيمة النقطة = ${POINT_VALUE_EGP} جنيه`;
+        pointsCounterBox.style.display = "none";
         convertBtn.style.display = "none";
         return;
       }
@@ -955,11 +968,11 @@
       const latest = state.db.users[state.currentUser.id] || state.currentUser;
       state.currentUser = { ...state.currentUser, ...latest };
       const pts = Number(state.currentUser.points) || 0;
-      const ptsValueEgp = (pts * POINT_VALUE_EGP).toFixed(2);
 
-      pointsSummary.textContent = `نقاطي (point): ${pts} (${ptsValueEGP} جنيه) • 1 point = ${POINT_VALUE_EGP} جنيه`;
+      // إظهار عداد النقاط في صفحة العميل وصفحة المتسابق فقط
+      pointsCounterBox.style.display = "block";
+      pointsValEl.textContent = String(pts);
 
-      // زر تحويل النقاط إلى فلوس للعميل
       convertBtn.style.display = state.currentUser.role === "client" && pts > 0 ? "inline-block" : "none";
 
       bar.style.display = "block";
@@ -974,7 +987,6 @@
         `عدد الأشخاص المرسل لهم الرابط: ${sentCount} • عدد من أتموا أول طلب شراء أو مهمة ناجحة: ${completedCount}`;
     }
 
-    // تحويل النقاط إلى رصيد محفظة بالفلوس للعميل (1 point = 33.333333333333 جنيه)
     window.convertClientPointsToMoney = async function () {
       if (!state.currentUser || state.currentUser.role !== "client") return;
       const uid = state.currentUser.id;
@@ -989,10 +1001,9 @@
         wallet: Number(((Number(state.db.users[uid]?.wallet) || 0) + addedMoney).toFixed(2))
       });
 
-      notify(`تم تحويل ${currentPts} point إلى ${addedMoney} جنيه وأضيفت إلى رصيدك بنجاح.`, "success");
+      notify(`تم تحويل ${currentPts} point إلى رصيدك (${addedMoney} جنيه) بنجاح.`, "success");
     };
 
-    // تسجيل انضمام شخص عبر رابط مخصص دون تكرار
     async function recordReferralJoin(referrerId, invitedUserId, invitedName) {
       if (!referrerId || !invitedUserId || referrerId === invitedUserId) return;
       if (!state.db.users[referrerId]) return;
@@ -1008,7 +1019,6 @@
       });
     }
 
-    // عند قيام الشخص المدعو بأول طلب شراء أو أول مهمة ناجحة
     async function markReferrerFirstActionSuccess(invitedUserId) {
       if (!invitedUserId) return;
       const allReferrals = state.db.referrals || {};
@@ -1097,9 +1107,10 @@
       const phone = document.getElementById("reg-client-phone").value.trim();
 
       if (!name) return notify("من فضلك أدخل الاسم.", "error");
-      if (!isValidEgyptianPhone(phone)) return notify("رقم الموبايل يجب أن يكون رقماً مصرياً صحيحاً مكوناً من 11 رقماً (يبدأ بـ 010 أو 011 أو 012 أو 015).", "error");
+      if (!isValidEgyptianPhone(phone)) return notify("رقم الموبايل يجب أن يكون رقماً مصرياً صحيحاً مكوناً من 11 رقماً.", "error");
       if (isBanned(name, phone)) return notify("عذراً، هذه البيانات محظورة من الدخول.", "error");
       if (isNameTaken(name)) return notify("هذا الاسم مستخدم بالفعل، اختر اسماً فريداً غير مكرر.", "error");
+      if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم موبايل يجب أن يكون لمستخدم وحيد.", "error");
 
       await push(ref(db, "clientRegRequests"), {
         name,
@@ -1148,6 +1159,14 @@
         if (uData.status === "rejected") {
           return notify("تم رفض طلبك من الإدارة.", "error");
         }
+        const ownsPhone1 = uData.phone === phone1 || uData.phone2 === phone1;
+        if (!ownsPhone1 && isPhoneBoundToAnotherUser(phone1, uid)) {
+          return notify("رقم الموبايل الأساسي مرتبط بمستخدم وحيد آخر.", "error");
+        }
+        if (phone2 && isPhoneBoundToAnotherUser(phone2, uid)) {
+          return notify("الرقم الإضافي مرتبط بمستخدم وحيد آخر.", "error");
+        }
+
         await update(ref(db, `users/${uid}`), {
           phone: phone1,
           phone2: phone2 || uData.phone2 || "",
@@ -1162,6 +1181,10 @@
         notify("تم قبول حسابك بنجاح، أهلاً بك في صفحة الطلبات.", "success");
         goScreen("screen-orders-home");
         return;
+      }
+
+      if (isPhoneBoundToAnotherUser(phone1) || (phone2 && isPhoneBoundToAnotherUser(phone2))) {
+        return notify("هذا الرقم مرتبط بمستخدم وحيد آخر ولا يمكن استخدامه لحساب جديد.", "error");
       }
 
       const newRef = push(ref(db, "users"));
@@ -1196,6 +1219,7 @@
       }
       if (isBanned(name, phone)) return notify("عذراً، هذه البيانات محظورة.", "error");
       if (isNameTaken(name)) return notify("هذا الاسم مسجل بالفعل، اختر اسماً فريداً.", "error");
+      if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم موبايل يجب أن يكون لمستخدم وحيد.", "error");
 
       await push(ref(db, "challengerRegRequests"), {
         name,
@@ -1248,6 +1272,9 @@
       }
       if (uData.role !== "challenger") {
         return notify("هذا الحساب مسجل كعميل وليس متسابقاً.", "error");
+      }
+      if (uData.phone && uData.phone !== phone) {
+        return notify("رقم الموبايل لا يطابق رقم المستخدم الوحيد المسجل لهذا الحساب.", "error");
       }
 
       state.currentUser = { id: uid, ...uData, phone };
@@ -1460,12 +1487,13 @@
     }
 
     window.openPaymentMethodsScreen = function () {
+      document.getElementById("payment-result-box").innerHTML = "";
       goScreen("screen-payment");
     };
 
     function renderPaymentScreen() {
       const total = getCartTotal();
-      document.getElementById("payment-amount-banner").textContent = `المبلغ المطلوب دفعه: ${total} جنيه`;
+      document.getElementById("payment-amount-banner").textContent = `المبلغ المطلوب دفعه من حسابك: ${total} جنيه`;
       const listEl = document.getElementById("admin-cash-phones-list");
       const phones = Array.isArray(state.db.cashPhones) ? state.db.cashPhones.slice(0, 5) : [];
 
@@ -1475,26 +1503,116 @@
       }
 
       listEl.innerHTML = phones
-        .map(
-          (ph) => `
-          <div class="box-card" style="display:flex; justify-content:space-between; align-items:center;">
-            <strong>${esc(ph)}</strong>
-            <button class="btn-dark" onclick="selectCashReceiver('${esc(ph)}')">اختيار هذا الرقم</button>
-          </div>
-        `
-        )
+        .map((ph) => {
+          const isPicked = state.selectedCashPhone === ph;
+          return `
+            <div class="box-card" style="display:flex; justify-content:space-between; align-items:center; ${isPicked ? "border-color:#10b981;" : ""}">
+              <strong>${esc(ph)}</strong>
+              <button class="${isPicked ? "btn-success" : "btn-dark"}" onclick="selectCashReceiver('${esc(ph)}')">
+                ${isPicked ? "محدد ✓" : "اختيار هذا الرقم"}
+              </button>
+            </div>
+          `;
+        })
         .join("");
     }
 
     window.selectCashReceiver = function (phone) {
       state.selectedCashPhone = phone;
-      document.getElementById("same-or-other-box").style.display = "block";
-      document.getElementById("other-number-receipt-box").style.display = "none";
-      notify(`تم اختيار رقم الاستقبال: ${phone}. اختر الآن الدفع من نفس الرقم أو من رقم اخر.`, "info");
+      renderPaymentScreen();
+      notify(`تم اختيار رقم الاستقبال المحدد من الأدمن: ${phone}.`, "info");
     };
 
-    window.showOtherNumberReceiptBox = function () {
-      document.getElementById("other-number-receipt-box").style.display = "block";
+    // اختيار "لا" -> يعود العميل إلى صفحة اختيار السلع
+    window.confirmPurchaseNo = function () {
+      notify("تم إلغاء تأكيد الشراء والعودة إلى صفحة اختيار السلع.", "info");
+      goScreen("screen-orders-home");
+    };
+
+    // اختيار "نعم" -> يتم إرسال المبلغ من حساب العميل إلى الرقم الذي يحدده الأدمن
+    window.confirmPurchaseYes = async function () {
+      const total = getCartTotal();
+      if (total <= 0) return notify("قيمة الطلب غير صالحة.", "error");
+
+      const phones = Array.isArray(state.db.cashPhones) ? state.db.cashPhones.slice(0, 5) : [];
+      const receiverPhone = state.selectedCashPhone || phones[0] || "";
+      if (!receiverPhone) {
+        return notify("يرجى اختيار رقم الاستقبال المحدد من الأدمن أولاً.", "error");
+      }
+
+      if (!state.currentUser || !state.currentUser.id) {
+        return notify("يرجى تسجيل الدخول كعميل أولاً ليتم الخصم من حسابك.", "error");
+      }
+
+      const userRef = ref(db, `users/${state.currentUser.id}/wallet`);
+      let paid = false;
+      await runTransaction(userRef, (currentBal) => {
+        const bal = Number(currentBal) || 0;
+        if (bal < total) return;
+        paid = true;
+        return Number((bal - total).toFixed(2));
+      });
+
+      if (!paid) {
+        return notify(`رصيدك الحالي غير كافٍ لإتمام طلب الشراء (${total} جنيه).`, "error");
+      }
+
+      const orderRef = push(ref(db, "orders"));
+      await set(orderRef, {
+        id: orderRef.key,
+        buyerId: state.currentUser.id,
+        buyerName: state.currentUser.name,
+        buyerPhone: state.currentUser.phone,
+        items: state.cart,
+        totalAmount: total,
+        cashReceiverPhone: receiverPhone,
+        paymentMethod: "خصم من حساب العميل إلى رقم الأدمن",
+        status: "جاري تنفيذ طلبك",
+        createdAt: Date.now()
+      });
+
+      await runTransaction(ref(db, `clientActivity/${state.currentUser.id}`), (curr) => {
+        const prev = curr || {
+          userId: state.currentUser.id,
+          name: state.currentUser.name,
+          phone: state.currentUser.phone,
+          orderCount: 0,
+          totalSpent: 0
+        };
+        return {
+          userId: state.currentUser.id,
+          name: state.currentUser.name,
+          phone: state.currentUser.phone,
+          orderCount: (Number(prev.orderCount) || 0) + 1,
+          totalSpent: Number(((Number(prev.totalSpent) || 0) + total).toFixed(2)),
+          lastOrderAt: Date.now()
+        };
+      });
+
+      await markReferrerFirstActionSuccess(state.currentUser.id);
+
+      await push(ref(db, "receipts"), {
+        type: "وصل دفع واستلام",
+        userId: state.currentUser.id,
+        userName: state.currentUser.name,
+        phone: state.currentUser.phone,
+        receiverPhone,
+        amount: total,
+        method: "من حساب العميل إلى رقم الأدمن",
+        createdAt: Date.now()
+      });
+
+      state.cart = [];
+      updateCartBadges();
+
+      document.getElementById("payment-result-box").innerHTML = `
+        <div class="receipt-box">
+          <h3 style="margin-top:0; color:#065f46;">تم تأكيد طلب الشراء وإرسال المبلغ</h3>
+          <p>تم خصم <strong>${total} جنيه</strong> من حسابك وإرسالها إلى رقم الأدمن: <strong>${esc(receiverPhone)}</strong>.</p>
+          <button class="btn-dark" onclick="goScreen('screen-orders-home')">العودة إلى الأقسام</button>
+        </div>
+      `;
+      notify("تم تأكيد طلب الشراء وإرسال المبلغ بنجاح.", "success");
     };
 
     window.previewCompressedImage = function (inputEl, previewImgId, key) {
@@ -1533,106 +1651,6 @@
       reader.readAsDataURL(file);
     };
 
-    async function createOrderRecord(paymentMethod, receiptImage) {
-      const total = getCartTotal();
-      if (total <= 0) return notify("قيمة الطلب غير صالحة.", "error");
-      const buyer = state.currentUser || {
-        id: "guest_" + Date.now(),
-        name: "عميل سريع",
-        phone: "01000000000",
-        role: "client"
-      };
-
-      const orderRef = push(ref(db, "orders"));
-      const orderData = {
-        id: orderRef.key,
-        buyerId: buyer.id,
-        buyerName: buyer.name,
-        buyerPhone: buyer.phone,
-        items: state.cart,
-        totalAmount: total,
-        cashReceiverPhone: state.selectedCashPhone || "",
-        paymentMethod,
-        receiptImage: receiptImage || "",
-        status: "جاري تنفيذ طلبك",
-        createdAt: Date.now()
-      };
-      await set(orderRef, orderData);
-
-      // تحديث إحصائيات العميل النشط واحتساب نجاح الإحالة عند أول طلب شراء
-      if (state.currentUser && state.currentUser.id) {
-        await runTransaction(ref(db, `clientActivity/${state.currentUser.id}`), (curr) => {
-          const prev = curr || { userId: state.currentUser.id, name: state.currentUser.name, phone: state.currentUser.phone, orderCount: 0, totalSpent: 0 };
-          return {
-            userId: state.currentUser.id,
-            name: state.currentUser.name,
-            phone: state.currentUser.phone,
-            orderCount: (Number(prev.orderCount) || 0) + 1,
-            totalSpent: Number(((Number(prev.totalSpent) || 0) + total).toFixed(2)),
-            lastOrderAt: Date.now()
-          };
-        });
-        await markReferrerFirstActionSuccess(state.currentUser.id);
-      }
-
-      await push(ref(db, "receipts"), {
-        type: "وصل دفع واستلام",
-        userId: buyer.id,
-        userName: buyer.name,
-        phone: buyer.phone,
-        receiverPhone: state.selectedCashPhone || "",
-        amount: total,
-        method: paymentMethod,
-        receiptImage: receiptImage || "",
-        createdAt: Date.now()
-      });
-
-      state.cart = [];
-      updateCartBadges();
-      state.uploadedImages.receipt = "";
-
-      document.getElementById("payment-result-box").innerHTML = `
-        <div class="receipt-box">
-          <h3 style="margin-top:0; color:#065f46;">جارى تنفيذ طلبك</h3>
-          <p>تم تسجيل عملية الدفع وإصدار وصل الدفع والاستلام بقيمة <strong>${total} جنيه</strong>.</p>
-          <button class="btn-dark" onclick="goScreen('screen-orders-home')">عودة إلى الأقسام</button>
-        </div>
-      `;
-    }
-
-    window.handlePayFromSameNumber = async function () {
-      const total = getCartTotal();
-      if (!state.currentUser || !state.currentUser.id) {
-        return notify("سجل اسمك ورقمك أولاً لإتمام الدفع من نفس الرقم.", "error");
-      }
-
-      const userRef = ref(db, `users/${state.currentUser.id}/wallet`);
-      let paid = false;
-      await runTransaction(userRef, (currentBal) => {
-        const bal = Number(currentBal) || 0;
-        if (bal < total) {
-          return;
-        }
-        paid = true;
-        return Number((bal - total).toFixed(2));
-      });
-
-      if (!paid) {
-        return notify(`رصيدك الحالي غير كافٍ لإتمام عملية الدفع (${total} جنيه).`, "error");
-      }
-
-      await createOrderRecord("الدفع من نفس الرقم", "");
-      notify("تم خصم قيمة المشتريات تلقائياً من حسابك وتحويلها إلى الرقم المحدد.", "success");
-    };
-
-    window.submitOtherNumberReceipt = async function () {
-      if (!state.uploadedImages.receipt) {
-        return notify("من فضلك التقط صورة الإيصال أو اخترها من الاستوديو أولاً.", "error");
-      }
-      await createOrderRecord("الدفع من رقم اخر (إيصال مرفق)", state.uploadedImages.receipt);
-      notify("تم إرسال صورة الإيصال وتسجيل طلبك.", "success");
-    };
-
     window.switchChallengerSubTab = function (tab) {
       ["available", "active", "rewards"].forEach((t) => {
         document.getElementById(`stab-${t}`).classList.toggle("active", t === tab);
@@ -1658,6 +1676,7 @@
           .map(
             (c) => `
             <div class="box-card">
+              ${c.image ? `<img src="${c.image}" class="thumb-preview" style="display:block; margin-bottom:10px;" alt="صورة التحدي" />` : ""}
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <strong>${esc(c.title)}</strong>
                 <span style="color:#059669; font-weight:bold;">مكافأة: ${Number(c.reward) || 0} جنيه</span>
@@ -1688,7 +1707,7 @@
             <h3 style="margin-top:0;">مهمة / طلب نشط</h3>
             <p><strong>اسم المتسابق:</strong> ${esc(myActiveOrder.assignedChallengerName)}</p>
             <p><strong>رقم التلفون:</strong> ${esc(myActiveOrder.assignedChallengerPhone)}</p>
-            <p><strong>وقت تأكيد قبول المهمة:</strong> ${new Date(myActiveOrder.acceptedAt).toLocaleString("ar-EG")}</p>
+            <p><strong>وقت بدء التوصيل / القبول:</strong> ${new Date(myActiveOrder.deliveryStartAt || myActiveOrder.acceptedAt).toLocaleString("ar-EG")}</p>
             <p><strong>قائمة المشتريات:</strong> ${itemsText || esc(myActiveOrder.challengeTitle || "مهمة تحدي")}</p>
             <p><strong>رقم تلفون العميل:</strong> ${esc(myActiveOrder.buyerPhone || "غير متوفر")}</p>
 
@@ -1696,7 +1715,7 @@
               otherChallengers.length
                 ? `
               <div class="form-group" style="margin-top:10px;">
-                <label>تحريك الأوردر إلى متسابق آخر</label>
+                <label>إرسال / تحريك الأوردر إلى متسابق آخر</label>
                 <div style="display:flex; gap:8px;">
                   <select id="transfer-chal-select">
                     ${otherChallengers.map((oc) => `<option value="${esc(oc.id)}">${esc(oc.name)} (${esc(oc.phone)})</option>`).join("")}
@@ -1734,7 +1753,16 @@
           <h3 style="margin-top:0;">الهدايا والعروض والمكافآت</h3>
           ${
             myGifts.length
-              ? myGifts.map((g) => `<div style="padding:8px 0; border-bottom:1px solid #e2e8f0;">🎁 <strong>${esc(g.title)}</strong>: ${esc(g.details)}</div>`).join("")
+              ? myGifts
+                  .map(
+                    (g) => `
+                  <div style="padding:10px 0; border-bottom:1px solid #e2e8f0;">
+                    🎁 <strong>${esc(g.title)}</strong>: ${esc(g.details)}
+                    ${g.image ? `<div><img src="${g.image}" class="thumb-preview" style="display:block;" alt="هدية" /></div>` : ""}
+                  </div>
+                `
+                  )
+                  .join("")
               : "<div>لا توجد هدايا مرسلة حالياً.</div>"
           }
         </div>
@@ -1779,6 +1807,7 @@
         assignedChallengerName: state.currentUser.name,
         assignedChallengerPhone: state.currentUser.phone,
         acceptedAt: now,
+        deliveryStartAt: now,
         stage: "active",
         status: "نشط"
       });
@@ -1787,20 +1816,46 @@
       switchChallengerSubTab("active");
     };
 
+    // عند إرسال/تحريك الأوردر إلى متسابق آخر يُحسب وقت التوصيل السابق ويبدأ وقت للمتسابق الجديد
     window.transferOrderToOther = async function (orderId) {
       const sel = document.getElementById("transfer-chal-select");
       if (!sel) return;
       const targetId = sel.value;
       const targetUser = state.db.users[targetId];
-      if (!targetUser) return;
+      const currentOrd = state.db.orders[orderId];
+      if (!targetUser || !currentOrd) return;
+
+      const now = Date.now();
+      const startTime = Number(currentOrd.deliveryStartAt || currentOrd.acceptedAt) || now;
+      const elapsedSec = Math.max(1, Math.round((now - startTime) / 1000));
+
+      if (currentOrd.assignedChallengerId) {
+        await runTransaction(ref(db, `challengersStats/${currentOrd.assignedChallengerId}`), (curr) => {
+          const prev = curr || {
+            name: currentOrd.assignedChallengerName,
+            phone: currentOrd.assignedChallengerPhone,
+            completedCount: 0,
+            totalEarned: 0,
+            totalDeliverySec: 0,
+            deliverySamples: 0
+          };
+          return {
+            ...prev,
+            totalDeliverySec: (Number(prev.totalDeliverySec) || 0) + elapsedSec,
+            deliverySamples: (Number(prev.deliverySamples) || 0) + 1
+          };
+        });
+      }
 
       await update(ref(db, `orders/${orderId}`), {
         assignedChallengerId: targetId,
         assignedChallengerName: targetUser.name,
         assignedChallengerPhone: targetUser.phone,
-        transferredAt: Date.now()
+        transferredAt: now,
+        deliveryStartAt: now,
+        lastTransferElapsedSec: elapsedSec
       });
-      notify(`تم تحويل الأوردر إلى المتسابق ${targetUser.name}.`, "success");
+      notify(`تم تحويل الأوردر إلى المتسابق ${targetUser.name} (مدة التسليم السابقة: ${elapsedSec} ثانية).`, "success");
       renderChallengesHub();
     };
 
@@ -1809,33 +1864,47 @@
         return notify("يرجى التقاط أو اختيار صورة تأكيد وصول الطلب أولاً.", "error");
       }
 
+      const now = Date.now();
       const orderObj = state.db.orders[orderId] || {};
+      const startTs = Number(orderObj.deliveryStartAt || orderObj.acceptedAt) || now;
+      const elapsedSec = Math.max(1, Math.round((now - startTs) / 1000));
       const rewardVal = Math.max(0, Number(orderObj.totalAmount) || Number(state.db.challenges[challengeId]?.reward) || 0);
 
       await update(ref(db, `orders/${orderId}`), {
         stage: "completed",
         status: "منتهي",
         deliveryImage: state.uploadedImages.deliveryProof,
-        completedAt: Date.now()
+        completedAt: now,
+        deliveryDurationSec: elapsedSec
       });
 
       if (state.currentUser) {
         const statsRef = ref(db, `challengersStats/${state.currentUser.id}`);
         await runTransaction(statsRef, (curr) => {
-          const prev = curr || { name: state.currentUser.name, phone: state.currentUser.phone, completedCount: 0, totalEarned: 0 };
+          const prev = curr || {
+            name: state.currentUser.name,
+            phone: state.currentUser.phone,
+            completedCount: 0,
+            totalEarned: 0,
+            totalDeliverySec: 0,
+            deliverySamples: 0
+          };
           return {
             name: state.currentUser.name,
             phone: state.currentUser.phone,
             completedCount: (Number(prev.completedCount) || 0) + 1,
             totalEarned: Number(((Number(prev.totalEarned) || 0) + rewardVal).toFixed(2)),
-            lastCompletedAt: Date.now()
+            totalDeliverySec: (Number(prev.totalDeliverySec) || 0) + elapsedSec,
+            deliverySamples: (Number(prev.deliverySamples) || 0) + 1,
+            lastDeliverySec: elapsedSec,
+            lastCompletedAt: now
           };
         });
         await markReferrerFirstActionSuccess(state.currentUser.id);
       }
 
       state.uploadedImages.deliveryProof = "";
-      notify("تم تأكيد انتهاء المهمة وإرسال الصورة إلى صفحة الطلبات المنتهية في الأدمن.", "success");
+      notify(`تم تأكيد انتهاء المهمة بنجاح (الوقت المستغرق: ${elapsedSec} ثانية).`, "success");
       renderChallengesHub();
     };
 
