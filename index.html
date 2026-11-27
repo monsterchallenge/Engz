@@ -547,7 +547,7 @@
   <div id="splash-screen">
     <div class="splash-card">
       <div class="splash-badge">تطبيق انجز • ENGZ</div>
-      <h1 class="splash-title">مرحبا بك فى تطبيق انجز للخصومات والمهام واللمكافأت</h1>
+      <h1 class="splash-title">مرحبا بك فى تطبيق انجز للخصومات والمهام والمكافآت</h1>
       <div class="countdown-circle">
         <div class="countdown-num" id="splash-seconds">30</div>
         <div class="countdown-unit">ثانية</div>
@@ -872,6 +872,8 @@
       }, 1000);
     })();
 
+    let autoRedirectedAfterApproval = false;
+
     const state = {
       currentRole: null,
       currentUser: null,
@@ -1034,32 +1036,99 @@
       }
     }
 
+    // التوجيه التلقائي الفوري للصفحة التالية عند قبول الأدمن للطلب
+    async function finalizeApprovedUserAndRedirect(userRecord, preferredId = null) {
+      if (!userRecord || autoRedirectedAfterApproval) return;
+      autoRedirectedAfterApproval = true;
+
+      let uid = preferredId;
+      if (!uid) {
+        const existing = Object.entries(state.db.users || {}).find(
+          ([, u]) =>
+            (u.name || "").trim().toLowerCase() === (userRecord.name || "").trim().toLowerCase() ||
+            (userRecord.phone && u.phone === userRecord.phone)
+        );
+        if (existing) {
+          uid = existing[0];
+          userRecord = { ...existing[1], ...userRecord };
+        }
+      }
+
+      if (!uid) {
+        const newRef = push(ref(db, "users"));
+        uid = newRef.key;
+        const payload = {
+          name: userRecord.name,
+          phone: userRecord.phone,
+          role: userRecord.role,
+          status: "approved",
+          wallet: Number(userRecord.wallet) || 0,
+          points: Number(userRecord.points) || 0,
+          invitedBy: userRecord.invitedBy || incomingRefCode || "",
+          createdAt: Date.now()
+        };
+        await set(newRef, payload);
+        userRecord = payload;
+      }
+
+      const role = userRecord.role || (state.trackedApplicant && state.trackedApplicant.kind) || "client";
+      state.currentUser = { id: uid, ...userRecord, role, status: "approved" };
+      state.currentRole = role;
+
+      if (incomingRefCode || userRecord.invitedBy) {
+        await recordReferralJoin(incomingRefCode || userRecord.invitedBy, uid, userRecord.name);
+      }
+
+      syncUserHeader();
+      state.trackedApplicant = null;
+
+      if (role === "challenger") {
+        notify("تم قبول طلبك، جاري نقلك إلى صفحة التحديات...", "success");
+        goScreen("screen-challenges-hub");
+      } else {
+        notify("تم قبول طلبك، جاري نقلك إلى صفحة الطلبات والأقسام...", "success");
+        goScreen("screen-orders-home");
+      }
+    }
+
     function checkRegistrationStatusBanner() {
       if (!state.trackedApplicant) return;
       const { name, phone, kind } = state.trackedApplicant;
       const cleanName = (name || "").trim().toLowerCase();
 
       const pendingMap = kind === "challenger" ? state.db.challengerRegRequests : state.db.clientRegRequests;
-      const isPending = Object.values(pendingMap || {}).some(
-        (r) => (r.name || "").trim().toLowerCase() === cleanName && r.phone === phone && r.status === "pending"
+      const isStillPending = Object.values(pendingMap || {}).some(
+        (r) =>
+          r.status === "pending" &&
+          ((cleanName && (r.name || "").trim().toLowerCase() === cleanName) || (phone && r.phone === phone))
       );
 
-      if (isPending) {
-        notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
+      const approvedEntry = Object.entries(state.db.users || {}).find(
+        ([, u]) =>
+          u.status === "approved" &&
+          (!kind || u.role === kind) &&
+          ((cleanName && (u.name || "").trim().toLowerCase() === cleanName) || (phone && u.phone === phone))
+      );
+
+      if (approvedEntry && !isStillPending) {
+        finalizeApprovedUserAndRedirect({ id: approvedEntry[0], ...approvedEntry[1] }, approvedEntry[0]);
         return;
       }
 
-      const matchedUser = Object.values(state.db.users || {}).find(
-        (u) => (u.name || "").trim().toLowerCase() === cleanName && (!kind || u.role === kind)
+      const rejectedEntry = Object.values(state.db.users || {}).find(
+        (u) =>
+          u.status === "rejected" &&
+          (!kind || u.role === kind) &&
+          ((cleanName && (u.name || "").trim().toLowerCase() === cleanName) || (phone && u.phone === phone))
       );
 
-      if (matchedUser) {
-        if (matchedUser.status === "approved") {
-          notify("تم قبول طلب التسجيل الخاص بك بنجاح.", "success");
-        } else if (matchedUser.status === "rejected") {
-          notify("تم رفض طلب التسجيل الخاص بك.", "error");
-        }
+      if (rejectedEntry && !isStillPending) {
+        state.trackedApplicant = null;
+        notify("تم رفض طلب التسجيل الخاص بك.", "error");
+        return;
       }
+
+      notify("جاري مراجعه طلبك", "info");
     }
 
     window.goScreen = function (screenId) {
@@ -1112,6 +1181,9 @@
       if (isNameTaken(name)) return notify("هذا الاسم مستخدم بالفعل، اختر اسماً فريداً غير مكرر.", "error");
       if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم موبايل يجب أن يكون لمستخدم وحيد.", "error");
 
+      autoRedirectedAfterApproval = false;
+      state.trackedApplicant = { name, phone, kind: "client" };
+
       await push(ref(db, "clientRegRequests"), {
         name,
         phone,
@@ -1121,10 +1193,9 @@
         createdAt: Date.now()
       });
 
-      state.trackedApplicant = { name, phone, kind: "client" };
       document.getElementById("reg-client-name").value = "";
       document.getElementById("reg-client-phone").value = "";
-      notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
+      notify("جاري مراجعه طلبك", "info");
     };
 
     window.loginClientSubscriber = async function () {
@@ -1146,8 +1217,9 @@
         (r) => (r.name || "").trim().toLowerCase() === name.toLowerCase() && r.status === "pending"
       );
       if (pendingClient) {
+        autoRedirectedAfterApproval = false;
         state.trackedApplicant = { name, phone: phone1, kind: "client" };
-        return notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
+        return notify("جاري مراجعه طلبك", "info");
       }
 
       const existingEntry = Object.entries(state.db.users).find(
@@ -1157,7 +1229,7 @@
       if (existingEntry) {
         const [uid, uData] = existingEntry;
         if (uData.status === "rejected") {
-          return notify("تم رفض طلبك من الإدارة.", "error");
+          return notify("تم رفض طلب التسجيل الخاص بك.", "error");
         }
         const ownsPhone1 = uData.phone === phone1 || uData.phone2 === phone1;
         if (!ownsPhone1 && isPhoneBoundToAnotherUser(phone1, uid)) {
@@ -1221,6 +1293,9 @@
       if (isNameTaken(name)) return notify("هذا الاسم مسجل بالفعل، اختر اسماً فريداً.", "error");
       if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم موبايل يجب أن يكون لمستخدم وحيد.", "error");
 
+      autoRedirectedAfterApproval = false;
+      state.trackedApplicant = { name, phone, kind: "challenger" };
+
       await push(ref(db, "challengerRegRequests"), {
         name,
         phone,
@@ -1230,10 +1305,9 @@
         createdAt: Date.now()
       });
 
-      state.trackedApplicant = { name, phone, kind: "challenger" };
       document.getElementById("reg-chal-name").value = "";
       document.getElementById("reg-chal-phone").value = "";
-      notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
+      notify("جاري مراجعه طلبك", "info");
     };
 
     window.loginChallengerSubscriber = async function () {
@@ -1251,8 +1325,9 @@
         (r) => (r.name || "").trim().toLowerCase() === name.toLowerCase() && r.status === "pending"
       );
       if (pendingChal) {
+        autoRedirectedAfterApproval = false;
         state.trackedApplicant = { name, phone, kind: "challenger" };
-        return notify("طلب التسجيل الذى ارسلته قيد المراجعه", "info");
+        return notify("جاري مراجعه طلبك", "info");
       }
 
       const found = Object.entries(state.db.users).find(
@@ -1265,7 +1340,7 @@
 
       const [uid, uData] = found;
       if (uData.status === "rejected") {
-        return notify("تم رفض طلبك", "error");
+        return notify("تم رفض طلب التسجيل الخاص بك.", "error");
       }
       if (uData.status === "waiting") {
         return notify("طلبك حالياً في قائمة الانتظار لدى الإدارة.", "info");
@@ -1816,7 +1891,6 @@
       switchChallengerSubTab("active");
     };
 
-    // عند إرسال/تحريك الأوردر إلى متسابق آخر يُحسب وقت التوصيل السابق ويبدأ وقت للمتسابق الجديد
     window.transferOrderToOther = async function (orderId) {
       const sel = document.getElementById("transfer-chal-select");
       if (!sel) return;
