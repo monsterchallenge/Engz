@@ -3,467 +3,381 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة تحكم انجز - ADMIN</title>
+  <title>لوحة تحكم الأدمن - تطبيق انجز ENGZ</title>
   <style>
+    :root {
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --border: #e2e8f0;
+      --text-dark: #0f172a;
+      --text-muted: #475569;
+    }
+
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       margin: 0;
-      padding: 16px;
-      font-family: Tahoma, Arial, sans-serif;
-      background: linear-gradient(135deg, #090d16 0%, #1a103c 50%, #082f49 100%);
-      color: #0f172a;
+      padding: 16px 14px 56px;
       min-height: 100vh;
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 1140px;
-      margin: 0 auto;
-    }
-
-    .lock-card {
-      max-width: 420px;
-      margin: 60px auto;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 28px 22px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
-      text-align: center;
+      font-family: Tahoma, Arial, sans-serif;
+      background: linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #082f49 100%);
+      color: var(--text-dark);
+      line-height: 1.65;
     }
 
     .admin-shell {
-      display: none;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 22px 18px 40px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+      max-width: 1040px;
+      margin: 0 auto;
     }
 
-    .top-banner {
-      background: linear-gradient(120deg, #ec4899, #7c3aed, #06b6d4);
+    .admin-header {
+      background: linear-gradient(120deg, #be185d 0%, #6d28d9 50%, #0284c7 100%);
       color: #ffffff;
-      border-radius: 18px;
-      padding: 16px 20px;
-      margin-bottom: 18px;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .nav-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+    .admin-header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .admin-card {
+      background: var(--surface);
+      border-radius: 22px;
+      padding: 20px 18px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+      margin-bottom: 16px;
+    }
+
+    .tabs-bar {
+      display: flex;
       gap: 8px;
-      margin-bottom: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
     }
 
-    @media (min-width: 760px) {
-      .nav-grid {
-        grid-template-columns: repeat(4, 1fr);
+    .tab-btn {
+      background: #e2e8f0;
+      color: #0f172a;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(90deg, #ec4899, #7c3aed);
+      color: #ffffff;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #be123c); color: #ffffff; }
+    .btn-amber { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #ffffff; }
+    .btn-dark { background: #1e293b; color: #ffffff; }
+    .btn-soft { background: #e2e8f0; color: #0f172a; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 680px) {
+      .form-grid.two-col {
+        grid-template-columns: 1fr 1fr;
       }
     }
 
-    .nav-btn {
-      padding: 10px 8px;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      background: #f8fafc;
-      color: #0f172a;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
+    .form-group {
+      margin-bottom: 12px;
     }
 
-    .nav-count-badge {
-      background: #0f172a;
-      color: #fde047;
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .nav-btn.active {
-      background: linear-gradient(135deg, #ec4899, #7c3aed);
-      color: #ffffff;
-      border-color: transparent;
-    }
-
-    .panel {
-      display: none;
-    }
-
-    .panel.active {
+    label {
       display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #1e293b;
     }
 
-    .panel-back-row {
-      display: flex;
-      justify-content: flex-start;
-      margin-bottom: 10px;
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #ffffff;
+      color: #0f172a;
     }
 
-    .card {
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
+    .item-box {
+      background: var(--surface-soft);
+      border: 1.5px solid var(--border);
       border-radius: 16px;
       padding: 14px;
       margin-bottom: 12px;
     }
 
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 14px;
-      background: #ffffff;
-      margin-bottom: 10px;
-    }
-
-    button {
-      font-family: inherit;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      padding: 9px 14px;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .btn-soft { background: #e2e8f0; color: #0f172a; }
-    .btn-grad { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: #ffffff; }
-    .btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; }
-    .btn-red { background: linear-gradient(135deg, #ef4444, #be123c); color: #ffffff; }
-    .btn-amber { background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; }
-    .btn-cyan { background: linear-gradient(135deg, #06b6d4, #0284c7); color: #ffffff; }
-
-    .notice {
-      padding: 10px 14px;
+    .status-banner {
+      padding: 12px 14px;
       border-radius: 12px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: bold;
+      background: #eff6ff;
+      color: #1e3a8a;
+      border: 1px solid #bfdbfe;
+    }
+
+    .status-banner.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .status-banner.success {
       background: #ecfdf5;
       color: #065f46;
-      border: 1px solid #a7f3d0;
-      font-weight: bold;
-      font-size: 13px;
-      margin-bottom: 14px;
-      display: none;
+      border-color: #a7f3d0;
     }
 
-    .img-thumb {
+    .thumb-preview {
       max-width: 220px;
-      max-height: 175px;
-      border-radius: 10px;
-      margin-top: 6px;
-      border: 1px solid #cbd5e1;
+      max-height: 170px;
+      border-radius: 12px;
+      margin-top: 8px;
+      display: none;
       object-fit: cover;
-      cursor: zoom-in;
+      border: 1px solid #cbd5e1;
     }
 
-    .img-box-inline {
+    .actions-row {
       display: flex;
-      align-items: center;
       gap: 8px;
       flex-wrap: wrap;
-      margin-top: 6px;
+      margin-top: 10px;
     }
 
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.72);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 999;
-    }
-
-    .modal-box {
-      background: #ffffff;
-      border-radius: 18px;
-      max-width: 560px;
-      width: 100%;
-      max-height: 85vh;
-      overflow-y: auto;
-      padding: 18px;
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #e0e7ff;
+      color: #3730a3;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="admin-lock" class="lock-card">
-      <h2 style="margin-top:0; color:#7c3aed;">لوحة إدارة انجز</h2>
-      <p style="color:#64748b; font-size:14px;">أدخل كلمة السر للوصول إلى كافة إعدادات الإدارة</p>
-      <input type="password" id="admin-pin-input" placeholder="كلمة السر" />
-      <button class="btn-grad" style="width:100%; padding:12px; font-size:15px;" onclick="verifyAdminPin()">دخول</button>
-      <div id="pin-error" style="color:#be123c; font-weight:bold; font-size:13px; margin-top:10px;"></div>
+  <div class="admin-shell">
+    <div class="admin-header">
+      <div>
+        <h1>لوحة تحكم الأدمن • ENGZ</h1>
+        <div style="font-size:13px; opacity:0.92;">إدارة التسجيل، الأرصدة والنقاط، الأقسام والمنتجات، الكاش، التحديات والطلبات</div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a href="index.html" style="text-decoration:none;">
+          <button type="button" class="btn-amber">فتح واجهة التطبيق (index.html)</button>
+        </a>
+      </div>
     </div>
 
-    <div id="admin-app" class="admin-shell">
-      <div class="top-banner">
-        <div>
-          <h1 style="margin:0; font-size:22px;">إدارة تطبيق انجز</h1>
-          <div style="font-size:12px; opacity:0.95;">العملة: جنيه • 1 point = 33.333333333333 جنيه</div>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-soft" onclick="goBackAdminPanel()">عودة</button>
-          <button class="btn-cyan" onclick="openImpersonateModal()">دخول إلى حساب مستخدم</button>
-        </div>
+    <div id="admin-notice" class="status-banner" style="display:none;"></div>
+
+    <div class="admin-card">
+      <div class="tabs-bar">
+        <button type="button" class="tab-btn active" id="tab-requests" onclick="switchAdminTab('requests')">طلبات التسجيل والانتظار</button>
+        <button type="button" class="tab-btn" id="tab-users" onclick="switchAdminTab('users')">المستخدمون والأرصدة والنقاط</button>
+        <button type="button" class="tab-btn" id="tab-catalog" onclick="switchAdminTab('catalog')">الأقسام والسلع والعروض</button>
+        <button type="button" class="tab-btn" id="tab-cash" onclick="switchAdminTab('cash')">أرقام الكاش</button>
+        <button type="button" class="tab-btn" id="tab-challenges" onclick="switchAdminTab('challenges')">التحديات والطلبات</button>
+        <button type="button" class="tab-btn" id="tab-gifts" onclick="switchAdminTab('gifts')">الهدايا والوصولات والحظر</button>
       </div>
 
-      <div id="admin-toast" class="notice"></div>
-
-      <div class="nav-grid">
-        <button class="nav-btn active" data-p="client-reqs" onclick="showAdminPanel('client-reqs')">
-          <span class="nav-count-badge" id="cnt-client-reqs">0</span>
-          <span>إعدادات طلبات التسجيل</span>
-        </button>
-        <button class="nav-btn" data-p="clients-mgr" onclick="showAdminPanel('clients-mgr')">
-          <span class="nav-count-badge" id="cnt-clients-mgr">0</span>
-          <span>إعداد العملاء والنقاط</span>
-        </button>
-        <button class="nav-btn" data-p="active-clients" onclick="showAdminPanel('active-clients')">
-          <span class="nav-count-badge" id="cnt-active-clients">0</span>
-          <span>العملاء النشطون</span>
-        </button>
-        <button class="nav-btn" data-p="chal-reqs" onclick="showAdminPanel('chal-reqs')">
-          <span class="nav-count-badge" id="cnt-chal-reqs">0</span>
-          <span>إعدادات طلبات المتسابقين</span>
-        </button>
-        <button class="nav-btn" data-p="chal-mgr" onclick="showAdminPanel('chal-mgr')">
-          <span class="nav-count-badge" id="cnt-chal-mgr">0</span>
-          <span>إعداد المتسابقين والنقاط</span>
-        </button>
-        <button class="nav-btn" data-p="active-challengers" onclick="showAdminPanel('active-challengers')">
-          <span class="nav-count-badge" id="cnt-active-challengers">0</span>
-          <span>المتسابقون النشطون</span>
-        </button>
-        <button class="nav-btn" data-p="waitlist" onclick="showAdminPanel('waitlist')">
-          <span class="nav-count-badge" id="cnt-waitlist">0</span>
-          <span>قائمة الانتظار</span>
-        </button>
-        <button class="nav-btn" data-p="depts-items" onclick="showAdminPanel('depts-items')">
-          <span class="nav-count-badge" id="cnt-depts-items">0</span>
-          <span>الأقسام والسلع والعروض</span>
-        </button>
-        <button class="nav-btn" data-p="cash-phones" onclick="showAdminPanel('cash-phones')">
-          <span class="nav-count-badge" id="cnt-cash-phones">0</span>
-          <span>إعداد أرقام الاتصال</span>
-        </button>
-        <button class="nav-btn" data-p="challenges-cfg" onclick="showAdminPanel('challenges-cfg')">
-          <span class="nav-count-badge" id="cnt-challenges-cfg">0</span>
-          <span>إعداد التحديات</span>
-        </button>
-        <button class="nav-btn" data-p="active-done" onclick="showAdminPanel('active-done')">
-          <span class="nav-count-badge" id="cnt-active-done">0</span>
-          <span>النشطة والمنتهية</span>
-        </button>
-        <button class="nav-btn" data-p="gifts-receipts" onclick="showAdminPanel('gifts-receipts')">
-          <span class="nav-count-badge" id="cnt-gifts-receipts">0</span>
-          <span>هدايا والوصولات</span>
-        </button>
+      <div id="panel-requests">
+        <h2 style="margin-top:0;">طلبات تسجيل العملاء والمتسابقين</h2>
+        <div id="pending-requests-list"></div>
       </div>
 
-      <div id="panel-client-reqs" class="panel active">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>صفحة إعدادات طلبات التسجيل (عملاء)</h3>
-        <div id="admin-client-requests-list"></div>
+      <div id="panel-users" style="display:none;">
+        <h2 style="margin-top:0;">إدارة أرصدة ونقاط المستخدمين</h2>
+        <div id="users-management-list"></div>
       </div>
 
-      <div id="panel-clients-mgr" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>إدارة العملاء والنقاط (point) والرصيد (جنيه) والحذف</h3>
-        <div id="admin-clients-list"></div>
-      </div>
-
-      <div id="panel-active-clients" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>العملاء النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد مرات الطلب)</h3>
-        <div id="admin-active-clients-list"></div>
-        <h3 style="margin-top:20px;">قائمة الأشخاص المرسل لهم التطبيق وترتيبهم (حتى 1000+ رقم)</h3>
-        <div id="admin-invited-ranking-list"></div>
-      </div>
-
-      <div id="panel-chal-reqs" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>صفحة إعدادات طلبات تسجيل المتسابقين</h3>
-        <div id="admin-challenger-requests-list"></div>
-      </div>
-
-      <div id="panel-chal-mgr" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>صفحة إعداد المتسابقين والنقاط (point)</h3>
-        <div id="admin-challengers-list"></div>
-      </div>
-
-      <div id="panel-active-challengers" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>المتسابقون النشطون (ترتيب تنازلي حسب المبالغ وعدد مرات النجاح والوقت المستغرق لتوصيل الأوردر)</h3>
-        <div id="admin-active-challengers-list"></div>
-      </div>
-
-      <div id="panel-waitlist" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>قائمة الانتظار (ترتيب تنازلي حسب تاريخ تقديم الطلب)</h3>
-        <div id="admin-waitlist-list"></div>
-      </div>
-
-      <div id="panel-depts-items" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>إعداد الأقسام والأنواع والسلع والعروض (جنيه)</h3>
-
-        <div class="card">
-          <label>إضافة قسم جديد أو تحديث صورة تعبيرية لأي قسم</label>
-          <input type="text" id="new-dept-name" placeholder="اسم القسم الجديد..." />
-          <label>صورة القسم (كاميرا / استوديو - جودة عالية)</label>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-            <button type="button" class="btn-cyan" onclick="document.getElementById('dept-camera-file').click()">كاميرا</button>
-            <button type="button" class="btn-grad" onclick="document.getElementById('dept-gallery-file').click()">استوديو</button>
+      <div id="panel-catalog" style="display:none;">
+        <h2 style="margin-top:0;">إضافة قسم جديد</h2>
+        <div class="form-grid two-col">
+          <div class="form-group">
+            <label for="new-dept-name">اسم القسم</label>
+            <input type="text" id="new-dept-name" placeholder="مثال: صيدلية أو إلكترونيات" />
           </div>
-          <input type="file" id="dept-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleDeptCoverImage(this)" />
-          <input type="file" id="dept-gallery-file" accept="image/*" style="display:none;" onchange="handleDeptCoverImage(this)" />
-          <div class="img-box-inline">
-            <img id="dept-cover-prev" class="img-thumb" style="display:none;" alt="صورة القسم" />
-            <button type="button" id="del-dept-cover-prev-btn" class="btn-red" style="display:none;" onclick="clearDeptCoverPreview()">حذف الصورة</button>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-            <button class="btn-grad" onclick="addNewDepartment()">إضافة قسم جديد</button>
-            <button class="btn-cyan" onclick="saveCoverForSelectedDepartment()">حفظ الصورة للقسم المحدد بالأسفل</button>
+          <div class="form-group">
+            <label for="new-dept-img">صورة القسم (اختياري)</label>
+            <input type="file" id="new-dept-img" accept="image/*" onchange="handleAdminImage(this, 'deptImg', 'new-dept-prev')" />
+            <img id="new-dept-prev" class="thumb-preview" alt="صورة القسم" />
           </div>
         </div>
+        <button type="button" class="btn-success" onclick="addNewDepartment()">حفظ القسم</button>
 
-        <div class="card">
-          <label>اختر القسم لإضافة عدد لا نهائي من الأنواع والسلع والعروض</label>
-          <select id="target-dept-select" onchange="renderDepartmentItemsTable()"></select>
-          <input type="text" id="item-type-input" placeholder="النوع المتاح داخل القسم (مثال: بيتزا / بسكوت / تلخيص جامعي)..." />
-          <input type="text" id="item-title-input" placeholder="اسم الصنف أو العرض..." />
-          <input type="number" id="item-price-input" placeholder="السعر بالجنيه (مثال: 150)" />
-          <input type="text" id="item-desc-input" placeholder="وصف مختصر أو تفاصيل العرض..." />
-          <label>
-            <input type="checkbox" id="item-is-offer" style="width:auto; margin-left:6px;" />
-            اعتبار هذا العنصر عرضاً خاصاً
-          </label>
-          <label>صورة الصنف أو العرض (كاميرا / استوديو - جودة عالية)</label>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-            <button type="button" class="btn-cyan" onclick="document.getElementById('item-camera-file').click()">كاميرا</button>
-            <button type="button" class="btn-grad" onclick="document.getElementById('item-gallery-file').click()">استوديو</button>
-            <button type="button" class="btn-amber" onclick="copyGeminiPromptForItem()">نسخ برومبت لـ Gemini</button>
+        <hr style="margin:22px 0; border:none; border-top:1px solid #e2e8f0;" />
+
+        <h3>إضافة صنف / نوع / عرض داخل قسم</h3>
+        <div class="form-grid two-col">
+          <div class="form-group">
+            <label for="prod-dept-select">اختر القسم</label>
+            <select id="prod-dept-select"></select>
           </div>
-          <input type="file" id="item-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleAdminImage(this, 'item-img-prev')" />
-          <input type="file" id="item-gallery-file" accept="image/*" style="display:none;" onchange="handleAdminImage(this, 'item-img-prev')" />
-          <div class="img-box-inline">
-            <img id="item-img-prev" class="img-thumb" style="display:none;" alt="معاينة" />
-            <button type="button" id="del-item-img-prev-btn" class="btn-red" style="display:none;" onclick="clearItemImgPreview()">حذف الصورة</button>
+          <div class="form-group">
+            <label for="prod-type-input">النوع (للتصفية داخل القسم)</label>
+            <input type="text" id="prod-type-input" placeholder="مثال: مشويات، عروض اليوم، فواكه..." />
           </div>
-          <div style="margin-top:10px;">
-            <button class="btn-green" onclick="addProductOrOffer()">إضافة</button>
+          <div class="form-group">
+            <label for="prod-title-input">اسم الصنف أو العرض</label>
+            <input type="text" id="prod-title-input" placeholder="مثال: وجبة دجاج مشوي" />
+          </div>
+          <div class="form-group">
+            <label for="prod-price-input">السعر (بالجنيه)</label>
+            <input type="number" id="prod-price-input" min="0" step="0.5" placeholder="مثال: 150" />
           </div>
         </div>
+        <div class="form-group">
+          <label for="prod-desc-input">الوصف / التفاصيل</label>
+          <textarea id="prod-desc-input" rows="2" placeholder="اكتب وصفاً مختصراً للصنف أو العرض..."></textarea>
+        </div>
+        <div class="form-grid two-col">
+          <div class="form-group">
+            <label for="prod-img-input">صورة الصنف / العرض</label>
+            <input type="file" id="prod-img-input" accept="image/*" onchange="handleAdminImage(this, 'prodImg', 'prod-img-prev')" />
+            <img id="prod-img-prev" class="thumb-preview" alt="صورة المنتج" />
+          </div>
+          <div class="form-group" style="display:flex; align-items:center; gap:8px; padding-top:22px;">
+            <input type="checkbox" id="prod-is-offer" style="width:auto;" />
+            <label for="prod-is-offer" style="margin:0;">تمييز كـ (عرض خاص)</label>
+          </div>
+        </div>
+        <button type="button" class="btn-success" onclick="addProductToDepartment()">إضافة الصنف / العرض</button>
 
-        <div id="admin-dept-products-preview"></div>
+        <h3 style="margin-top:24px;">الأصناف والعروض الحالية</h3>
+        <div id="existing-products-list"></div>
       </div>
 
-      <div id="panel-cash-phones" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>إعداد أرقام الاتصال لاستقبال الكاش</h3>
-        <p style="font-size:13px; color:#475569;">7 خانات أساسية مع اختيار عبر checkbox، ويمكنك إضافة أي عدد إضافي بزر (+). يظهر للعميل حتى 5 أرقام مختارة.</p>
-        <div id="cash-phones-slots" class="card"></div>
-        <div class="card" style="display:flex; gap:8px; align-items:center;">
-          <input type="tel" id="extra-cash-phone-input" placeholder="أدخل رقم كاش إضافي..." style="margin:0;" />
-          <button class="btn-grad" onclick="addExtraCashPhone()">+</button>
+      <div id="panel-cash" style="display:none;">
+        <h2 style="margin-top:0;">أرقام الكاش المحددة للدفع (حتى 5 أرقام)</h2>
+        <div class="form-group">
+          <label for="cash-phone-input">أدخل رقم كاش مصري (11 رقم)</label>
+          <input type="tel" id="cash-phone-input" maxlength="11" placeholder="01xxxxxxxxx" />
         </div>
-        <button class="btn-green" onclick="saveSelectedCashPhones()">حفظ أرقام الكاش المختارة</button>
+        <button type="button" class="btn-success" onclick="addCashPhone()">إضافة رقم الكاش</button>
+        <div id="cash-phones-admin-list" style="margin-top:16px;"></div>
       </div>
 
-      <div id="panel-challenges-cfg" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>صفحة إعداد التحديات</h3>
-        <div class="card">
-          <label>عنوان التحدي / المهمة</label>
-          <input type="text" id="chal-title-input" placeholder="مثال: توصيل طلب مطعم للحي..." />
-          <label>تفاصيل التحدي وقائمة المشتريات أو التعليمات</label>
-          <textarea id="chal-details-input" placeholder="اكتب تفاصيل التحدي..."></textarea>
-          <label>قيمة المكافأة (جنيه)</label>
-          <input type="number" id="chal-reward-input" placeholder="مثال: 50" />
-          <label>صورة التحدي (كاميرا / استوديو - جودة عالية)</label>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-            <button type="button" class="btn-cyan" onclick="document.getElementById('chal-camera-file').click()">كاميرا</button>
-            <button type="button" class="btn-grad" onclick="document.getElementById('chal-gallery-file').click()">استوديو</button>
+      <div id="panel-challenges" style="display:none;">
+        <h2 style="margin-top:0;">إضافة تحدٍ جديد للمتسابقين</h2>
+        <div class="form-grid two-col">
+          <div class="form-group">
+            <label for="chal-title-input">عنوان التحدي / المهمة</label>
+            <input type="text" id="chal-title-input" placeholder="مثال: توصيل طلب مطعم الكوثر" />
           </div>
-          <input type="file" id="chal-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleChallengeMedia(this)" />
-          <input type="file" id="chal-gallery-file" accept="image/*" style="display:none;" onchange="handleChallengeMedia(this)" />
-          <div class="img-box-inline">
-            <img id="chal-img-prev" class="img-thumb" style="display:none;" alt="صورة التحدي" />
-            <button type="button" id="del-chal-img-prev-btn" class="btn-red" style="display:none;" onclick="clearChallengeImgPreview()">حذف الصورة</button>
+          <div class="form-group">
+            <label for="chal-reward-input">مكافأة التحدي (جنيه)</label>
+            <input type="number" id="chal-reward-input" min="0" step="1" placeholder="مثال: 60" />
           </div>
-          <div style="margin-top:8px;">
-            <button class="btn-green" onclick="publishChallenge()">تأكيد</button>
+          <div class="form-group">
+            <label for="chal-buyer-name">اسم العميل (اختياري)</label>
+            <input type="text" id="chal-buyer-name" placeholder="اسم العميل" />
+          </div>
+          <div class="form-group">
+            <label for="chal-buyer-phone">رقم تلفون العميل (اختياري)</label>
+            <input type="tel" id="chal-buyer-phone" maxlength="11" placeholder="01xxxxxxxxx" />
           </div>
         </div>
+        <div class="form-group">
+          <label for="chal-details-input">تفاصيل التحدي / المهمة</label>
+          <textarea id="chal-details-input" rows="2" placeholder="اكتب تعليمات التحدي ونقطة الاستلام والتسليم..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="chal-img-input">صورة التحدي (اختياري)</label>
+          <input type="file" id="chal-img-input" accept="image/*" onchange="handleAdminImage(this, 'chalImg', 'chal-img-prev')" />
+          <img id="chal-img-prev" class="thumb-preview" alt="صورة التحدي" />
+        </div>
+        <button type="button" class="btn-success" onclick="createNewChallenge()">نشر التحدي</button>
+
+        <h3 style="margin-top:24px;">التحديات المنشورة</h3>
         <div id="admin-challenges-list"></div>
+
+        <h3 style="margin-top:24px;">الطلبات والمهام (النشطة والمنتهية)</h3>
+        <div id="admin-orders-list"></div>
+
+        <h3 style="margin-top:24px;">إحصائيات أداء المتسابقين</h3>
+        <div id="admin-challengers-stats"></div>
       </div>
 
-      <div id="panel-active-done" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>الطلبات النشطة</h3>
-        <div id="admin-active-orders-list"></div>
-        <h3 style="margin-top:20px;">الطلبات المنتهية (مع صورة تأكيد الوصول والوقت المستغرق)</h3>
-        <div id="admin-completed-orders-list"></div>
-      </div>
-
-      <div id="panel-gifts-receipts" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة</button></div>
-        <h3>صفحة إعداد إرسال هدية أو عرض أو مكافأة</h3>
-        <div class="card">
-          <input type="text" id="gift-target-input" placeholder="اسم العميل أو المتسابق (أو اتركه للجميع)" />
-          <input type="text" id="gift-title-input" placeholder="اسم الهدية / العرض / المكافأة..." />
-          <input type="text" id="gift-details-input" placeholder="تفاصيل المكافأة أو القيمة بالجنيه..." />
-          <label>صورة الهدية / المكافأة (كاميرا / استوديو - جودة عالية)</label>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-            <button type="button" class="btn-cyan" onclick="document.getElementById('gift-camera-file').click()">كاميرا</button>
-            <button type="button" class="btn-grad" onclick="document.getElementById('gift-gallery-file').click()">استوديو</button>
+      <div id="panel-gifts" style="display:none;">
+        <h2 style="margin-top:0;">إرسال هدية أو عرض</h2>
+        <div class="form-grid two-col">
+          <div class="form-group">
+            <label for="gift-title-input">عنوان الهدية / العرض</label>
+            <input type="text" id="gift-title-input" placeholder="مثال: قسيمة خصم أو مكافأة" />
           </div>
-          <input type="file" id="gift-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleGiftMedia(this)" />
-          <input type="file" id="gift-gallery-file" accept="image/*" style="display:none;" onchange="handleGiftMedia(this)" />
-          <div class="img-box-inline">
-            <img id="gift-img-prev" class="img-thumb" style="display:none;" alt="صورة الهدية" />
-            <button type="button" id="del-gift-img-prev-btn" class="btn-red" style="display:none;" onclick="clearGiftImgPreview()">حذف الصورة</button>
-          </div>
-          <div style="margin-top:8px;">
-            <button class="btn-grad" onclick="sendGiftOrReward()">إرسال الهدية / المكافأة</button>
+          <div class="form-group">
+            <label for="gift-target-input">اسم المستهدف (اتركه فارغاً للجميع)</label>
+            <input type="text" id="gift-target-input" placeholder="اسم العميل أو المتسابق" />
           </div>
         </div>
+        <div class="form-group">
+          <label for="gift-details-input">تفاصيل الهدية</label>
+          <textarea id="gift-details-input" rows="2" placeholder="اكتب تفاصيل الهدية أو المكافأة..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="gift-img-input">صورة الهدية (اختياري)</label>
+          <input type="file" id="gift-img-input" accept="image/*" onchange="handleAdminImage(this, 'giftImg', 'gift-img-prev')" />
+          <img id="gift-img-prev" class="thumb-preview" alt="صورة الهدية" />
+        </div>
+        <button type="button" class="btn-success" onclick="sendGiftOrReward()">إرسال الهدية</button>
 
-        <h3>وصولات الدفع والاستلام</h3>
+        <h3 style="margin-top:24px;">حظر اسم أو رقم تلفون</h3>
+        <div class="form-grid two-col">
+          <div class="form-group">
+            <label for="ban-name-input">الاسم المراد حظره</label>
+            <input type="text" id="ban-name-input" placeholder="الاسم" />
+          </div>
+          <div class="form-group">
+            <label for="ban-phone-input">رقم التلفون المراد حظره</label>
+            <input type="tel" id="ban-phone-input" maxlength="11" placeholder="01xxxxxxxxx" />
+          </div>
+        </div>
+        <button type="button" class="btn-danger" onclick="banUserRecord()">حظر</button>
+        <div id="banned-list-box" style="margin-top:12px;"></div>
+
+        <h3 style="margin-top:24px;">سجل وصولات الدفع والاستلام</h3>
         <div id="admin-receipts-list"></div>
       </div>
-    </div>
-  </div>
-
-  <div id="impersonate-modal" class="modal-backdrop">
-    <div class="modal-box">
-      <h3 style="margin-top:0;">الدخول إلى حساب أي مستخدم</h3>
-      <div id="impersonate-users-list"></div>
-      <button class="btn-red" style="margin-top:12px;" onclick="closeImpersonateModal()">إغلاق</button>
-    </div>
-  </div>
-
-  <div id="history-modal" class="modal-backdrop">
-    <div class="modal-box">
-      <h3 id="history-modal-title" style="margin-top:0;">سجل طلبات المتسابق</h3>
-      <div id="history-modal-body"></div>
-      <button class="btn-cyan" style="margin-top:12px;" onclick="closeHistoryModal()">إغلاق</button>
     </div>
   </div>
 
@@ -479,9 +393,6 @@
       remove,
       runTransaction
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const ADMIN_PIN = "38512385";
-    const POINT_VALUE_EGP = 33.333333333333;
 
     const firebaseConfig = {
       apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
@@ -507,30 +418,32 @@
       "خدمات الشراء والبيع"
     ];
 
-    const panelHistory = ["client-reqs"];
-
     const state = {
-      users: {},
-      clientRegRequests: {},
-      challengerRegRequests: {},
-      departments: [],
-      departmentsMeta: {},
-      products: {},
-      cashPhones: [],
-      cashPool: ["", "", "", "", "", "", ""],
-      challenges: {},
-      orders: {},
-      challengersStats: {},
-      clientActivity: {},
-      referrals: {},
-      receipts: {},
-      gifts: {},
-      waitlist: {},
-      uploadedProductImg: "",
-      uploadedDeptCoverImg: "",
-      uploadedChallengeImg: "",
-      uploadedGiftImg: ""
+      activeTab: "requests",
+      imgs: { deptImg: "", prodImg: "", chalImg: "", giftImg: "" },
+      db: {
+        users: {},
+        banned: {},
+        clientRegRequests: {},
+        challengerRegRequests: {},
+        departments: [],
+        departmentsMeta: {},
+        products: {},
+        cashPhones: [],
+        challenges: {},
+        orders: {},
+        gifts: {},
+        receipts: {},
+        challengersStats: {}
+      }
     };
+
+    function notify(msg, type = "info") {
+      const el = document.getElementById("admin-notice");
+      el.style.display = "block";
+      el.className = "status-banner" + (type === "error" ? " error" : type === "success" ? " success" : "");
+      el.textContent = msg;
+    }
 
     function esc(v) {
       return String(v ?? "")
@@ -540,46 +453,35 @@
         .replace(/"/g, "&quot;");
     }
 
-    function toast(msg) {
-      const el = document.getElementById("admin-toast");
-      el.style.display = "block";
-      el.textContent = msg;
-      setTimeout(() => {
-        el.style.display = "none";
-      }, 4500);
-    }
-
-    window.copyGeminiPromptForItem = function () {
-      const dept = document.getElementById("target-dept-select").value || "منتج";
-      const typeVal = document.getElementById("item-type-input").value.trim();
-      const titleVal = document.getElementById("item-title-input").value.trim() || typeVal || "صنف";
-      const priceVal = document.getElementById("item-price-input").value.trim();
-      const promptText = `اكتب وصفاً تسويقياً جذاباً ومختصراً بالعربية لصنف (${titleVal}) ضمن قسم (${dept})${typeVal ? ` ونوع (${typeVal})` : ""}${priceVal ? ` بسعر ${priceVal} جنيه` : ""}، واقتراح وصف لصورة منتج واضحة بإضاءة احترافية وخلفية نظيفة.`;
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(promptText).catch(() => {});
-      }
-      toast("تم نسخ برومبت Gemini — الصقه في Gemini ثم ارفع الصورة الناتجة عبر زر (استوديو).");
+    window.switchAdminTab = function (tabName) {
+      state.activeTab = tabName;
+      const tabs = ["requests", "users", "catalog", "cash", "challenges", "gifts"];
+      tabs.forEach((t) => {
+        document.getElementById(`tab-${t}`).classList.toggle("active", t === tabName);
+        document.getElementById(`panel-${t}`).style.display = t === tabName ? "block" : "none";
+      });
+      renderCurrentAdminTab();
     };
 
-    function getReferralSummaryForUser(uid) {
-      const entries = Object.values(state.referrals[uid] || {});
-      const sentToCount = entries.length;
-      const completedFirstCount = entries.filter((x) => x.completedFirstAction === true).length;
-      return { sentToCount, completedFirstCount, entries };
+    function renderCurrentAdminTab() {
+      if (state.activeTab === "requests") renderRequests();
+      if (state.activeTab === "users") renderUsersManagement();
+      if (state.activeTab === "catalog") renderCatalogAdmin();
+      if (state.activeTab === "cash") renderCashPhonesAdmin();
+      if (state.activeTab === "challenges") renderChallengesAdmin();
+      if (state.activeTab === "gifts") renderGiftsAndBanAdmin();
     }
 
-    function compressFileToDataUrl(file, cb, options = {}) {
-      const maxDim = options.maxDim || 1600;
-      const quality = options.quality || 0.92;
-
+    window.handleAdminImage = function (inputEl, key, previewId) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = function (ev) {
         const img = new Image();
-        img.onload = () => {
+        img.onload = function () {
+          const maxDim = 1400;
           let w = img.width;
           let h = img.height;
-
           if (w > maxDim || h > maxDim) {
             if (w >= h) {
               h = Math.round((h * maxDim) / w);
@@ -589,111 +491,53 @@
               h = maxDim;
             }
           }
-
           const canvas = document.createElement("canvas");
           canvas.width = w;
           canvas.height = h;
           const ctx = canvas.getContext("2d");
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, w, h);
-
-          const isPng = file.type === "image/png";
-          let dataUrl = isPng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", quality);
-
-          let q = quality;
-          while (!isPng && dataUrl.length > 1800000 && q > 0.7) {
-            q = Number((q - 0.05).toFixed(2));
-            dataUrl = canvas.toDataURL("image/jpeg", q);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
+          state.imgs[key] = dataUrl;
+          const prev = document.getElementById(previewId);
+          if (prev) {
+            prev.src = dataUrl;
+            prev.style.display = "block";
           }
-          cb(dataUrl);
         };
         img.src = ev.target.result;
       };
       reader.readAsDataURL(file);
-    }
-
-    window.verifyAdminPin = function () {
-      const val = document.getElementById("admin-pin-input").value.trim();
-      if (val === ADMIN_PIN) {
-        document.getElementById("admin-lock").style.display = "none";
-        document.getElementById("admin-app").style.display = "block";
-        renderAll();
-      } else {
-        document.getElementById("pin-error").textContent = "كلمة السر غير صحيحة";
-      }
     };
 
-    function activateAdminPanelWithoutHistory(panelKey) {
-      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.p === panelKey));
-      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-      const target = document.getElementById("panel-" + panelKey);
-      if (target) target.classList.add("active");
-    }
+    function renderRequests() {
+      const box = document.getElementById("pending-requests-list");
+      const clientReqs = Object.entries(state.db.clientRegRequests || {})
+        .filter(([, r]) => r.status === "pending")
+        .map(([id, r]) => ({ id, kind: "clientRegRequests", role: "client", ...r }));
+      const chalReqs = Object.entries(state.db.challengerRegRequests || {})
+        .filter(([, r]) => r.status === "pending")
+        .map(([id, r]) => ({ id, kind: "challengerRegRequests", role: "challenger", ...r }));
 
-    window.showAdminPanel = function (panelKey, recordHistory = true) {
-      const current = panelHistory[panelHistory.length - 1];
-      if (recordHistory && panelKey !== current) {
-        panelHistory.push(panelKey);
-      }
-      activateAdminPanelWithoutHistory(panelKey);
-    };
-
-    window.goBackAdminPanel = function () {
-      if (panelHistory.length > 1) {
-        panelHistory.pop();
-        activateAdminPanelWithoutHistory(panelHistory[panelHistory.length - 1]);
-      } else {
-        activateAdminPanelWithoutHistory("client-reqs");
-      }
-    };
-
-    function updateSectionBadges() {
-      const pendingClientReqs = Object.values(state.clientRegRequests || {}).filter((r) => r.status === "pending").length;
-      const clientsCount = Object.values(state.users || {}).filter((u) => u.role === "client").length;
-      const pendingChalReqs = Object.values(state.challengerRegRequests || {}).filter((r) => r.status === "pending").length;
-      const challengersCount = Object.values(state.users || {}).filter((u) => u.role === "challenger" && u.status === "approved").length;
-      const waitCount = Object.keys(state.waitlist || {}).length;
-      const deptsCount = [...new Set([...DEFAULT_DEPARTMENTS, ...(state.departments || [])])].length;
-      const cashCount = (state.cashPhones || []).length;
-      const chalsCount = Object.keys(state.challenges || {}).length;
-      const ordersCount = Object.keys(state.orders || {}).length;
-      const giftsAndRecCount = Object.keys(state.gifts || {}).length + Object.keys(state.receipts || {}).length;
-
-      const setBadge = (id, n) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = String(n);
-      };
-
-      setBadge("cnt-client-reqs", pendingClientReqs);
-      setBadge("cnt-clients-mgr", clientsCount);
-      setBadge("cnt-active-clients", clientsCount);
-      setBadge("cnt-chal-reqs", pendingChalReqs);
-      setBadge("cnt-chal-mgr", challengersCount);
-      setBadge("cnt-active-challengers", challengersCount);
-      setBadge("cnt-waitlist", waitCount);
-      setBadge("cnt-depts-items", deptsCount);
-      setBadge("cnt-cash-phones", cashCount);
-      setBadge("cnt-challenges-cfg", chalsCount);
-      setBadge("cnt-active-done", ordersCount);
-      setBadge("cnt-gifts-receipts", giftsAndRecCount);
-    }
-
-    function renderClientRequests() {
-      const el = document.getElementById("admin-client-requests-list");
-      const reqs = Object.entries(state.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
-      if (!reqs.length) {
-        el.innerHTML = `<div class="card">لا توجد طلبات تسجيل عملاء جديدة.</div>`;
+      const all = [...clientReqs, ...chalReqs];
+      if (!all.length) {
+        box.innerHTML = `<div class="item-box">لا توجد طلبات تسجيل معلقة حالياً.</div>`;
         return;
       }
-      el.innerHTML = reqs
+
+      box.innerHTML = all
         .map(
-          ([id, r]) => `
-          <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <div><strong>العميل:</strong> ${esc(r.name)} — <strong>موبايل:</strong> ${esc(r.phone)}</div>
-            <div style="display:flex; gap:8px;">
-              <button class="btn-green" onclick="approveClientRequest('${esc(id)}')">موافق</button>
-              <button class="btn-red" onclick="rejectClientRequest('${esc(id)}')">رفض</button>
+          (reqItem) => `
+          <div class="item-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div>
+                <strong>${esc(reqItem.name)}</strong> • <span class="badge">${reqItem.role === "challenger" ? "متسابق (تحدى)" : "عميل"}</span><br/>
+                <span style="color:#475569; font-size:13px;">رقم التلفون: ${esc(reqItem.phone)}</span>
+              </div>
+              <div class="actions-row">
+                <button type="button" class="btn-success" onclick="decideRegistration('${reqItem.kind}', '${reqItem.id}', 'approved')">موافقة</button>
+                <button type="button" class="btn-amber" onclick="decideRegistration('${reqItem.kind}', '${reqItem.id}', 'waiting')">انتظار</button>
+                <button type="button" class="btn-danger" onclick="decideRegistration('${reqItem.kind}', '${reqItem.id}', 'rejected')">رفض</button>
+              </div>
             </div>
           </div>
         `
@@ -701,310 +545,68 @@
         .join("");
     }
 
-    window.approveClientRequest = async function (reqId) {
-      const reqData = state.clientRegRequests[reqId];
-      if (!reqData) return;
-      const userRef = push(ref(db, "users"));
-      await set(userRef, {
-        name: reqData.name,
-        phone: reqData.phone,
-        role: "client",
-        status: "approved",
-        wallet: 0,
-        points: 0,
-        invitedBy: reqData.invitedBy || "",
-        createdAt: Date.now()
+    window.decideRegistration = async function (collectionName, reqId, decision) {
+      const reqObj = (state.db[collectionName] || {})[reqId];
+      if (!reqObj) return;
+      const role = reqObj.role || (collectionName === "challengerRegRequests" ? "challenger" : "client");
+
+      await update(ref(db, `${collectionName}/${reqId}`), {
+        status: decision,
+        reviewedAt: Date.now()
       });
-      await remove(ref(db, `clientRegRequests/${reqId}`));
-      toast(`تمت الموافقة على طلب العميل ${reqData.name} وأصبح مشتركاً.`);
-    };
 
-    window.rejectClientRequest = async function (reqId) {
-      const reqData = state.clientRegRequests[reqId];
-      if (!reqData) return;
-      const userRef = push(ref(db, "users"));
-      await set(userRef, {
-        name: reqData.name,
-        phone: reqData.phone,
-        role: "client",
-        status: "rejected",
-        wallet: 0,
-        points: 0,
-        createdAt: Date.now()
-      });
-      await remove(ref(db, `clientRegRequests/${reqId}`));
-      toast(`تم رفض طلب ${reqData.name}.`);
-    };
-
-    window.handleClientPhotoInput = function (inputEl, uid) {
-      const file = inputEl.files && inputEl.files[0];
-      if (!file || !uid) return;
-      compressFileToDataUrl(file, async (dataUrl) => {
-        await update(ref(db, `users/${uid}`), { avatar: dataUrl });
-        toast("تم حفظ صورة العميل بجودة عالية.");
-      });
-    };
-
-    window.deleteSavedClientPhoto = async function (uid) {
-      if (!uid) return;
-      await remove(ref(db, `users/${uid}/avatar`));
-      toast("تم حذف صورة العميل.");
-    };
-
-    function renderClientsManager() {
-      const el = document.getElementById("admin-clients-list");
-      const clients = Object.entries(state.users || {}).filter(([, u]) => u.role === "client");
-      if (!clients.length) {
-        el.innerHTML = `<div class="card">لا يوجد عملاء مسجلون حالياً.</div>`;
-        return;
-      }
-      el.innerHTML = clients
-        .map(([uid, u]) => {
-          const pts = Number(u.points) || 0;
-          const refStats = getReferralSummaryForUser(uid);
-          return `
-            <div class="card">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
-                <div>
-                  <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الحالة: <strong>${esc(u.status || "approved")}</strong></div>
-                  <div style="margin-top:4px;">الرصيد: <strong>${Number(u.wallet) || 0} جنيه</strong> • عداد النقاط (point): <strong>${pts}</strong></div>
-                  <div style="font-size:12px; color:#0284c7; margin-top:4px;">أرسل الرابط لـ: <strong>${refStats.sentToCount}</strong> شخص • أتموا أول طلب/مهمة: <strong>${refStats.completedFirstCount}</strong></div>
-                </div>
-                ${
-                  u.avatar
-                    ? `<div class="img-box-inline">
-                         <img src="${u.avatar}" class="img-thumb" alt="${esc(u.name)}" />
-                         <button type="button" class="btn-red" onclick="deleteSavedClientPhoto('${esc(uid)}')">حذف الصورة</button>
-                       </div>`
-                    : ""
-                }
-              </div>
-
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-                <button type="button" class="btn-cyan" onclick="document.getElementById('cam-client-${esc(uid)}').click()">كاميرا</button>
-                <button type="button" class="btn-grad" onclick="document.getElementById('gal-client-${esc(uid)}').click()">استوديو</button>
-                <input type="file" id="cam-client-${esc(uid)}" accept="image/*" capture="environment" style="display:none;" onchange="handleClientPhotoInput(this, '${esc(uid)}')" />
-                <input type="file" id="gal-client-${esc(uid)}" accept="image/*" style="display:none;" onchange="handleClientPhotoInput(this, '${esc(uid)}')" />
-              </div>
-
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-                <input type="number" step="any" id="set-pts-${esc(uid)}" value="${pts}" placeholder="تحديد point" style="width:130px; margin:0;" />
-                <button class="btn-cyan" onclick="saveUserPoints('${esc(uid)}')">حفظ النقاط</button>
-                <input type="number" step="any" id="add-wal-${esc(uid)}" placeholder="إضافة رصيد (جنيه)" style="width:150px; margin:0;" />
-                <button class="btn-green" onclick="addClientWallet('${esc(uid)}')">إضافة رصيد</button>
-                <button class="btn-red" onclick="deleteClientAndBan('${esc(uid)}')">حذف العميل</button>
-              </div>
-            </div>
-          `;
-        })
-        .join("");
-    }
-
-    window.saveUserPoints = async function (uid) {
-      const newPts = Math.max(0, Number(document.getElementById("set-pts-" + uid).value) || 0);
-      await update(ref(db, `users/${uid}`), { points: newPts });
-      toast(`تم تحديث نقاط المستخدم إلى ${newPts} point.`);
-    };
-
-    window.addClientWallet = async function (uid) {
-      const amt = Number(document.getElementById("add-wal-" + uid).value) || 0;
-      if (!amt) return;
-      await runTransaction(ref(db, `users/${uid}/wallet`), (cur) => Number(((Number(cur) || 0) + amt).toFixed(2)));
-      toast(`تمت إضافة ${amt} جنيه للرصيد.`);
-    };
-
-    window.deleteClientAndBan = async function (uid) {
-      if (!confirm("هل أنت متأكد من حذف هذا العميل ومنعه من الدخول بنفس البيانات؟")) return;
-      const u = state.users[uid];
-      if (u) {
-        await push(ref(db, "banned"), { name: u.name, phone: u.phone, bannedAt: Date.now() });
-      }
-      await remove(ref(db, `users/${uid}`));
-      toast("تم حذف العميل وحظر دخوله بنفس البيانات.");
-    };
-
-    function renderActiveClients() {
-      const el = document.getElementById("admin-active-clients-list");
-      const clients = Object.entries(state.users || {})
-        .filter(([, u]) => u.role === "client" && u.status === "approved")
-        .map(([uid, u]) => {
-          const act = state.clientActivity[uid] || {};
-          const userOrders = Object.values(state.orders || {}).filter((o) => o.buyerId === uid);
-          const orderCount = Math.max(Number(act.orderCount) || 0, userOrders.length);
-          const totalSpent = Math.max(
-            Number(act.totalSpent) || 0,
-            userOrders.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0)
-          );
-          const refStats = getReferralSummaryForUser(uid);
-          return { uid, ...u, orderCount, totalSpent, refStats };
-        })
-        .sort((a, b) => b.totalSpent - a.totalSpent || b.orderCount - a.orderCount);
-
-      el.innerHTML = clients.length
-        ? clients
-            .map(
-              (c, i) => `
-              <div class="card">
-                <div><strong>#${i + 1} — ${esc(c.name)}</strong> (${esc(c.phone)})</div>
-                <div>إجمالي قيمة الشراء: <strong style="color:#be185d;">${c.totalSpent} جنيه</strong> • عدد مرات الطلب: <strong>${c.orderCount}</strong></div>
-                <div style="font-size:12px; color:#0284c7;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
-              </div>
-            `
-            )
-            .join("")
-        : `<div class="card">لا يوجد عملاء نشطون بعد.</div>`;
-
-      const invitedBox = document.getElementById("admin-invited-ranking-list");
-      const invitedRows = [];
-      for (const [referrerId, invitedMap] of Object.entries(state.referrals || {})) {
-        const sender = state.users[referrerId] || { name: referrerId };
-        for (const [invUid, rec] of Object.entries(invitedMap || {})) {
-          const invUser = state.users[invUid] || {};
-          const invOrders = Object.values(state.orders || {}).filter((o) => o.buyerId === invUid);
-          const invDoneTasks = Object.values(state.orders || {}).filter(
-            (o) => o.assignedChallengerId === invUid && o.stage === "completed"
-          );
-          const purchaseAmount = invOrders.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0);
-          const taskAmount = invDoneTasks.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0);
-          const totalAmount = Math.max(purchaseAmount, taskAmount);
-          const purchaseCount = invOrders.length;
-          const successCount = invDoneTasks.length;
-          const avgDurationSec = invDoneTasks.length
-            ? Math.round(invDoneTasks.reduce((s, o) => s + (Number(o.deliveryDurationSec) || 0), 0) / invDoneTasks.length)
-            : 0;
-
-          invitedRows.push({
-            senderName: sender.name || referrerId,
-            invitedName: rec.invitedName || invUser.name || invUid,
-            invitedPhone: invUser.phone || "",
-            totalAmount,
-            purchaseCount,
-            successCount,
-            avgDurationSec
-          });
-        }
-      }
-
-      invitedRows.sort(
-        (a, b) =>
-          b.totalAmount - a.totalAmount ||
-          (b.purchaseCount + b.successCount) - (a.purchaseCount + a.successCount) ||
-          a.avgDurationSec - b.avgDurationSec
+      const existingEntry = Object.entries(state.db.users || {}).find(
+        ([, u]) =>
+          (u.name || "").trim().toLowerCase() === (reqObj.name || "").trim().toLowerCase() ||
+          (reqObj.phone && u.phone === reqObj.phone)
       );
 
-      invitedBox.innerHTML = invitedRows.length
-        ? invitedRows
-            .map(
-              (r, idx) => `
-              <div class="card">
-                <div><strong>#${idx + 1} — ${esc(r.invitedName)}</strong> ${r.invitedPhone ? `(${esc(r.invitedPhone)})` : ""} • بواسطة: <strong>${esc(r.senderName)}</strong></div>
-                <div>المبالغ المرتبطة: <strong style="color:#be185d;">${r.totalAmount} جنيه</strong> • عدد مرات الشراء: <strong>${r.purchaseCount}</strong> • مرات النجاح في المهمة: <strong>${r.successCount}</strong></div>
-                <div style="font-size:12px; color:#475569;">الوقت المستغرق لتوصيل الأوردر: <strong>${r.avgDurationSec} ثانية</strong></div>
-              </div>
-            `
-            )
-            .join("")
-        : `<div class="card">لا توجد بيانات لأشخاص منضمين عبر الروابط بعد.</div>`;
-    }
-
-    function renderChallengerRequests() {
-      const el = document.getElementById("admin-challenger-requests-list");
-      const reqs = Object.entries(state.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
-      if (!reqs.length) {
-        el.innerHTML = `<div class="card">لا توجد طلبات تسجيل متسابقين حالياً.</div>`;
-        return;
-      }
-      el.innerHTML = reqs
-        .map(
-          ([id, r]) => `
-          <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <div><strong>مقدم الطلب:</strong> ${esc(r.name)} — <strong>موبايل:</strong> ${esc(r.phone)}</div>
-            <div style="display:flex; gap:8px;">
-              <button class="btn-green" onclick="decideChallenger('${esc(id)}', 'approved')">موافق</button>
-              <button class="btn-red" onclick="decideChallenger('${esc(id)}', 'rejected')">رفض</button>
-              <button class="btn-amber" onclick="decideChallenger('${esc(id)}', 'waiting')">waiting</button>
-            </div>
-          </div>
-        `
-        )
-        .join("");
-    }
-
-    window.decideChallenger = async function (reqId, decision) {
-      const reqData = state.challengerRegRequests[reqId];
-      if (!reqData) return;
-
-      if (decision === "approved") {
-        const uRef = push(ref(db, "users"));
-        await set(uRef, {
-          name: reqData.name,
-          phone: reqData.phone,
-          role: "challenger",
-          status: "approved",
+      if (existingEntry) {
+        await update(ref(db, `users/${existingEntry[0]}`), {
+          status: decision,
+          role
+        });
+      } else {
+        const newUserRef = push(ref(db, "users"));
+        await set(newUserRef, {
+          name: reqObj.name,
+          phone: reqObj.phone,
+          role,
+          status: decision,
           wallet: 0,
           points: 0,
-          invitedBy: reqData.invitedBy || "",
+          invitedBy: reqObj.invitedBy || "",
           createdAt: Date.now()
         });
-        toast(`تمت الموافقة على طلب المتسابق ${reqData.name} وأصبح مشتركاً في صفحة التحديات.`);
-      } else if (decision === "rejected") {
-        const uRef = push(ref(db, "users"));
-        await set(uRef, {
-          name: reqData.name,
-          phone: reqData.phone,
-          role: "challenger",
-          status: "rejected",
-          createdAt: Date.now()
-        });
-        toast(`تم رفض طلب ${reqData.name}.`);
-      } else if (decision === "waiting") {
-        await push(ref(db, "waitlist"), {
-          name: reqData.name,
-          phone: reqData.phone,
-          submittedAt: Date.now()
-        });
-        toast(`تم نقل ${reqData.name} إلى قائمة الانتظار.`);
       }
 
-      await remove(ref(db, `challengerRegRequests/${reqId}`));
+      notify(`تم تحديث حالة طلب (${reqObj.name}) إلى: ${decision}`, "success");
     };
 
-    function renderChallengersManager() {
-      const el = document.getElementById("admin-challengers-list");
-      const challengers = Object.entries(state.users || {})
-        .filter(([, u]) => u.role === "challenger" && u.status === "approved")
-        .map(([id, u]) => {
-          const st = state.challengersStats[id] || { completedCount: 0, totalEarned: 0 };
-          const completedOrders = Object.values(state.orders || {}).filter(
-            (o) => o.assignedChallengerId === id && o.stage === "completed"
-          );
-          const count = Math.max(Number(st.completedCount) || 0, completedOrders.length);
-          const pts = Number(u.points) || 0;
-          const refStats = getReferralSummaryForUser(id);
-          return { id, ...u, completedCount: count, pts, refStats };
-        })
-        .sort((a, b) => b.completedCount - a.completedCount);
-
-      if (!challengers.length) {
-        el.innerHTML = `<div class="card">لا يوجد متسابقون معتمدون حالياً.</div>`;
+    function renderUsersManagement() {
+      const box = document.getElementById("users-management-list");
+      const entries = Object.entries(state.db.users || {});
+      if (!entries.length) {
+        box.innerHTML = `<div class="item-box">لا يوجد مستخدمون مسجلون بعد.</div>`;
         return;
       }
 
-      el.innerHTML = challengers
+      box.innerHTML = entries
         .map(
-          (c) => `
-          <div class="card">
-            <div>
-              <strong>${esc(c.name)}</strong> (${esc(c.phone)}) —
-              <strong>عدد الطلبات المنفذة / التحديات:</strong> <span style="color:#059669; font-weight:bold;">${c.completedCount}</span> •
-              <strong>عداد النقاط (point):</strong> <strong>${c.pts}</strong>
-            </div>
-            <div style="font-size:12px; color:#0284c7; margin-top:4px;">أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> • أتموا أول طلب شراء/مهمة: <strong>${c.refStats.completedFirstCount}</strong></div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
-              <input type="number" step="any" id="set-pts-${esc(c.id)}" value="${c.pts}" placeholder="تحديد point" style="width:130px; margin:0;" />
-              <button class="btn-cyan" onclick="saveUserPoints('${esc(c.id)}')">حفظ النقاط</button>
-              <button class="btn-cyan" onclick="openChallengerHistory('${esc(c.id)}')">سجل الطلبات</button>
-              <button class="btn-red" onclick="deleteChallengerWithConfirm('${esc(c.id)}')">حذف</button>
+          ([uid, u]) => `
+          <div class="item-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div>
+                <strong>${esc(u.name)}</strong> • <span class="badge">${esc(u.role || "client")}</span> • حالة: <strong>${esc(u.status || "approved")}</strong><br/>
+                <span style="font-size:13px; color:#475569;">تلفون: ${esc(u.phone || "")} • الرصيد: <strong>${Number(u.wallet) || 0}</strong> جنيه • النقاط: <strong>${Number(u.points) || 0}</strong> point</span>
+              </div>
+              <div class="actions-row">
+                <input type="number" id="adj-wallet-${uid}" placeholder="مبلغ جنيه" style="width:120px;" />
+                <button type="button" class="btn-success" onclick="adjustUserWallet('${uid}', 1)">إضافة رصيد</button>
+                <button type="button" class="btn-danger" onclick="adjustUserWallet('${uid}', -1)">خصم رصيد</button>
+                <input type="number" id="adj-points-${uid}" placeholder="نقاط" style="width:95px;" />
+                <button type="button" class="btn-amber" onclick="setUserPoints('${uid}')">تعيين نقاط</button>
+              </div>
             </div>
           </div>
         `
@@ -1012,650 +614,345 @@
         .join("");
     }
 
-    function renderActiveChallengers() {
-      const el = document.getElementById("admin-active-challengers-list");
-      const list = Object.entries(state.users || {})
-        .filter(([, u]) => u.role === "challenger" && u.status === "approved")
-        .map(([uid, u]) => {
-          const st = state.challengersStats[uid] || {};
-          const doneOrders = Object.values(state.orders || {}).filter(
-            (o) => o.assignedChallengerId === uid && o.stage === "completed"
-          );
-          const successCount = Math.max(Number(st.completedCount) || 0, doneOrders.length);
-          const purchaseOrRewardValue = Math.max(
-            Number(st.totalEarned) || 0,
-            doneOrders.reduce((s, o) => s + (Number(o.totalAmount) || 0), 0)
-          );
-          const totalSec = Number(st.totalDeliverySec) || doneOrders.reduce((s, o) => s + (Number(o.deliveryDurationSec) || 0), 0);
-          const samples = Number(st.deliverySamples) || doneOrders.length || 1;
-          const avgDeliverySec = successCount > 0 ? Math.round(totalSec / samples) : 0;
-          const refStats = getReferralSummaryForUser(uid);
-          return { uid, ...u, successCount, purchaseOrRewardValue, avgDeliverySec, refStats };
-        })
-        .sort(
-          (a, b) =>
-            b.purchaseOrRewardValue - a.purchaseOrRewardValue ||
-            b.successCount - a.successCount ||
-            a.avgDeliverySec - b.avgDeliverySec
-        );
-
-      if (!list.length) {
-        el.innerHTML = `<div class="card">لا يوجد متسابقون نشطون بعد.</div>`;
-        return;
-      }
-
-      el.innerHTML = list
-        .map(
-          (c, i) => `
-          <div class="card">
-            <div><strong>#${i + 1} — ${esc(c.name)}</strong> (${esc(c.phone)})</div>
-            <div>المبالغ المرتبطة بالمهام / الشراء: <strong style="color:#059669;">${c.purchaseOrRewardValue} جنيه</strong> • مرات النجاح في تحقيق المهمة: <strong>${c.successCount}</strong></div>
-            <div style="font-size:12px; color:#475569;">الوقت المستغرق لتوصيل الأوردر: <strong>${c.avgDeliverySec} ثانية</strong> • أرسل الرابط لـ: <strong>${c.refStats.sentToCount}</strong> (أتموا أول طلب/مهمة: <strong>${c.refStats.completedFirstCount}</strong>)</div>
-          </div>
-        `
-        )
-        .join("");
-    }
-
-    window.openChallengerHistory = function (chalId) {
-      const u = state.users[chalId];
-      const list = Object.values(state.orders || {}).filter(
-        (o) => o.assignedChallengerId === chalId && o.stage === "completed"
+    window.adjustUserWallet = async function (uid, sign) {
+      const inp = document.getElementById(`adj-wallet-${uid}`);
+      const delta = Math.abs(Number(inp?.value) || 0) * sign;
+      if (!delta) return notify("أدخل مبلغاً صحيحاً.", "error");
+      await runTransaction(ref(db, `users/${uid}/wallet`), (cur) =>
+        Number(Math.max(0, (Number(cur) || 0) + delta).toFixed(2))
       );
-      document.getElementById("history-modal-title").textContent = `سجل طلبات المتسابق: ${u ? u.name : ""}`;
-      document.getElementById("history-modal-body").innerHTML = list.length
-        ? list
-            .map(
-              (o) =>
-                `<div class="card"><strong>${esc(o.challengeTitle || "طلب")}</strong> — ${Number(o.totalAmount) || 0} جنيه • الوقت المستغرق: <strong>${Number(o.deliveryDurationSec) || 0} ثانية</strong><br/>العميل: ${esc(o.buyerName)} (${esc(o.buyerPhone)})</div>`
-            )
-            .join("")
-        : "<p>لا توجد طلبات مكتملة مسجلة لهذا المتسابق.</p>";
-      document.getElementById("history-modal").style.display = "flex";
+      if (inp) inp.value = "";
+      notify("تم تحديث رصيد المستخدم بنجاح.", "success");
     };
 
-    window.closeHistoryModal = function () {
-      document.getElementById("history-modal").style.display = "none";
+    window.setUserPoints = async function (uid) {
+      const inp = document.getElementById(`adj-points-${uid}`);
+      const pts = Math.max(0, Number(inp?.value) || 0);
+      await update(ref(db, `users/${uid}`), { points: pts });
+      if (inp) inp.value = "";
+      notify("تم تحديث نقاط المستخدم بنجاح.", "success");
     };
 
-    window.deleteChallengerWithConfirm = async function (chalId) {
-      if (!confirm("تأكيد حذف المتسابق؟ سيتم حذفه ومنع دخوله بنفس البيانات.")) return;
-      const u = state.users[chalId];
-      if (u) {
-        await push(ref(db, "banned"), { name: u.name, phone: u.phone, bannedAt: Date.now() });
-      }
-      await remove(ref(db, `users/${chalId}`));
-      toast("تم حذف المتسابق وتأكيد الحذف.");
-    };
-
-    function renderWaitlist() {
-      const el = document.getElementById("admin-waitlist-list");
-      const rows = Object.values(state.waitlist || {}).sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
-      if (!rows.length) {
-        el.innerHTML = `<div class="card">قائمة الانتظار فارغة.</div>`;
-        return;
-      }
-      el.innerHTML = rows
-        .map(
-          (r) => `
-          <div class="card">
-            <strong>${esc(r.name)}</strong> — <span>${esc(r.phone)}</span> —
-            <span style="color:#64748b; font-size:12px;">تاريخ التقديم: ${new Date(r.submittedAt || Date.now()).toLocaleString("ar-EG")}</span>
-          </div>
-        `
-        )
-        .join("");
+    function getAllDepartments() {
+      const extra = Array.isArray(state.db.departments) ? state.db.departments : [];
+      return [...new Set([...DEFAULT_DEPARTMENTS, ...extra])];
     }
 
-    function getAllDepts() {
-      return [...new Set([...DEFAULT_DEPARTMENTS, ...(state.departments || [])])];
-    }
-
-    window.clearDeptCoverPreview = function () {
-      state.uploadedDeptCoverImg = "";
-      document.getElementById("dept-camera-file").value = "";
-      document.getElementById("dept-gallery-file").value = "";
-      const prev = document.getElementById("dept-cover-prev");
-      prev.src = "";
-      prev.style.display = "none";
-      document.getElementById("del-dept-cover-prev-btn").style.display = "none";
-      toast("تم حذف صورة معاينة القسم.");
-    };
-
-    window.deleteSavedDeptCover = async function (deptName) {
-      await remove(ref(db, `departmentsMeta/${deptName}/image`));
-      toast(`تم حذف الصورة المحفوظة لقسم (${deptName}).`);
-    };
-
-    window.handleDeptCoverImage = function (inputEl) {
-      const file = inputEl.files && inputEl.files[0];
-      if (!file) return;
-      compressFileToDataUrl(file, (dataUrl) => {
-        state.uploadedDeptCoverImg = dataUrl;
-        const prev = document.getElementById("dept-cover-prev");
-        prev.src = dataUrl;
-        prev.style.display = "block";
-        document.getElementById("del-dept-cover-prev-btn").style.display = "inline-block";
-      });
-    };
-
-    window.addNewDepartment = async function () {
-      const name = document.getElementById("new-dept-name").value.trim();
-      if (!name) return toast("أدخل اسم القسم أولاً.");
-      const updated = [...new Set([...getAllDepts(), name])];
-      await set(ref(db, "departments"), updated);
-      if (state.uploadedDeptCoverImg) {
-        await set(ref(db, `departmentsMeta/${name}/image`), state.uploadedDeptCoverImg);
-      }
-      document.getElementById("new-dept-name").value = "";
-      clearDeptCoverPreview();
-      toast(`تمت إضافة القسم (${name}).`);
-    };
-
-    window.saveCoverForSelectedDepartment = async function () {
-      const dept = document.getElementById("target-dept-select").value;
-      if (!dept || !state.uploadedDeptCoverImg) {
-        return toast("اختر صورة للقسم أولاً.");
-      }
-      await set(ref(db, `departmentsMeta/${dept}/image`), state.uploadedDeptCoverImg);
-      clearDeptCoverPreview();
-      toast(`تم حفظ الصورة التعبيرية لقسم (${dept}).`);
-    };
-
-    function renderDepartmentsAndProducts() {
-      const sel = document.getElementById("target-dept-select");
-      const depts = getAllDepts();
+    function renderCatalogAdmin() {
+      const sel = document.getElementById("prod-dept-select");
+      const depts = getAllDepartments();
       const prevVal = sel.value;
       sel.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
       if (prevVal && depts.includes(prevVal)) sel.value = prevVal;
-      renderDepartmentItemsTable();
-    }
 
-    window.deleteSavedProductImage = async function (dept, pid) {
-      await remove(ref(db, `products/${dept}/${pid}/image`));
-      toast("تم حذف صورة الصنف.");
-    };
-
-    window.renderDepartmentItemsTable = function () {
-      const selDept = document.getElementById("target-dept-select").value;
-      const preview = document.getElementById("admin-dept-products-preview");
-      const depts = getAllDepts();
-
-      preview.innerHTML = depts
-        .map((d) => {
-          const items = Object.entries(state.products[d] || {});
-          const meta = state.departmentsMeta[d] || {};
-          const isSelectedDept = d === selDept;
-
-          return `
-            <div class="card" style="${isSelectedDept ? "border-color:#7c3aed;" : ""}">
-              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
-                <h4 style="margin:0;">${esc(d)} (${items.length} صنف / نوع / عرض)</h4>
-                ${
-                  meta.image
-                    ? `<div class="img-box-inline">
-                         <img src="${meta.image}" class="img-thumb" alt="${esc(d)}" />
-                         <button type="button" class="btn-red" onclick="deleteSavedDeptCover('${esc(d)}')">حذف الصورة</button>
-                       </div>`
-                    : ""
-                }
-              </div>
-              ${
-                items.length
-                  ? items
-                      .map(
-                        ([pid, it]) => `
-                      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #e2e8f0; flex-wrap:wrap;">
-                        <div>
-                          <strong>${esc(it.title || it.type)}</strong>
-                          ${it.type ? `• النوع: <span style="color:#7c3aed;">${esc(it.type)}</span>` : ""}
-                          • السعر: <strong style="color:#be185d;">${Number(it.price) || 0} جنيه</strong>
-                          ${it.isOffer ? `• <span style="color:#d97706;">عرض</span>` : ""}
-                          ${
-                            it.image
-                              ? `<div class="img-box-inline">
-                                   <img src="${it.image}" class="img-thumb" alt="${esc(it.title || it.type)}" />
-                                   <button type="button" class="btn-red" onclick="deleteSavedProductImage('${esc(d)}', '${esc(pid)}')">حذف الصورة</button>
-                                 </div>`
-                              : ""
-                          }
-                        </div>
-                        <button class="btn-red" onclick="deleteProductItem('${esc(d)}', '${esc(pid)}')">حذف</button>
-                      </div>
-                    `
-                      )
-                      .join("")
-                  : `<div style="font-size:13px; color:#64748b;">لا توجد أنواع أو سلع أو عروض مضافة في هذا القسم بعد.</div>`
-              }
-            </div>
-          `;
-        })
-        .join("");
-    };
-
-    window.clearItemImgPreview = function () {
-      state.uploadedProductImg = "";
-      document.getElementById("item-camera-file").value = "";
-      document.getElementById("item-gallery-file").value = "";
-      const prev = document.getElementById("item-img-prev");
-      prev.src = "";
-      prev.style.display = "none";
-      document.getElementById("del-item-img-prev-btn").style.display = "none";
-      toast("تم حذف صورة معاينة الصنف.");
-    };
-
-    window.handleAdminImage = function (inputEl, prevId) {
-      const file = inputEl.files && inputEl.files[0];
-      if (!file) return;
-      compressFileToDataUrl(file, (dataUrl) => {
-        state.uploadedProductImg = dataUrl;
-        const prev = document.getElementById(prevId);
-        prev.src = dataUrl;
-        prev.style.display = "block";
-        document.getElementById("del-item-img-prev-btn").style.display = "inline-block";
+      const listEl = document.getElementById("existing-products-list");
+      const rows = [];
+      Object.entries(state.db.products || {}).forEach(([deptName, itemsObj]) => {
+        Object.entries(itemsObj || {}).forEach(([itemId, it]) => {
+          rows.push({ deptName, itemId, ...it });
+        });
       });
-    };
 
-    window.addProductOrOffer = async function () {
-      const dept = document.getElementById("target-dept-select").value;
-      const typeName = document.getElementById("item-type-input").value.trim();
-      const title = document.getElementById("item-title-input").value.trim() || typeName;
-      const price = Number(document.getElementById("item-price-input").value) || 0;
-      const desc = document.getElementById("item-desc-input").value.trim();
-      const isOffer = document.getElementById("item-is-offer").checked;
-
-      if (!title || price <= 0) {
-        return toast("أدخل اسم الصنف أو النوع وسعراً صحيحاً بالجنيه.");
+      if (!rows.length) {
+        listEl.innerHTML = `<div class="item-box">لا توجد أصناف أو عروض مضافة بعد.</div>`;
+        return;
       }
 
-      const itemRef = push(ref(db, `products/${dept}`));
-      await set(itemRef, {
-        type: typeName || title,
-        title,
+      listEl.innerHTML = rows
+        .map(
+          (r) => `
+          <div class="item-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <strong>${esc(r.title || r.type)}</strong> <span class="badge">${esc(r.deptName)}</span> ${r.isOffer ? `<span class="badge" style="background:#fef3c7; color:#92400e;">عرض خاص</span>` : ""}<br/>
+              <span style="font-size:13px; color:#475569;">النوع: ${esc(r.type || "عام")} • السعر: <strong>${Number(r.price) || 0}</strong> جنيه</span>
+            </div>
+            <button type="button" class="btn-danger" onclick="deleteProductItem('${esc(r.deptName)}', '${esc(r.itemId)}')">حذف</button>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    window.addNewDepartment = async function () {
+      const name = document.getElementById("new-dept-name").value.trim();
+      if (!name) return notify("اكتب اسم القسم أولاً.", "error");
+      const updated = getAllDepartments();
+      if (!updated.includes(name)) updated.push(name);
+      await set(ref(db, "departments"), updated);
+      if (state.imgs.deptImg) {
+        await update(ref(db, `departmentsMeta/${name}`), { image: state.imgs.deptImg });
+      }
+      document.getElementById("new-dept-name").value = "";
+      document.getElementById("new-dept-img").value = "";
+      document.getElementById("new-dept-prev").style.display = "none";
+      state.imgs.deptImg = "";
+      notify(`تم حفظ القسم (${name}) بنجاح.`, "success");
+    };
+
+    window.addProductToDepartment = async function () {
+      const dept = document.getElementById("prod-dept-select").value;
+      const type = document.getElementById("prod-type-input").value.trim();
+      const title = document.getElementById("prod-title-input").value.trim();
+      const price = Number(document.getElementById("prod-price-input").value);
+      const desc = document.getElementById("prod-desc-input").value.trim();
+      const isOffer = document.getElementById("prod-is-offer").checked;
+
+      if (!dept || (!title && !type) || isNaN(price) || price < 0) {
+        return notify("أدخل القسم والاسم/النوع والسعر الصحيح.", "error");
+      }
+
+      const newProdRef = push(ref(db, `products/${dept}`));
+      await set(newProdRef, {
+        title: title || type,
+        type: type || title,
         price,
         desc,
         isOffer,
-        image: state.uploadedProductImg || ""
+        image: state.imgs.prodImg || "",
+        createdAt: Date.now()
       });
 
-      document.getElementById("item-type-input").value = "";
-      document.getElementById("item-title-input").value = "";
-      document.getElementById("item-price-input").value = "";
-      document.getElementById("item-desc-input").value = "";
-      document.getElementById("item-is-offer").checked = false;
-      clearItemImgPreview();
-      toast(`تمت إضافة (${title}) إلى قسم ${dept} — يمكنك إضافة المزيد فوراً.`);
+      document.getElementById("prod-title-input").value = "";
+      document.getElementById("prod-type-input").value = "";
+      document.getElementById("prod-price-input").value = "";
+      document.getElementById("prod-desc-input").value = "";
+      document.getElementById("prod-is-offer").checked = false;
+      document.getElementById("prod-img-input").value = "";
+      document.getElementById("prod-img-prev").style.display = "none";
+      state.imgs.prodImg = "";
+      notify("تمت إضافة الصنف/العرض بنجاح.", "success");
     };
 
-    window.deleteProductItem = async function (dept, pid) {
-      await remove(ref(db, `products/${dept}/${pid}`));
-      toast("تم حذف العنصر.");
+    window.deleteProductItem = async function (deptName, itemId) {
+      await remove(ref(db, `products/${deptName}/${itemId}`));
+      notify("تم حذف الصنف.", "info");
     };
 
-    function renderCashPhonesEditor() {
-      const slotsEl = document.getElementById("cash-phones-slots");
-      const activeSet = new Set(state.cashPhones || []);
-      const allNumbers = [...new Set([...state.cashPool, ...(state.cashPhones || [])])];
-      while (allNumbers.length < 7) allNumbers.push("");
-
-      slotsEl.innerHTML = allNumbers
-        .map((num, idx) => {
-          const checked = num && activeSet.has(num) ? "checked" : "";
-          return `
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-              <input type="checkbox" class="cash-chk" data-idx="${idx}" ${checked} style="width:20px; height:20px; margin:0;" />
-              <input type="tel" class="cash-num-inp" data-idx="${idx}" value="${esc(num)}" placeholder="رقم الكاش ${idx + 1}" style="margin:0;" />
-            </div>
-          `;
-        })
+    function renderCashPhonesAdmin() {
+      const listEl = document.getElementById("cash-phones-admin-list");
+      const phones = Array.isArray(state.db.cashPhones) ? state.db.cashPhones : [];
+      if (!phones.length) {
+        listEl.innerHTML = `<div class="item-box">لا توجد أرقام كاش مضافة حالياً.</div>`;
+        return;
+      }
+      listEl.innerHTML = phones
+        .map(
+          (ph, idx) => `
+          <div class="item-box" style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>${esc(ph)}</strong>
+            <button type="button" class="btn-danger" onclick="removeCashPhone(${idx})">حذف</button>
+          </div>
+        `
+        )
         .join("");
     }
 
-    window.addExtraCashPhone = function () {
-      const val = document.getElementById("extra-cash-phone-input").value.trim();
-      if (!val) return;
-      state.cashPool.push(val);
-      document.getElementById("extra-cash-phone-input").value = "";
-      renderCashPhonesEditor();
-      toast(`تمت إضافة الرقم ${val} للقائمة.`);
+    window.addCashPhone = async function () {
+      const ph = document.getElementById("cash-phone-input").value.trim();
+      if (!/^01[0125][0-9]{8}$/.test(ph)) {
+        return notify("أدخل رقم تلفون مصرياً صحيحاً مكوناً من 11 رقماً.", "error");
+      }
+      const current = Array.isArray(state.db.cashPhones) ? [...state.db.cashPhones] : [];
+      if (current.length >= 5) {
+        return notify("الحد الأقصى 5 أرقام كاش.", "error");
+      }
+      if (!current.includes(ph)) current.push(ph);
+      await set(ref(db, "cashPhones"), current);
+      document.getElementById("cash-phone-input").value = "";
+      notify("تم حفظ رقم الكاش بنجاح.", "success");
     };
 
-    window.saveSelectedCashPhones = async function () {
-      const checks = [...document.querySelectorAll(".cash-chk")];
-      const inputs = [...document.querySelectorAll(".cash-num-inp")];
-      const poolVals = inputs.map((i) => i.value.trim());
-      state.cashPool = poolVals;
-
-      const selected = [];
-      checks.forEach((chk, i) => {
-        const ph = poolVals[i];
-        if (chk.checked && ph && selected.length < 5) {
-          selected.push(ph);
-        }
-      });
-
-      await set(ref(db, "cashPhones"), selected);
-      toast(`تم حفظ ${selected.length} أرقام كاش للظهور في صفحة الدفع.`);
+    window.removeCashPhone = async function (idx) {
+      const current = Array.isArray(state.db.cashPhones) ? [...state.db.cashPhones] : [];
+      current.splice(idx, 1);
+      await set(ref(db, "cashPhones"), current);
+      notify("تم حذف رقم الكاش.", "info");
     };
 
-    window.clearChallengeImgPreview = function () {
-      state.uploadedChallengeImg = "";
-      document.getElementById("chal-camera-file").value = "";
-      document.getElementById("chal-gallery-file").value = "";
-      const prev = document.getElementById("chal-img-prev");
-      prev.src = "";
-      prev.style.display = "none";
-      document.getElementById("del-chal-img-prev-btn").style.display = "none";
-      toast("تم حذف صورة معاينة التحدي.");
-    };
-
-    window.deleteSavedChallengeImage = async function (cid) {
-      await remove(ref(db, `challenges/${cid}/image`));
-      toast("تم حذف صورة التحدي.");
-    };
-
-    window.handleChallengeMedia = function (inputEl) {
-      const file = inputEl.files && inputEl.files[0];
-      if (!file) return;
-      compressFileToDataUrl(file, (dataUrl) => {
-        state.uploadedChallengeImg = dataUrl;
-        const prev = document.getElementById("chal-img-prev");
-        prev.src = dataUrl;
-        prev.style.display = "block";
-        document.getElementById("del-chal-img-prev-btn").style.display = "inline-block";
-      });
-    };
-
-    window.publishChallenge = async function () {
+    window.createNewChallenge = async function () {
       const title = document.getElementById("chal-title-input").value.trim();
-      const details = document.getElementById("chal-details-input").value.trim();
       const reward = Number(document.getElementById("chal-reward-input").value) || 0;
-      if (!title || !details) return toast("أدخل عنوان التحدي وتفاصيله.");
+      const buyerName = document.getElementById("chal-buyer-name").value.trim();
+      const buyerPhone = document.getElementById("chal-buyer-phone").value.trim();
+      const details = document.getElementById("chal-details-input").value.trim();
 
-      const cRef = push(ref(db, "challenges"));
-      await set(cRef, {
+      if (!title || !details) {
+        return notify("أدخل عنوان التحدي وتفاصيله.", "error");
+      }
+
+      const chalRef = push(ref(db, "challenges"));
+      await set(chalRef, {
         title,
-        details,
         reward,
-        image: state.uploadedChallengeImg || "",
+        buyerName,
+        buyerPhone,
+        details,
+        image: state.imgs.chalImg || "",
         createdAt: Date.now()
       });
 
       document.getElementById("chal-title-input").value = "";
-      document.getElementById("chal-details-input").value = "";
       document.getElementById("chal-reward-input").value = "";
-      clearChallengeImgPreview();
-      toast("تم تأكيد نشر التحدي في صفحة التحديات للمتسابقين.");
+      document.getElementById("chal-buyer-name").value = "";
+      document.getElementById("chal-buyer-phone").value = "";
+      document.getElementById("chal-details-input").value = "";
+      document.getElementById("chal-img-input").value = "";
+      document.getElementById("chal-img-prev").style.display = "none";
+      state.imgs.chalImg = "";
+      notify("تم نشر التحدي بنجاح.", "success");
     };
 
-    function renderChallengesAdminList() {
-      const el = document.getElementById("admin-challenges-list");
-      const list = Object.entries(state.challenges || {});
-      el.innerHTML = list
-        .map(
-          ([id, c]) => `
-          <div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-            <div>
-              <strong>${esc(c.title)}</strong> (${Number(c.reward) || 0} جنيه) — ${c.acceptedBy ? `مقبول بواسطة ${esc(c.acceptedByName)}` : "متاح"}
-              ${
-                c.image
-                  ? `<div class="img-box-inline">
-                       <img src="${c.image}" class="img-thumb" alt="صورة التحدي" />
-                       <button type="button" class="btn-red" onclick="deleteSavedChallengeImage('${esc(id)}')">حذف الصورة</button>
-                     </div>`
-                  : ""
-              }
-            </div>
-            <button class="btn-red" onclick="deleteChallengeItem('${esc(id)}')">حذف</button>
-          </div>
-        `
-        )
-        .join("");
-    }
-
-    window.deleteChallengeItem = async function (id) {
-      await remove(ref(db, `challenges/${id}`));
-    };
-
-    window.deleteSavedOrderDeliveryImage = async function (orderId) {
-      await remove(ref(db, `orders/${orderId}/deliveryImage`));
-      toast("تم حذف صورة تأكيد الوصول.");
-    };
-
-    function renderOrdersPanels() {
-      const all = Object.entries(state.orders || {}).map(([id, o]) => ({ id, ...o }));
-      const activeList = all.filter((o) => o.stage === "active" || (!o.stage && o.status === "جاري تنفيذ طلبك"));
-      const doneList = all.filter((o) => o.stage === "completed");
-
-      document.getElementById("admin-active-orders-list").innerHTML = activeList.length
-        ? activeList
+    function renderChallengesAdmin() {
+      const chalList = document.getElementById("admin-challenges-list");
+      const chals = Object.entries(state.db.challenges || {});
+      chalList.innerHTML = chals.length
+        ? chals
             .map(
-              (o) => `
-              <div class="card">
-                <strong>${esc(o.buyerName || o.challengeTitle || "طلب")}</strong> — ${Number(o.totalAmount) || 0} جنيه<br/>
-                المتسابق: ${esc(o.assignedChallengerName || "قيد التعيين")} • هاتف: ${esc(o.assignedChallengerPhone || o.buyerPhone || "")}
+              ([id, c]) => `
+              <div class="item-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <div>
+                  <strong>${esc(c.title)}</strong> • مكافأة: <strong>${Number(c.reward) || 0}</strong> جنيه<br/>
+                  <span style="font-size:13px; color:#475569;">${esc(c.details)} • ${c.acceptedByName ? `مقبول بواسطة: ${esc(c.acceptedByName)}` : "متاح"}</span>
+                </div>
+                <button type="button" class="btn-danger" onclick="deleteChallenge('${id}')">حذف</button>
               </div>
             `
             )
             .join("")
-        : `<div class="card">لا توجد طلبات نشطة حالياً.</div>`;
+        : `<div class="item-box">لا توجد تحديات منشورة حالياً.</div>`;
 
-      document.getElementById("admin-completed-orders-list").innerHTML = doneList.length
-        ? doneList
+      const ordList = document.getElementById("admin-orders-list");
+      const orders = Object.entries(state.db.orders || {});
+      ordList.innerHTML = orders.length
+        ? orders
             .map(
-              (o) => `
-              <div class="card">
-                <div><strong>${esc(o.challengeTitle || o.buyerName || "طلب منتهي")}</strong> — ${Number(o.totalAmount) || 0} جنيه • الوقت المستغرق: <strong>${Number(o.deliveryDurationSec) || 0} ثانية</strong></div>
-                <div>المتسابق: ${esc(o.assignedChallengerName)}</div>
-                ${
-                  o.deliveryImage
-                    ? `<div class="img-box-inline">
-                         <img src="${o.deliveryImage}" class="img-thumb" alt="صورة التسليم" />
-                         <button type="button" class="btn-red" onclick="deleteSavedOrderDeliveryImage('${esc(o.id)}')">حذف الصورة</button>
-                       </div>`
-                    : ""
-                }
-              </div>
-            `
-            )
-            .join("")
-        : `<div class="card">لا توجد طلبات منتهية بعد.</div>`;
-    }
-
-    window.clearGiftImgPreview = function () {
-      state.uploadedGiftImg = "";
-      document.getElementById("gift-camera-file").value = "";
-      document.getElementById("gift-gallery-file").value = "";
-      const prev = document.getElementById("gift-img-prev");
-      prev.src = "";
-      prev.style.display = "none";
-      document.getElementById("del-gift-img-prev-btn").style.display = "none";
-      toast("تم حذف صورة معاينة الهدية.");
-    };
-
-    window.deleteSavedGiftImage = async function (gid) {
-      await remove(ref(db, `gifts/${gid}/image`));
-      toast("تم حذف صورة الهدية.");
-    };
-
-    window.handleGiftMedia = function (inputEl) {
-      const file = inputEl.files && inputEl.files[0];
-      if (!file) return;
-      compressFileToDataUrl(file, (dataUrl) => {
-        state.uploadedGiftImg = dataUrl;
-        const prev = document.getElementById("gift-img-prev");
-        prev.src = dataUrl;
-        prev.style.display = "block";
-        document.getElementById("del-gift-img-prev-btn").style.display = "inline-block";
-      });
-    };
-
-    window.sendGiftOrReward = async function () {
-      const targetName = document.getElementById("gift-target-input").value.trim();
-      const title = document.getElementById("gift-title-input").value.trim();
-      const details = document.getElementById("gift-details-input").value.trim();
-      if (!title) return toast("أدخل عنوان الهدية أو المكافأة.");
-
-      await push(ref(db, "gifts"), {
-        targetName,
-        title,
-        details,
-        image: state.uploadedGiftImg || "",
-        createdAt: Date.now()
-      });
-
-      document.getElementById("gift-target-input").value = "";
-      document.getElementById("gift-title-input").value = "";
-      document.getElementById("gift-details-input").value = "";
-      clearGiftImgPreview();
-      toast("تم إرسال الهدية / المكافأة.");
-    };
-
-    window.deleteSavedReceiptImage = async function (rid) {
-      await remove(ref(db, `receipts/${rid}/receiptImage`));
-      toast("تم حذف صورة الوصل.");
-    };
-
-    function renderReceiptsList() {
-      const el = document.getElementById("admin-receipts-list");
-      const rows = Object.entries(state.receipts || {});
-      el.innerHTML = rows.length
-        ? rows
-            .map(
-              ([rid, r]) => `
-              <div class="card">
-                <div><strong>${esc(r.userName)}</strong> (${esc(r.phone)}) — <strong>${Number(r.amount) || 0} جنيه</strong> — ${esc(r.method || "")}</div>
-                <div>رقم الاستقبال: ${esc(r.receiverPhone || "")} • الحالة: <strong>${esc(r.adminConfirmed || "بانتظار التأكيد")}</strong></div>
-                ${
-                  r.receiptImage
-                    ? `<div class="img-box-inline">
-                         <img src="${r.receiptImage}" class="img-thumb" alt="صورة الإيصال" />
-                         <button type="button" class="btn-red" onclick="deleteSavedReceiptImage('${esc(rid)}')">حذف الصورة</button>
-                       </div>`
-                    : ""
-                }
-                <div style="margin-top:8px;">
-                  <button class="btn-green" onclick="confirmReceiptAdmin('${esc(rid)}')">تأكيد استلام الكاش</button>
+              ([id, o]) => `
+              <div class="item-box">
+                <div>
+                  <strong>طلب / مهمة #${esc(id.slice(-6))}</strong> • الحالة: <span class="badge">${esc(o.status || o.stage || "جديد")}</span><br/>
+                  <span style="font-size:13px; color:#475569;">العميل: ${esc(o.buyerName || "")} (${esc(o.buyerPhone || "")}) • الإجمالي: <strong>${Number(o.totalAmount) || 0}</strong> جنيه</span><br/>
+                  ${o.assignedChallengerName ? `<span style="font-size:13px; color:#059669;">المتسابق: <strong>${esc(o.assignedChallengerName)}</strong> (${esc(o.assignedChallengerPhone || "")})</span><br/>` : ""}
+                  ${o.deliveryDurationSec ? `<span style="font-size:13px; color:#7c3aed;">مدة التسليم: <strong>${Number(o.deliveryDurationSec)}</strong> ثانية</span><br/>` : ""}
+                  ${o.deliveryImage ? `<img src="${o.deliveryImage}" class="thumb-preview" style="display:block;" alt="تأكيد الوصول" />` : ""}
                 </div>
               </div>
             `
             )
             .join("")
-        : `<div class="card">لا توجد وصولات بعد.</div>`;
+        : `<div class="item-box">لا توجد طلبات مسجلة حالياً.</div>`;
+
+      const statsEl = document.getElementById("admin-challengers-stats");
+      const statsArr = Object.values(state.db.challengersStats || {});
+      statsEl.innerHTML = statsArr.length
+        ? statsArr
+            .map((st) => {
+              const avgSec =
+                st.deliverySamples && st.totalDeliverySec
+                  ? Math.round(Number(st.totalDeliverySec) / Number(st.deliverySamples))
+                  : Number(st.lastDeliverySec) || 0;
+              return `
+                <div class="item-box">
+                  <strong>${esc(st.name)}</strong> (${esc(st.phone || "")})<br/>
+                  <span style="font-size:13px; color:#475569;">مهام مكتملة: <strong>${Number(st.completedCount) || 0}</strong> • إجمالي المكافآت: <strong>${Number(st.totalEarned) || 0}</strong> جنيه • متوسط مدة التسليم: <strong>${avgSec}</strong> ثانية</span>
+                </div>
+              `;
+            })
+            .join("")
+        : `<div class="item-box">لا توجد إحصائيات متسابقين بعد.</div>`;
     }
 
-    window.confirmReceiptAdmin = async function (rid) {
-      await update(ref(db, `receipts/${rid}`), { adminConfirmed: "تم تأكيد الاستلام" });
-      toast("تم تأكيد استلام الكاش.");
+    window.deleteChallenge = async function (id) {
+      await remove(ref(db, `challenges/${id}`));
+      notify("تم حذف التحدي.", "info");
     };
 
-    window.openImpersonateModal = function () {
-      const box = document.getElementById("impersonate-users-list");
-      const entries = Object.entries(state.users || {});
-      box.innerHTML = entries.length
-        ? entries
+    window.sendGiftOrReward = async function () {
+      const title = document.getElementById("gift-title-input").value.trim();
+      const targetName = document.getElementById("gift-target-input").value.trim();
+      const details = document.getElementById("gift-details-input").value.trim();
+      if (!title || !details) return notify("أدخل عنوان الهدية وتفاصيلها.", "error");
+
+      await push(ref(db, "gifts"), {
+        title,
+        targetName,
+        details,
+        image: state.imgs.giftImg || "",
+        createdAt: Date.now()
+      });
+
+      document.getElementById("gift-title-input").value = "";
+      document.getElementById("gift-target-input").value = "";
+      document.getElementById("gift-details-input").value = "";
+      document.getElementById("gift-img-input").value = "";
+      document.getElementById("gift-img-prev").style.display = "none";
+      state.imgs.giftImg = "";
+      notify("تم إرسال الهدية/العرض بنجاح.", "success");
+    };
+
+    window.banUserRecord = async function () {
+      const name = document.getElementById("ban-name-input").value.trim();
+      const phone = document.getElementById("ban-phone-input").value.trim();
+      if (!name && !phone) return notify("أدخل اسماً أو رقم تلفون للحظر.", "error");
+
+      await push(ref(db, "banned"), {
+        name,
+        phone,
+        bannedAt: Date.now()
+      });
+      document.getElementById("ban-name-input").value = "";
+      document.getElementById("ban-phone-input").value = "";
+      notify("تمت إضافة السجل إلى قائمة الحظر.", "success");
+    };
+
+    window.unbanUserRecord = async function (banId) {
+      await remove(ref(db, `banned/${banId}`));
+      notify("تم فك الحظر.", "info");
+    };
+
+    function renderGiftsAndBanAdmin() {
+      const banBox = document.getElementById("banned-list-box");
+      const banEntries = Object.entries(state.db.banned || {});
+      banBox.innerHTML = banEntries.length
+        ? banEntries
             .map(
-              ([uid, u]) => `
-              <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                <div><strong>${esc(u.name)}</strong> (${u.role === "challenger" ? "متسابق" : "عميل"}) • ${esc(u.phone)}</div>
-                <button class="btn-grad" onclick="impersonateUser('${esc(uid)}')">دخول الحساب</button>
+              ([id, b]) => `
+              <div class="item-box" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>محظور: <strong>${esc(b.name || "-")}</strong> • ${esc(b.phone || "-")}</span>
+                <button type="button" class="btn-soft" onclick="unbanUserRecord('${id}')">فك الحظر</button>
               </div>
             `
             )
             .join("")
-        : "<p>لا يوجد مستخدمون مسجلون.</p>";
-      document.getElementById("impersonate-modal").style.display = "flex";
-    };
+        : "";
 
-    window.closeImpersonateModal = function () {
-      document.getElementById("impersonate-modal").style.display = "none";
-    };
-
-    window.impersonateUser = function (uid) {
-      const u = state.users[uid];
-      if (!u) return;
-      toast(`تم فتح حساب (${u.name}) - الصلاحية: ${u.role === "challenger" ? "متسابق" : "عميل"} - الرصيد: ${Number(u.wallet) || 0} جنيه - النقاط: ${Number(u.points) || 0} point.`);
-      closeImpersonateModal();
-    };
-
-    function renderAll() {
-      updateSectionBadges();
-      if (document.getElementById("admin-app").style.display !== "block") return;
-      renderClientRequests();
-      renderClientsManager();
-      renderActiveClients();
-      renderChallengerRequests();
-      renderChallengersManager();
-      renderActiveChallengers();
-      renderWaitlist();
-      renderDepartmentsAndProducts();
-      renderCashPhonesEditor();
-      renderChallengesAdminList();
-      renderOrdersPanels();
-      renderReceiptsList();
+      const recBox = document.getElementById("admin-receipts-list");
+      const recs = Object.values(state.db.receipts || {});
+      recBox.innerHTML = recs.length
+        ? recs
+            .map(
+              (r) => `
+              <div class="item-box">
+                <strong>${esc(r.type || "وصل")}</strong> • المستخدم: <strong>${esc(r.userName || "")}</strong> (${esc(r.phone || "")}) • المبلغ: <strong>${Number(r.amount) || 0}</strong> جنيه • الوسيلة: ${esc(r.method || "")}
+              </div>
+            `
+            )
+            .join("")
+        : `<div class="item-box">لا توجد وصولات بعد.</div>`;
     }
 
-    onValue(ref(db, "users"), (s) => {
-      state.users = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "banned"), (s) => (state.db.banned = s.val() || {}));
-    onValue(ref(db, "clientRegRequests"), (s) => {
-      state.clientRegRequests = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "challengerRegRequests"), (s) => {
-      state.challengerRegRequests = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "departments"), (s) => {
-      state.departments = s.val() || [];
-      renderAll();
-    });
-    onValue(ref(db, "departmentsMeta"), (s) => {
-      state.departmentsMeta = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "products"), (s) => {
-      state.products = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "cashPhones"), (s) => {
-      state.cashPhones = s.val() || [];
-      renderAll();
-    });
-    onValue(ref(db, "challenges"), (s) => {
-      state.challenges = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "orders"), (s) => {
-      state.orders = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "challengersStats"), (s) => {
-      state.challengersStats = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "clientActivity"), (s) => {
-      state.clientActivity = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "referrals"), (s) => {
-      state.referrals = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "receipts"), (s) => {
-      state.receipts = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "gifts"), (s) => {
-      state.gifts = s.val() || {};
-      renderAll();
-    });
-    onValue(ref(db, "waitlist"), (s) => {
-      state.waitlist = s.val() || {};
-      renderAll();
-    });
+    onValue(ref(db, "users"), (s) => { state.db.users = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "banned"), (s) => { state.db.banned = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "clientRegRequests"), (s) => { state.db.clientRegRequests = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "challengerRegRequests"), (s) => { state.db.challengerRegRequests = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "departments"), (s) => { state.db.departments = s.val() || []; renderCurrentAdminTab(); });
+    onValue(ref(db, "departmentsMeta"), (s) => { state.db.departmentsMeta = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "products"), (s) => { state.db.products = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "cashPhones"), (s) => { state.db.cashPhones = s.val() || []; renderCurrentAdminTab(); });
+    onValue(ref(db, "challenges"), (s) => { state.db.challenges = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "orders"), (s) => { state.db.orders = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "gifts"), (s) => { state.db.gifts = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "receipts"), (s) => { state.db.receipts = s.val() || {}; renderCurrentAdminTab(); });
+    onValue(ref(db, "challengersStats"), (s) => { state.db.challengersStats = s.val() || {}; renderCurrentAdminTab(); });
   </script>
 </body>
 </html>
