@@ -521,6 +521,8 @@
     let ordersSubSection = "active";
     const imgs = { deptImg: "", prodImg: "" };
     const adminDeliveryProofs = {};
+    let noticeTimer = null;
+    let deliveryBannerTimer = null;
 
     const store = {
       users: {},
@@ -540,19 +542,34 @@
       appSettings: { requireDeliveryPhoto: false }
     };
 
-    function notify(msg, type = "info") {
+    function notify(msg, type = "info", durationMs = 8000) {
       const el = document.getElementById("admin-notice");
+      if (!el) return;
+      if (noticeTimer) clearTimeout(noticeTimer);
       el.style.display = "block";
       el.className = "notice" + (type === "error" ? " error" : type === "success" ? " success" : "");
       el.textContent = msg;
+      if (durationMs > 0) {
+        noticeTimer = setTimeout(() => {
+          el.style.display = "none";
+          el.textContent = "";
+        }, durationMs);
+      }
     }
 
-    function showAdminDeliveryBanner(orderId, customText = "") {
+    function showAdminDeliveryBanner(orderId, customText = "", durationMs = 8000) {
       const banner = document.getElementById("admin-delivery-banner");
       if (!banner) return;
+      if (deliveryBannerTimer) clearTimeout(deliveryBannerTimer);
       const suffix = orderId ? ` • طلب #${String(orderId).slice(-6)}` : "";
       banner.textContent = customText ? `${customText}${suffix}` : `تنبيه: جارى التوصيل${suffix}`;
       banner.style.display = "block";
+      if (durationMs > 0) {
+        deliveryBannerTimer = setTimeout(() => {
+          banner.style.display = "none";
+          banner.textContent = "";
+        }, durationMs);
+      }
     }
 
     function esc(v) {
@@ -755,6 +772,7 @@
         userAlertMessage: completedLabel,
         deliveryImage: photoData,
         completedAt: now,
+        completedAtFormatted: new Date(now).toLocaleString("ar-EG"),
         completedBy: "admin"
       });
 
@@ -768,18 +786,45 @@
 
       delete adminDeliveryProofs[orderId];
 
-      // الانتقال مباشرة إلى تبويب الطلبات ثم قسم الطلبات والتحديات المنتهية
       window.switchTab("orders");
       window.switchOrdersSubSection("completed");
-      showAdminDeliveryBanner(orderId, "تم وصول الطلب وانتقل إلى الطلبات والتحديات المنتهية");
-      notify(`تم وصول الطلب #${orderId.slice(-6)} وانتقل إلى الطلبات والتحديات المنتهية والمهام المكتملة.`, "success");
+      showAdminDeliveryBanner(orderId, "تم وصول الطلب وانتقل إلى الطلبات والتحديات المنتهية", 8000);
+      notify(`تم وصول الطلب #${orderId.slice(-6)} وانتقل إلى الطلبات والتحديات المنتهية والمهام المكتملة.`, "success", 8000);
     };
 
     window.deleteCompletedOrder = async function (orderId) {
-      const ok = confirm(`هل تريد حذف الطلب #${String(orderId).slice(-6)} نهائياً من الطلبات المنتهية؟ (نعم / لا)`);
+      const ok = confirm(`هل تريد حذف الطلب #${String(orderId).slice(-6)} من الطلبات المنتهية؟ (سيبقى محفوظاً في سجل المستخدم بالتاريخ والوقت)`);
       if (!ok) return;
+
+      const ord = store.orders[orderId];
+      if (ord) {
+        const deletedAt = Date.now();
+        const historyPayload = {
+          orderId,
+          buyerId: ord.buyerId || "",
+          buyerName: ord.buyerName || "مستخدم",
+          buyerPhone: ord.buyerPhone || ord.payerPhone || "",
+          items: ord.items || [],
+          challengeTitle: ord.challengeTitle || "",
+          totalAmount: Number(ord.totalAmount) || 0,
+          status: "تم وصول الطلب",
+          createdAt: ord.createdAt || deletedAt,
+          completedAt: ord.completedAt || deletedAt,
+          deletedAt,
+          dateTimeText: new Date(deletedAt).toLocaleString("ar-EG")
+        };
+
+        if (ord.buyerId) {
+          await set(ref(db, `userOrderHistory/${ord.buyerId}/${orderId}`), historyPayload);
+        }
+        const cleanBuyerName = (ord.buyerName || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+        if (cleanBuyerName) {
+          await set(ref(db, `userOrderHistoryByName/${cleanBuyerName}/${orderId}`), historyPayload);
+        }
+      }
+
       await remove(ref(db, `orders/${orderId}`));
-      notify(`تم حذف الطلب #${String(orderId).slice(-6)} بنجاح.`, "success");
+      notify(`تم حذف الطلب #${String(orderId).slice(-6)} بنجاح.`, "success", 8000);
     };
 
     function allDepts() {
@@ -1216,13 +1261,6 @@
       const activeOrders = sortedOrders.filter(([, o]) => !isOrderCompleted(o));
       const completedOrders = sortedOrders.filter(([, o]) => isOrderCompleted(o));
       const receiptsEntries = Object.entries(store.paymentReceipts || {});
-
-      const latestConfirmedOrder = activeOrders.find(
-        ([, o]) => o && (o.paymentStatus === "confirmed" || o.paymentConfirmed === true || o.deliveryStatus === "out_for_delivery")
-      );
-      if (latestConfirmedOrder) {
-        showAdminDeliveryBanner(latestConfirmedOrder[0]);
-      }
 
       document.getElementById("all-orders-list").innerHTML = activeOrders.length
         ? activeOrders.map(([id, o]) => {
