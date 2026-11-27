@@ -106,6 +106,12 @@
       display: block;
     }
 
+    .panel-back-row {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 10px;
+    }
+
     .card {
       background: #f8fafc;
       border: 1.5px solid #e2e8f0;
@@ -135,6 +141,7 @@
       cursor: pointer;
     }
 
+    .btn-soft { background: #e2e8f0; color: #0f172a; }
     .btn-grad { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: #ffffff; }
     .btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; }
     .btn-red { background: linear-gradient(135deg, #ef4444, #be123c); color: #ffffff; }
@@ -159,6 +166,14 @@
       border-radius: 10px;
       margin-top: 6px;
       border: 1px solid #cbd5e1;
+    }
+
+    .img-box-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
     }
 
     .modal-backdrop {
@@ -199,12 +214,14 @@
           <h1 style="margin:0; font-size:22px;">إدارة تطبيق انجز</h1>
           <div style="font-size:12px; opacity:0.95;">العملة: جنيه • 1 point = 33.333333333333 جنيه</div>
         </div>
-        <button class="btn-cyan" onclick="openImpersonateModal()">دخول إلى حساب مستخدم</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button>
+          <button class="btn-cyan" onclick="openImpersonateModal()">دخول إلى حساب مستخدم</button>
+        </div>
       </div>
 
       <div id="admin-toast" class="notice"></div>
 
-      <!-- أزرار الأقسام مع العداد فوق كل قسم -->
       <div class="nav-grid">
         <button class="nav-btn active" data-p="client-reqs" onclick="showAdminPanel('client-reqs')">
           <span class="nav-count-badge" id="cnt-client-reqs">0</span>
@@ -256,20 +273,23 @@
         </button>
       </div>
 
-      <!-- 1. إعدادات طلبات التسجيل (عملاء) -->
+      <!-- 1. إعدادات طلبات التسجيل -->
       <div id="panel-client-reqs" class="panel active">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>صفحة إعدادات طلبات التسجيل (عملاء)</h3>
         <div id="admin-client-requests-list"></div>
       </div>
 
-      <!-- 2. إعداد العملاء والنقاط والرصيد -->
+      <!-- 2. إدارة العملاء والنقاط والرصيد + كاميرا/استوديو وحذف صورة -->
       <div id="panel-clients-mgr" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>إدارة العملاء والنقاط (point) والرصيد (جنيه) والحذف</h3>
         <div id="admin-clients-list"></div>
       </div>
 
       <!-- 3. العملاء النشطون وقائمة المدعوين بالترتيب -->
       <div id="panel-active-clients" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>العملاء النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد مرات الطلب)</h3>
         <div id="admin-active-clients-list"></div>
         <h3 style="margin-top:20px;">قائمة الأشخاص المرسل لهم التطبيق وترتيبهم (حتى 1000+ رقم)</h3>
@@ -278,38 +298,51 @@
 
       <!-- 4. إعدادات طلبات تسجيل المتسابقين -->
       <div id="panel-chal-reqs" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>صفحة إعدادات طلبات تسجيل المتسابقين</h3>
         <div id="admin-challenger-requests-list"></div>
       </div>
 
       <!-- 5. إعداد المتسابقين والنقاط -->
       <div id="panel-chal-mgr" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>صفحة إعداد المتسابقين والنقاط (point)</h3>
         <div id="admin-challengers-list"></div>
       </div>
 
       <!-- 6. المتسابقون النشطون -->
       <div id="panel-active-challengers" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>المتسابقون النشطون (ترتيب تنازلي حسب المبالغ وعدد مرات النجاح والوقت المستغرق لتوصيل الأوردر)</h3>
         <div id="admin-active-challengers-list"></div>
       </div>
 
       <!-- 7. قائمة الانتظار -->
       <div id="panel-waitlist" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>قائمة الانتظار (ترتيب تنازلي حسب تاريخ تقديم الطلب)</h3>
         <div id="admin-waitlist-list"></div>
       </div>
 
-      <!-- 8. إعداد الأقسام والأنواع والسلع والعروض مع زر إضافة لعدد لا نهائي -->
+      <!-- 8. إعداد الأقسام والأنواع والسلع والعروض مع أزرار كاميرا/استوديو وحذف صورة -->
       <div id="panel-depts-items" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>إعداد الأقسام والأنواع والسلع والعروض (جنيه)</h3>
 
         <div class="card">
           <label>إضافة قسم جديد أو تحديث صورة تعبيرية لأي قسم</label>
           <input type="text" id="new-dept-name" placeholder="اسم القسم الجديد..." />
-          <label>اختر صورة تعبر عن القسم (تُضغط تلقائياً)</label>
-          <input type="file" id="dept-cover-file" accept="image/*" onchange="handleDeptCoverImage(this)" />
-          <img id="dept-cover-prev" class="img-thumb" style="display:none;" alt="صورة القسم" />
+          <label>صورة القسم (كاميرا / استوديو)</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <button type="button" class="btn-cyan" onclick="document.getElementById('dept-camera-file').click()">كاميرا</button>
+            <button type="button" class="btn-grad" onclick="document.getElementById('dept-gallery-file').click()">استوديو</button>
+          </div>
+          <input type="file" id="dept-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleDeptCoverImage(this)" />
+          <input type="file" id="dept-gallery-file" accept="image/*" style="display:none;" onchange="handleDeptCoverImage(this)" />
+          <div class="img-box-inline">
+            <img id="dept-cover-prev" class="img-thumb" style="display:none;" alt="صورة القسم" />
+            <button type="button" id="del-dept-cover-prev-btn" class="btn-red" style="display:none;" onclick="clearDeptCoverPreview()">حذف الصورة</button>
+          </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
             <button class="btn-grad" onclick="addNewDepartment()">إضافة قسم جديد</button>
             <button class="btn-cyan" onclick="saveCoverForSelectedDepartment()">حفظ الصورة للقسم المحدد بالأسفل</button>
@@ -327,9 +360,17 @@
             <input type="checkbox" id="item-is-offer" style="width:auto; margin-left:6px;" />
             اعتبار هذا العنصر عرضاً خاصاً
           </label>
-          <label>اختر صورة الصنف أو العرض مع السعر (يتم ضغطها تلقائياً وحفظها)</label>
-          <input type="file" id="item-image-file" accept="image/*" onchange="handleAdminImage(this, 'item-img-prev')" />
-          <img id="item-img-prev" class="img-thumb" style="display:none;" alt="معاينة" />
+          <label>صورة الصنف أو العرض (كاميرا / استوديو)</label>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <button type="button" class="btn-cyan" onclick="document.getElementById('item-camera-file').click()">كاميرا</button>
+            <button type="button" class="btn-grad" onclick="document.getElementById('item-gallery-file').click()">استوديو</button>
+          </div>
+          <input type="file" id="item-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleAdminImage(this, 'item-img-prev')" />
+          <input type="file" id="item-gallery-file" accept="image/*" style="display:none;" onchange="handleAdminImage(this, 'item-img-prev')" />
+          <div class="img-box-inline">
+            <img id="item-img-prev" class="img-thumb" style="display:none;" alt="معاينة" />
+            <button type="button" id="del-item-img-prev-btn" class="btn-red" style="display:none;" onclick="clearItemImgPreview()">حذف الصورة</button>
+          </div>
           <div style="margin-top:10px;">
             <button class="btn-green" onclick="addProductOrOffer()">إضافة</button>
           </div>
@@ -340,6 +381,7 @@
 
       <!-- 9. إعداد أرقام الاتصال -->
       <div id="panel-cash-phones" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>إعداد أرقام الاتصال لاستقبال الكاش</h3>
         <p style="font-size:13px; color:#475569;">7 خانات أساسية مع اختيار عبر checkbox، ويمكنك إضافة أي عدد إضافي بزر (+). يظهر للعميل حتى 5 أرقام مختارة.</p>
         <div id="cash-phones-slots" class="card"></div>
@@ -350,8 +392,9 @@
         <button class="btn-green" onclick="saveSelectedCashPhones()">حفظ أرقام الكاش المختارة</button>
       </div>
 
-      <!-- 10. إعداد التحديات مع زر كاميرا/استديو -->
+      <!-- 10. إعداد التحديات مع زر كاميرا/استوديو وحذف صورة -->
       <div id="panel-challenges-cfg" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>صفحة إعداد التحديات</h3>
         <div class="card">
           <label>عنوان التحدي / المهمة</label>
@@ -360,14 +403,17 @@
           <textarea id="chal-details-input" placeholder="اكتب تفاصيل التحدي..."></textarea>
           <label>قيمة المكافأة (جنيه)</label>
           <input type="number" id="chal-reward-input" placeholder="مثال: 50" />
-          <label>صورة التحدي (كاميرا / استديو)</label>
+          <label>صورة التحدي (كاميرا / استوديو)</label>
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <button type="button" class="btn-cyan" onclick="document.getElementById('chal-camera-file').click()">كاميرا</button>
-            <button type="button" class="btn-grad" onclick="document.getElementById('chal-gallery-file').click()">استديو</button>
+            <button type="button" class="btn-grad" onclick="document.getElementById('chal-gallery-file').click()">استوديو</button>
           </div>
           <input type="file" id="chal-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleChallengeMedia(this)" />
           <input type="file" id="chal-gallery-file" accept="image/*" style="display:none;" onchange="handleChallengeMedia(this)" />
-          <img id="chal-img-prev" class="img-thumb" style="display:none;" alt="صورة التحدي" />
+          <div class="img-box-inline">
+            <img id="chal-img-prev" class="img-thumb" style="display:none;" alt="صورة التحدي" />
+            <button type="button" id="del-chal-img-prev-btn" class="btn-red" style="display:none;" onclick="clearChallengeImgPreview()">حذف الصورة</button>
+          </div>
           <div style="margin-top:8px;">
             <button class="btn-green" onclick="publishChallenge()">تأكيد</button>
           </div>
@@ -377,27 +423,32 @@
 
       <!-- 11. الطلبات النشطة والطلبات المنتهية -->
       <div id="panel-active-done" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>الطلبات النشطة</h3>
         <div id="admin-active-orders-list"></div>
         <h3 style="margin-top:20px;">الطلبات المنتهية (مع صورة تأكيد الوصول والوقت المستغرق)</h3>
         <div id="admin-completed-orders-list"></div>
       </div>
 
-      <!-- 12. إعداد إرسال هدية والوصولات مع زر كاميرا/استديو -->
+      <!-- 12. إعداد إرسال هدية والوصولات مع زر كاميرا/استوديو وحذف صورة -->
       <div id="panel-gifts-receipts" class="panel">
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
         <h3>صفحة إعداد إرسال هدية أو عرض أو مكافأة</h3>
         <div class="card">
           <input type="text" id="gift-target-input" placeholder="اسم العميل أو المتسابق (أو اتركه للجميع)" />
           <input type="text" id="gift-title-input" placeholder="اسم الهدية / العرض / المكافأة..." />
           <input type="text" id="gift-details-input" placeholder="تفاصيل المكافأة أو القيمة بالجنيه..." />
-          <label>صورة الهدية / المكافأة (كاميرا / استديو)</label>
+          <label>صورة الهدية / المكافأة (كاميرا / استوديو)</label>
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <button type="button" class="btn-cyan" onclick="document.getElementById('gift-camera-file').click()">كاميرا</button>
-            <button type="button" class="btn-grad" onclick="document.getElementById('gift-gallery-file').click()">استديو</button>
+            <button type="button" class="btn-grad" onclick="document.getElementById('gift-gallery-file').click()">استوديو</button>
           </div>
           <input type="file" id="gift-camera-file" accept="image/*" capture="environment" style="display:none;" onchange="handleGiftMedia(this)" />
           <input type="file" id="gift-gallery-file" accept="image/*" style="display:none;" onchange="handleGiftMedia(this)" />
-          <img id="gift-img-prev" class="img-thumb" style="display:none;" alt="صورة الهدية" />
+          <div class="img-box-inline">
+            <img id="gift-img-prev" class="img-thumb" style="display:none;" alt="صورة الهدية" />
+            <button type="button" id="del-gift-img-prev-btn" class="btn-red" style="display:none;" onclick="clearGiftImgPreview()">حذف الصورة</button>
+          </div>
           <div style="margin-top:8px;">
             <button class="btn-grad" onclick="sendGiftOrReward()">إرسال الهدية / المكافأة</button>
           </div>
@@ -466,6 +517,8 @@
       "توصيل اغراض",
       "خدمات الشراء والبيع"
     ];
+
+    const panelHistory = ["client-reqs"];
 
     const state = {
       users: {},
@@ -551,10 +604,28 @@
       }
     };
 
-    window.showAdminPanel = function (panelKey) {
+    function activateAdminPanelWithoutHistory(panelKey) {
       document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.p === panelKey));
       document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-      document.getElementById("panel-" + panelKey).classList.add("active");
+      const target = document.getElementById("panel-" + panelKey);
+      if (target) target.classList.add("active");
+    }
+
+    window.showAdminPanel = function (panelKey, recordHistory = true) {
+      const current = panelHistory[panelHistory.length - 1];
+      if (recordHistory && panelKey !== current) {
+        panelHistory.push(panelKey);
+      }
+      activateAdminPanelWithoutHistory(panelKey);
+    };
+
+    window.goBackAdminPanel = function () {
+      if (panelHistory.length > 1) {
+        panelHistory.pop();
+        activateAdminPanelWithoutHistory(panelHistory[panelHistory.length - 1]);
+      } else {
+        activateAdminPanelWithoutHistory("client-reqs");
+      }
     };
 
     function updateSectionBadges() {
@@ -588,7 +659,6 @@
       setBadge("cnt-gifts-receipts", giftsAndRecCount);
     }
 
-    // 1. إعدادات طلبات التسجيل (عملاء) — أزرار موافق ورفض
     function renderClientRequests() {
       const el = document.getElementById("admin-client-requests-list");
       const reqs = Object.entries(state.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -646,7 +716,21 @@
       toast(`تم رفض طلب ${reqData.name}.`);
     };
 
-    // 2. إدارة العملاء والنقاط والرصيد
+    window.handleClientPhotoInput = function (inputEl, uid) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file || !uid) return;
+      compressFileToDataUrl(file, async (dataUrl) => {
+        await update(ref(db, `users/${uid}`), { avatar: dataUrl });
+        toast("تم حفظ صورة العميل بنجاح.");
+      });
+    };
+
+    window.deleteSavedClientPhoto = async function (uid) {
+      if (!uid) return;
+      await remove(ref(db, `users/${uid}/avatar`));
+      toast("تم حذف صورة العميل.");
+    };
+
     function renderClientsManager() {
       const el = document.getElementById("admin-clients-list");
       const clients = Object.entries(state.users || {}).filter(([, u]) => u.role === "client");
@@ -660,9 +744,29 @@
           const refStats = getReferralSummaryForUser(uid);
           return `
             <div class="card">
-              <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الحالة: <strong>${esc(u.status || "approved")}</strong></div>
-              <div style="margin-top:4px;">الرصيد: <strong>${Number(u.wallet) || 0} جنيه</strong> • عداد النقاط (point): <strong>${pts}</strong></div>
-              <div style="font-size:12px; color:#0284c7; margin-top:4px;">أرسل الرابط لـ: <strong>${refStats.sentToCount}</strong> شخص • أتموا أول طلب/مهمة: <strong>${refStats.completedFirstCount}</strong></div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                <div>
+                  <div><strong>${esc(u.name)}</strong> (${esc(u.phone)}) — الحالة: <strong>${esc(u.status || "approved")}</strong></div>
+                  <div style="margin-top:4px;">الرصيد: <strong>${Number(u.wallet) || 0} جنيه</strong> • عداد النقاط (point): <strong>${pts}</strong></div>
+                  <div style="font-size:12px; color:#0284c7; margin-top:4px;">أرسل الرابط لـ: <strong>${refStats.sentToCount}</strong> شخص • أتموا أول طلب/مهمة: <strong>${refStats.completedFirstCount}</strong></div>
+                </div>
+                ${
+                  u.avatar
+                    ? `<div class="img-box-inline">
+                         <img src="${u.avatar}" class="img-thumb" alt="${esc(u.name)}" />
+                         <button type="button" class="btn-red" onclick="deleteSavedClientPhoto('${esc(uid)}')">حذف الصورة</button>
+                       </div>`
+                    : ""
+                }
+              </div>
+
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                <button type="button" class="btn-cyan" onclick="document.getElementById('cam-client-${esc(uid)}').click()">كاميرا</button>
+                <button type="button" class="btn-grad" onclick="document.getElementById('gal-client-${esc(uid)}').click()">استوديو</button>
+                <input type="file" id="cam-client-${esc(uid)}" accept="image/*" capture="environment" style="display:none;" onchange="handleClientPhotoInput(this, '${esc(uid)}')" />
+                <input type="file" id="gal-client-${esc(uid)}" accept="image/*" style="display:none;" onchange="handleClientPhotoInput(this, '${esc(uid)}')" />
+              </div>
+
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
                 <input type="number" step="any" id="set-pts-${esc(uid)}" value="${pts}" placeholder="تحديد point" style="width:130px; margin:0;" />
                 <button class="btn-cyan" onclick="saveUserPoints('${esc(uid)}')">حفظ النقاط</button>
@@ -699,7 +803,6 @@
       toast("تم حذف العميل وحظر دخوله بنفس البيانات.");
     };
 
-    // 3. العملاء النشطون وقائمة الأشخاص المرسل لهم التطبيق وترتيبهم
     function renderActiveClients() {
       const el = document.getElementById("admin-active-clients-list");
       const clients = Object.entries(state.users || {})
@@ -784,7 +887,6 @@
         : `<div class="card">لا توجد بيانات لأشخاص منضمين عبر الروابط بعد.</div>`;
     }
 
-    // 4. إعدادات طلبات تسجيل المتسابقين — أزرار موافق ورفض وwaiting
     function renderChallengerRequests() {
       const el = document.getElementById("admin-challenger-requests-list");
       const reqs = Object.entries(state.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -847,7 +949,6 @@
       await remove(ref(db, `challengerRegRequests/${reqId}`));
     };
 
-    // 5. إعداد المتسابقين والنقاط
     function renderChallengersManager() {
       const el = document.getElementById("admin-challengers-list");
       const challengers = Object.entries(state.users || {})
@@ -891,7 +992,6 @@
         .join("");
     }
 
-    // 6. المتسابقون النشطون
     function renderActiveChallengers() {
       const el = document.getElementById("admin-active-challengers-list");
       const list = Object.entries(state.users || {})
@@ -968,7 +1068,6 @@
       toast("تم حذف المتسابق وتأكيد الحذف.");
     };
 
-    // 7. قائمة الانتظار
     function renderWaitlist() {
       const el = document.getElementById("admin-waitlist-list");
       const rows = Object.values(state.waitlist || {}).sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
@@ -988,10 +1087,25 @@
         .join("");
     }
 
-    // 8. إعداد الأقسام والأنواع والسلع والعروض (عدد لا نهائي عبر زر إضافة)
     function getAllDepts() {
       return [...new Set([...DEFAULT_DEPARTMENTS, ...(state.departments || [])])];
     }
+
+    window.clearDeptCoverPreview = function () {
+      state.uploadedDeptCoverImg = "";
+      document.getElementById("dept-camera-file").value = "";
+      document.getElementById("dept-gallery-file").value = "";
+      const prev = document.getElementById("dept-cover-prev");
+      prev.src = "";
+      prev.style.display = "none";
+      document.getElementById("del-dept-cover-prev-btn").style.display = "none";
+      toast("تم حذف صورة معاينة القسم.");
+    };
+
+    window.deleteSavedDeptCover = async function (deptName) {
+      await remove(ref(db, `departmentsMeta/${deptName}/image`));
+      toast(`تم حذف الصورة المحفوظة لقسم (${deptName}).`);
+    };
 
     window.handleDeptCoverImage = function (inputEl) {
       const file = inputEl.files && inputEl.files[0];
@@ -1001,6 +1115,7 @@
         const prev = document.getElementById("dept-cover-prev");
         prev.src = dataUrl;
         prev.style.display = "block";
+        document.getElementById("del-dept-cover-prev-btn").style.display = "inline-block";
       });
     };
 
@@ -1013,8 +1128,7 @@
         await set(ref(db, `departmentsMeta/${name}/image`), state.uploadedDeptCoverImg);
       }
       document.getElementById("new-dept-name").value = "";
-      state.uploadedDeptCoverImg = "";
-      document.getElementById("dept-cover-prev").style.display = "none";
+      clearDeptCoverPreview();
       toast(`تمت إضافة القسم (${name}).`);
     };
 
@@ -1024,8 +1138,7 @@
         return toast("اختر صورة للقسم أولاً.");
       }
       await set(ref(db, `departmentsMeta/${dept}/image`), state.uploadedDeptCoverImg);
-      state.uploadedDeptCoverImg = "";
-      document.getElementById("dept-cover-prev").style.display = "none";
+      clearDeptCoverPreview();
       toast(`تم حفظ الصورة التعبيرية لقسم (${dept}).`);
     };
 
@@ -1037,6 +1150,11 @@
       if (prevVal && depts.includes(prevVal)) sel.value = prevVal;
       renderDepartmentItemsTable();
     }
+
+    window.deleteSavedProductImage = async function (dept, pid) {
+      await remove(ref(db, `products/${dept}/${pid}/image`));
+      toast("تم حذف صورة الصنف.");
+    };
 
     window.renderDepartmentItemsTable = function () {
       const selDept = document.getElementById("target-dept-select").value;
@@ -1053,19 +1171,34 @@
             <div class="card" style="${isSelectedDept ? "border-color:#7c3aed;" : ""}">
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
                 <h4 style="margin:0;">${esc(d)} (${items.length} صنف / نوع / عرض)</h4>
-                ${meta.image ? `<img src="${meta.image}" class="img-thumb" alt="${esc(d)}" />` : ""}
+                ${
+                  meta.image
+                    ? `<div class="img-box-inline">
+                         <img src="${meta.image}" class="img-thumb" alt="${esc(d)}" />
+                         <button type="button" class="btn-red" onclick="deleteSavedDeptCover('${esc(d)}')">حذف الصورة</button>
+                       </div>`
+                    : ""
+                }
               </div>
               ${
                 items.length
                   ? items
                       .map(
                         ([pid, it]) => `
-                      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #e2e8f0;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #e2e8f0; flex-wrap:wrap;">
                         <div>
                           <strong>${esc(it.title || it.type)}</strong>
                           ${it.type ? `• النوع: <span style="color:#7c3aed;">${esc(it.type)}</span>` : ""}
                           • السعر: <strong style="color:#be185d;">${Number(it.price) || 0} جنيه</strong>
                           ${it.isOffer ? `• <span style="color:#d97706;">عرض</span>` : ""}
+                          ${
+                            it.image
+                              ? `<div class="img-box-inline">
+                                   <img src="${it.image}" class="img-thumb" alt="${esc(it.title || it.type)}" />
+                                   <button type="button" class="btn-red" onclick="deleteSavedProductImage('${esc(d)}', '${esc(pid)}')">حذف الصورة</button>
+                                 </div>`
+                              : ""
+                          }
                         </div>
                         <button class="btn-red" onclick="deleteProductItem('${esc(d)}', '${esc(pid)}')">حذف</button>
                       </div>
@@ -1080,6 +1213,17 @@
         .join("");
     };
 
+    window.clearItemImgPreview = function () {
+      state.uploadedProductImg = "";
+      document.getElementById("item-camera-file").value = "";
+      document.getElementById("item-gallery-file").value = "";
+      const prev = document.getElementById("item-img-prev");
+      prev.src = "";
+      prev.style.display = "none";
+      document.getElementById("del-item-img-prev-btn").style.display = "none";
+      toast("تم حذف صورة معاينة الصنف.");
+    };
+
     window.handleAdminImage = function (inputEl, prevId) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
@@ -1088,6 +1232,7 @@
         const prev = document.getElementById(prevId);
         prev.src = dataUrl;
         prev.style.display = "block";
+        document.getElementById("del-item-img-prev-btn").style.display = "inline-block";
       });
     };
 
@@ -1118,9 +1263,7 @@
       document.getElementById("item-price-input").value = "";
       document.getElementById("item-desc-input").value = "";
       document.getElementById("item-is-offer").checked = false;
-      document.getElementById("item-image-file").value = "";
-      state.uploadedProductImg = "";
-      document.getElementById("item-img-prev").style.display = "none";
+      clearItemImgPreview();
       toast(`تمت إضافة (${title}) إلى قسم ${dept} — يمكنك إضافة المزيد فوراً.`);
     };
 
@@ -1129,7 +1272,6 @@
       toast("تم حذف العنصر.");
     };
 
-    // 9. إعداد أرقام الاتصال
     function renderCashPhonesEditor() {
       const slotsEl = document.getElementById("cash-phones-slots");
       const activeSet = new Set(state.cashPhones || []);
@@ -1176,7 +1318,22 @@
       toast(`تم حفظ ${selected.length} أرقام كاش للظهور في صفحة الدفع.`);
     };
 
-    // 10. إعداد التحديات مع زر كاميرا / استديو
+    window.clearChallengeImgPreview = function () {
+      state.uploadedChallengeImg = "";
+      document.getElementById("chal-camera-file").value = "";
+      document.getElementById("chal-gallery-file").value = "";
+      const prev = document.getElementById("chal-img-prev");
+      prev.src = "";
+      prev.style.display = "none";
+      document.getElementById("del-chal-img-prev-btn").style.display = "none";
+      toast("تم حذف صورة معاينة التحدي.");
+    };
+
+    window.deleteSavedChallengeImage = async function (cid) {
+      await remove(ref(db, `challenges/${cid}/image`));
+      toast("تم حذف صورة التحدي.");
+    };
+
     window.handleChallengeMedia = function (inputEl) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
@@ -1185,6 +1342,7 @@
         const prev = document.getElementById("chal-img-prev");
         prev.src = dataUrl;
         prev.style.display = "block";
+        document.getElementById("del-chal-img-prev-btn").style.display = "inline-block";
       });
     };
 
@@ -1206,8 +1364,7 @@
       document.getElementById("chal-title-input").value = "";
       document.getElementById("chal-details-input").value = "";
       document.getElementById("chal-reward-input").value = "";
-      state.uploadedChallengeImg = "";
-      document.getElementById("chal-img-prev").style.display = "none";
+      clearChallengeImgPreview();
       toast("تم تأكيد نشر التحدي في صفحة التحديات للمتسابقين.");
     };
 
@@ -1220,7 +1377,14 @@
           <div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
             <div>
               <strong>${esc(c.title)}</strong> (${Number(c.reward) || 0} جنيه) — ${c.acceptedBy ? `مقبول بواسطة ${esc(c.acceptedByName)}` : "متاح"}
-              ${c.image ? `<div><img src="${c.image}" class="img-thumb" alt="صورة التحدي" /></div>` : ""}
+              ${
+                c.image
+                  ? `<div class="img-box-inline">
+                       <img src="${c.image}" class="img-thumb" alt="صورة التحدي" />
+                       <button type="button" class="btn-red" onclick="deleteSavedChallengeImage('${esc(id)}')">حذف الصورة</button>
+                     </div>`
+                  : ""
+              }
             </div>
             <button class="btn-red" onclick="deleteChallengeItem('${esc(id)}')">حذف</button>
           </div>
@@ -1233,7 +1397,11 @@
       await remove(ref(db, `challenges/${id}`));
     };
 
-    // 11. الطلبات النشطة والطلبات المنتهية
+    window.deleteSavedOrderDeliveryImage = async function (orderId) {
+      await remove(ref(db, `orders/${orderId}/deliveryImage`));
+      toast("تم حذف صورة تأكيد الوصول.");
+    };
+
     function renderOrdersPanels() {
       const all = Object.entries(state.orders || {}).map(([id, o]) => ({ id, ...o }));
       const activeList = all.filter((o) => o.stage === "active" || (!o.stage && o.status === "جاري تنفيذ طلبك"));
@@ -1259,7 +1427,14 @@
               <div class="card">
                 <div><strong>${esc(o.challengeTitle || o.buyerName || "طلب منتهي")}</strong> — ${Number(o.totalAmount) || 0} جنيه • الوقت المستغرق: <strong>${Number(o.deliveryDurationSec) || 0} ثانية</strong></div>
                 <div>المتسابق: ${esc(o.assignedChallengerName)}</div>
-                ${o.deliveryImage ? `<img src="${o.deliveryImage}" class="img-thumb" alt="صورة التسليم" />` : ""}
+                ${
+                  o.deliveryImage
+                    ? `<div class="img-box-inline">
+                         <img src="${o.deliveryImage}" class="img-thumb" alt="صورة التسليم" />
+                         <button type="button" class="btn-red" onclick="deleteSavedOrderDeliveryImage('${esc(o.id)}')">حذف الصورة</button>
+                       </div>`
+                    : ""
+                }
               </div>
             `
             )
@@ -1267,7 +1442,22 @@
         : `<div class="card">لا توجد طلبات منتهية بعد.</div>`;
     }
 
-    // 12. إعداد إرسال هدية مع كاميرا / استديو + الوصولات
+    window.clearGiftImgPreview = function () {
+      state.uploadedGiftImg = "";
+      document.getElementById("gift-camera-file").value = "";
+      document.getElementById("gift-gallery-file").value = "";
+      const prev = document.getElementById("gift-img-prev");
+      prev.src = "";
+      prev.style.display = "none";
+      document.getElementById("del-gift-img-prev-btn").style.display = "none";
+      toast("تم حذف صورة معاينة الهدية.");
+    };
+
+    window.deleteSavedGiftImage = async function (gid) {
+      await remove(ref(db, `gifts/${gid}/image`));
+      toast("تم حذف صورة الهدية.");
+    };
+
     window.handleGiftMedia = function (inputEl) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
@@ -1276,6 +1466,7 @@
         const prev = document.getElementById("gift-img-prev");
         prev.src = dataUrl;
         prev.style.display = "block";
+        document.getElementById("del-gift-img-prev-btn").style.display = "inline-block";
       });
     };
 
@@ -1296,9 +1487,13 @@
       document.getElementById("gift-target-input").value = "";
       document.getElementById("gift-title-input").value = "";
       document.getElementById("gift-details-input").value = "";
-      state.uploadedGiftImg = "";
-      document.getElementById("gift-img-prev").style.display = "none";
+      clearGiftImgPreview();
       toast("تم إرسال الهدية / المكافأة.");
+    };
+
+    window.deleteSavedReceiptImage = async function (rid) {
+      await remove(ref(db, `receipts/${rid}/receiptImage`));
+      toast("تم حذف صورة الوصل.");
     };
 
     function renderReceiptsList() {
@@ -1311,7 +1506,14 @@
               <div class="card">
                 <div><strong>${esc(r.userName)}</strong> (${esc(r.phone)}) — <strong>${Number(r.amount) || 0} جنيه</strong> — ${esc(r.method || "")}</div>
                 <div>رقم الاستقبال: ${esc(r.receiverPhone || "")} • الحالة: <strong>${esc(r.adminConfirmed || "بانتظار التأكيد")}</strong></div>
-                ${r.receiptImage ? `<img src="${r.receiptImage}" class="img-thumb" alt="صورة الإيصال" />` : ""}
+                ${
+                  r.receiptImage
+                    ? `<div class="img-box-inline">
+                         <img src="${r.receiptImage}" class="img-thumb" alt="صورة الإيصال" />
+                         <button type="button" class="btn-red" onclick="deleteSavedReceiptImage('${esc(rid)}')">حذف الصورة</button>
+                       </div>`
+                    : ""
+                }
                 <div style="margin-top:8px;">
                   <button class="btn-green" onclick="confirmReceiptAdmin('${esc(rid)}')">تأكيد استلام الكاش</button>
                 </div>
@@ -1327,7 +1529,6 @@
       toast("تم تأكيد استلام الكاش.");
     };
 
-    // الدخول إلى حساب أي مستخدم
     window.openImpersonateModal = function () {
       const box = document.getElementById("impersonate-users-list");
       const entries = Object.entries(state.users || {});
