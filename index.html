@@ -683,13 +683,13 @@
       </div>
     </div>
 
-    <!-- 1. صفحة البداية: عميل أم تحدى -->
-    <div id="screen-choice" class="screen">
+    <!-- الخطوة 1: صفحة البداية (عميل أم تحدى + تأكيد) -->
+    <div id="screen-choice" class="screen active">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة البداية: عميل أم تحدى</h2>
-      <p class="screen-sub">اختر <strong>عميل</strong> أو <strong>تحدى</strong> ثم اضغط <strong>تأكيد</strong> للانتقال إلى صفحة التسجيل والمشاركة.</p>
+      <p class="screen-sub">اختر <strong>عميل</strong> أو <strong>تحدى</strong> ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="two-big-btns">
         <button type="button" id="choice-btn-client" class="big-choice-btn btn-client selected-path" onclick="selectHomePath('client')">عميل</button>
         <button type="button" id="choice-btn-challenge" class="big-choice-btn btn-challenge" onclick="selectHomePath('challenger')">تحدى</button>
@@ -708,13 +708,13 @@
       </div>
     </div>
 
-    <!-- 2. صفحة التسجيل والمشاركة (عميل) -->
-    <div id="screen-client-entry" class="screen active">
+    <!-- الخطوة 2 (مسار العميل): صفحة التسجيل والمشاركة (تسجيل / مشترك + تأكيد) -->
+    <div id="screen-client-entry" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة التسجيل والمشاركة (عميل)</h2>
-      <p class="screen-sub">اختر <strong>تسجيل</strong> إذا لم تكن مشتركاً، أو <strong>مشترك</strong> إذا كنت مسجلاً من قبل، ثم اضغط <strong>تأكيد</strong>.</p>
+      <p class="screen-sub">اختر <strong>تسجيل</strong> أو <strong>مشترك</strong> ثم اضغط <strong>تأكيد</strong> للانتقال إلى صفحة إدخال البيانات.</p>
       <div class="two-big-btns">
         <button type="button" id="client-mode-reg-btn" class="big-choice-btn btn-client selected-path" onclick="chooseEntryMode('client', 'register')">تسجيل</button>
         <button type="button" id="client-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('client', 'subscriber')">مشترك</button>
@@ -725,7 +725,7 @@
       </div>
     </div>
 
-    <!-- 3. صفحة إدخال بيانات تسجيل عميل جديد -->
+    <!-- الخطوة 3 (مسار العميل - تسجيل): إدخال الاسم + رقم التلفون + تأكيد -->
     <div id="screen-client-register" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
@@ -746,13 +746,13 @@
       </div>
     </div>
 
-    <!-- 4. صفحة دخول مشترك (عميل) -->
+    <!-- الخطوة 3 (مسار العميل - مشترك): إدخال الاسم + رقم التلفون + تأكيد -->
     <div id="screen-client-subscriber" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">دخول المشتركين (عميل)</h2>
-      <p class="screen-sub">أدخل الاسم ورقم التلفون الأساسي (ويمكن إضافة رقم إضافي مرتبط بنفس الحساب) ثم اضغط <strong>تأكيد</strong>.</p>
+      <p class="screen-sub">أدخل الاسم ورقم التلفون الأساسي (ورقم إضافي اختياري) ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="form-group">
         <label for="sub-client-name">الاسم</label>
         <input type="text" id="sub-client-name" placeholder="اكتب اسمك..." />
@@ -771,7 +771,66 @@
       </div>
     </div>
 
-    <!-- 5. صفحة الطلبات والأقسام -->
+    <!-- الخطوة 2 (مسار التحدى): صفحة التسجيل والمشاركة (تسجيل / مشترك + تأكيد) -->
+    <div id="screen-challenger-entry" class="screen">
+      <div class="screen-top-bar">
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
+      <h2 class="screen-title">صفحة التسجيل والمشاركة (تحدى)</h2>
+      <p class="screen-sub">اختر <strong>تسجيل</strong> أو <strong>مشترك</strong> ثم اضغط <strong>تأكيد</strong> للانتقال إلى صفحة إدخال البيانات.</p>
+      <div class="two-big-btns">
+        <button type="button" id="chal-mode-reg-btn" class="big-choice-btn btn-challenge selected-path" onclick="chooseEntryMode('challenger', 'register')">تسجيل</button>
+        <button type="button" id="chal-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('challenger', 'subscriber')">مشترك</button>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" id="btn-confirm-chal-entry" class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('challenger')">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
+    </div>
+
+    <!-- الخطوة 3 (مسار التحدى - تسجيل): إدخال الاسم + رقم التلفون + تأكيد -->
+    <div id="screen-challenger-register" class="screen">
+      <div class="screen-top-bar">
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
+      <h2 class="screen-title">تسجيل متسابق جديد</h2>
+      <p class="screen-sub">أدخل الاسم ورقم التلفون (11 رقماً مصرياً) ثم اضغط <strong>تأكيد</strong>.</p>
+      <div class="form-group">
+        <label for="reg-chal-name">الاسم</label>
+        <input type="text" id="reg-chal-name" placeholder="مثال: كريم حسن" />
+      </div>
+      <div class="form-group">
+        <label for="reg-chal-phone">رقم التلفون (مصر - 11 رقم)</label>
+        <input type="tel" id="reg-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="btn-success" onclick="submitChallengerRegistration()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
+    </div>
+
+    <!-- الخطوة 3 (مسار التحدى - مشترك): إدخال الاسم + رقم التلفون + تأكيد -->
+    <div id="screen-challenger-subscriber" class="screen">
+      <div class="screen-top-bar">
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
+      <h2 class="screen-title">دخول متسابق مشترك</h2>
+      <p class="screen-sub">أدخل الاسم ورقم التلفون ثم اضغط <strong>تأكيد</strong>.</p>
+      <div class="form-group">
+        <label for="sub-chal-name">الاسم</label>
+        <input type="text" id="sub-chal-name" placeholder="اكتب اسمك..." />
+      </div>
+      <div class="form-group">
+        <label for="sub-chal-phone">رقم التلفون (مصر - 11 رقم)</label>
+        <input type="tel" id="sub-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="btn-success" onclick="loginChallengerSubscriber()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
+    </div>
+
+    <!-- صفحة الطلبات والأقسام -->
     <div id="screen-orders-home" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
@@ -785,7 +844,7 @@
       </div>
     </div>
 
-    <!-- 6. صفحة القسم والأنواع والسلع والعروض -->
+    <!-- صفحة القسم والأنواع والسلع والعروض -->
     <div id="screen-department-view" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackInsideDepartment()">عودة</button>
@@ -800,7 +859,7 @@
       <div id="dept-items-container" class="items-grid"></div>
     </div>
 
-    <!-- 7. عربة التسوق -->
+    <!-- عربة التسوق -->
     <div id="screen-cart" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
@@ -817,7 +876,7 @@
       </div>
     </div>
 
-    <!-- 8. تأكيد الشراء -->
+    <!-- تأكيد الشراء -->
     <div id="screen-confirm-purchase" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
@@ -832,7 +891,7 @@
       </div>
     </div>
 
-    <!-- 9. صفحة الدفع -->
+    <!-- صفحة الدفع -->
     <div id="screen-payment" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
@@ -856,66 +915,7 @@
       <div id="payment-result-box"></div>
     </div>
 
-    <!-- 10. صفحة التسجيل والمشاركة (تحدى) -->
-    <div id="screen-challenger-entry" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">صفحة التسجيل والمشاركة (تحدى)</h2>
-      <p class="screen-sub">اختر <strong>تسجيل</strong> إذا لم تكن مشتركاً، أو <strong>مشترك</strong> إذا كنت مسجلاً من قبل، ثم اضغط <strong>تأكيد</strong>.</p>
-      <div class="two-big-btns">
-        <button type="button" id="chal-mode-reg-btn" class="big-choice-btn btn-challenge selected-path" onclick="chooseEntryMode('challenger', 'register')">تسجيل</button>
-        <button type="button" id="chal-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('challenger', 'subscriber')">مشترك</button>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" id="btn-confirm-chal-entry" class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('challenger')">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- 11. تسجيل متسابق جديد -->
-    <div id="screen-challenger-register" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">تسجيل متسابق جديد</h2>
-      <p class="screen-sub">أدخل الاسم ورقم التلفون (11 رقماً مصرياً) ثم اضغط <strong>تأكيد</strong>.</p>
-      <div class="form-group">
-        <label for="reg-chal-name">الاسم</label>
-        <input type="text" id="reg-chal-name" placeholder="مثال: كريم حسن" />
-      </div>
-      <div class="form-group">
-        <label for="reg-chal-phone">رقم التلفون (مصر - 11 رقم)</label>
-        <input type="tel" id="reg-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="btn-success" onclick="submitChallengerRegistration()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- 12. دخول متسابق مشترك -->
-    <div id="screen-challenger-subscriber" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">دخول متسابق مشترك</h2>
-      <p class="screen-sub">أدخل الاسم ورقم التلفون ثم اضغط <strong>تأكيد</strong>.</p>
-      <div class="form-group">
-        <label for="sub-chal-name">الاسم</label>
-        <input type="text" id="sub-chal-name" placeholder="اكتب اسمك..." />
-      </div>
-      <div class="form-group">
-        <label for="sub-chal-phone">رقم التلفون (مصر - 11 رقم)</label>
-        <input type="tel" id="sub-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="btn-success" onclick="loginChallengerSubscriber()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- 13. صفحة التحديات -->
+    <!-- صفحة التحديات -->
     <div id="screen-challenges-hub" class="screen">
       <div class="screen-top-bar">
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
@@ -961,7 +961,7 @@
   </div>
 
   <script>
-    window.__engzHistory = ["screen-choice", "screen-client-entry"];
+    window.__engzHistory = ["screen-choice"];
     window.__engzDeptHistory = ["الكل"];
     window.__engzHomePath = "client";
     window.__engzClientMode = "register";
@@ -1135,7 +1135,10 @@
       });
     };
 
-    window.engzActivateScreen("screen-client-entry");
+    window.startFull30SecSplash(function () {
+      window.__engzHistory = ["screen-choice"];
+      window.engzActivateScreen("screen-choice");
+    });
 
     window.addEventListener("popstate", function () {
       if (!window.__engzSplashRunning) {
@@ -1144,7 +1147,6 @@
     });
 
     document.addEventListener("DOMContentLoaded", function () {
-      window.engzActivateScreen("screen-client-entry");
       var b1 = document.getElementById("btn-confirm-client-entry");
       if (b1) b1.addEventListener("click", function () { window.confirmEntryModeSelection("client"); });
 
