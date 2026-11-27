@@ -142,6 +142,10 @@
       padding: 14px;
       margin-bottom: 12px;
     }
+    .box.completed-box {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
     .form-row-2 {
       display: grid;
       grid-template-columns: 1fr;
@@ -201,9 +205,26 @@
       background: #dbeafe;
       color: #1e40af;
     }
+    .badge-status.completed {
+      background: #dcfce7;
+      color: #166534;
+    }
     .badge-status.rejected {
       background: #fee2e2;
       color: #991b1b;
+    }
+    .completed-highlight-box {
+      background: linear-gradient(135deg, #ecfdf5, #eff6ff);
+      border: 2px solid #10b981;
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 18px;
+    }
+    .sub-orders-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
     }
   </style>
 </head>
@@ -212,7 +233,7 @@
     <div class="admin-header">
       <div>
         <h1>نسخة الأدمن المنفصلة • ENGZ ADMIN</h1>
-        <div style="font-size:13px; opacity:0.92;">تحكم كامل في التطبيق والطلبات وإيصالات الدفع وحسابات المستخدمين</div>
+        <div style="font-size:13px; opacity:0.92;">تحكم كامل في التطبيق والطلبات وإيصالات الدفع والمهام والطلبات المنتهية</div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <button type="button" class="btn-amber" onclick="openUserAppWindow()">فتح نسخة المستخدم (index.html)</button>
@@ -242,8 +263,8 @@
         <button type="button" class="tab-btn active" id="tab-requests" onclick="switchTab('requests')">طلبات التسجيل</button>
         <button type="button" class="tab-btn" id="tab-users" onclick="switchTab('users')">المستخدمون والوصول لحساب</button>
         <button type="button" class="tab-btn" id="tab-catalog" onclick="switchTab('catalog')">الأقسام والمنتجات</button>
-        <button type="button" class="tab-btn" id="tab-challenges" onclick="switchTab('challenges')">التحديات والهدايا</button>
-        <button type="button" class="tab-btn" id="tab-orders" onclick="switchTab('orders')">الطلبات وأرقام الكاش</button>
+        <button type="button" class="tab-btn" id="tab-challenges" onclick="switchTab('challenges')">المهام والتحديات والهدايا</button>
+        <button type="button" class="tab-btn" id="tab-orders" onclick="switchTab('orders')">الطلبات والطلبات المنتهية</button>
       </div>
 
       <!-- 1. طلبات التسجيل -->
@@ -354,13 +375,13 @@
         <div id="all-products-list"></div>
       </div>
 
-      <!-- 4. التحديات والهدايا -->
+      <!-- 4. المهام والتحديات والهدايا -->
       <div id="sec-challenges" style="display:none;">
         <div class="box">
-          <h3 style="margin-top:0;">إضافة تحدٍ جديد</h3>
+          <h3 style="margin-top:0;">إضافة تحدٍ / مهمة جديدة</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="chal-title">عنوان التحدي</label>
+              <label for="chal-title">عنوان التحدي / المهمة</label>
               <input type="text" id="chal-title" placeholder="مثال: توصيل طلب" />
             </div>
             <div class="form-group">
@@ -369,7 +390,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="chal-details">تفاصيل التحدي</label>
+            <label for="chal-details">تفاصيل التحدي / المهمة</label>
             <textarea id="chal-details" rows="2" placeholder="تفاصيل المهمة..."></textarea>
           </div>
           <button type="button" class="btn-success" onclick="addChallenge()">نشر التحدي</button>
@@ -394,12 +415,28 @@
           <button type="button" class="btn-amber" onclick="sendGift()">إرسال الهدية</button>
         </div>
 
-        <h3>التحديات المسجلة</h3>
-        <div id="all-challenges-list"></div>
+        <h3>المهام المعلّقة (التي لم تصل / جارية)</h3>
+        <div id="pending-challenges-list"></div>
+
+        <div class="completed-highlight-box">
+          <h3 style="margin-top:0; color:#166534;">المهام المكتملة</h3>
+          <div id="completed-challenges-list"></div>
+        </div>
       </div>
 
-      <!-- 5. الطلبات وأرقام الكاش -->
+      <!-- 5. الطلبات والطلبات المنتهية -->
       <div id="sec-orders" style="display:none;">
+        <div class="box">
+          <h3 style="margin-top:0;">إعدادات الكاميرا والاستوديو عند «تم وصول الطلب»</h3>
+          <p style="font-size:13px; color:#475569; margin-top:0;">
+            أزرار الكاميرا والاستوديو متاحة اختيارياً للزيادة والتأكيد، ويمكنك تفعيلها إجبارية من هنا:
+          </p>
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:10px;">
+            <input type="checkbox" id="require-photo-toggle" style="width:auto;" onchange="toggleRequireDeliveryPhoto(this.checked)" />
+            <span>جعل تصوير أو اختيار صورة (كاميرا / استوديو) شرطاً إجبارياً قبل تأكيد وصول الطلب</span>
+          </label>
+        </div>
+
         <div class="box">
           <h3 style="margin-top:0;">أرقام الكاش للاستقبال (حد أقصى 5 أرقام)</h3>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -409,8 +446,26 @@
           <div id="cash-phones-list" style="margin-top:12px;"></div>
         </div>
 
-        <h3>جميع الطلبات وإيصالات الدفع</h3>
-        <div id="all-orders-list"></div>
+        <div class="sub-orders-bar">
+          <button type="button" class="tab-btn active" id="subtab-active-orders" onclick="switchOrdersSubSection('active')">
+            الطلبات الجارية / المعلّقة
+          </button>
+          <button type="button" class="tab-btn" id="subtab-completed-orders" onclick="switchOrdersSubSection('completed')">
+            الطلبات والتحديات المنتهية
+          </button>
+        </div>
+
+        <div id="orders-active-panel">
+          <h3>الطلبات الجارية وإيصالات الدفع</h3>
+          <div id="all-orders-list"></div>
+        </div>
+
+        <div id="orders-completed-panel" style="display:none;">
+          <div class="completed-highlight-box" style="margin-top:0;">
+            <h3 style="margin-top:0; color:#166534;">الطلبات والتحديات المنتهية</h3>
+            <div id="completed-orders-list"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -463,7 +518,9 @@
 
     let unlocked = sessionStorage.getItem("engz_admin_auth_v1") === "1";
     let currentTab = "requests";
+    let ordersSubSection = "active";
     const imgs = { deptImg: "", prodImg: "" };
+    const adminDeliveryProofs = {};
 
     const store = {
       users: {},
@@ -479,7 +536,8 @@
       challenges: {},
       gifts: {},
       receipts: {},
-      referrals: {}
+      referrals: {},
+      appSettings: { requireDeliveryPhoto: false }
     };
 
     function notify(msg, type = "info") {
@@ -489,11 +547,11 @@
       el.textContent = msg;
     }
 
-    function showAdminDeliveryBanner(orderId) {
+    function showAdminDeliveryBanner(orderId, customText = "") {
       const banner = document.getElementById("admin-delivery-banner");
       if (!banner) return;
       const suffix = orderId ? ` • طلب #${String(orderId).slice(-6)}` : "";
-      banner.textContent = `تنبيه: جارى التوصيل${suffix}`;
+      banner.textContent = customText ? `${customText}${suffix}` : `تنبيه: جارى التوصيل${suffix}`;
       banner.style.display = "block";
     }
 
@@ -507,6 +565,17 @@
 
     function isValidPhone(p) {
       return /^01[0125][0-9]{8}$/.test(String(p || "").trim());
+    }
+
+    function isOrderCompleted(o) {
+      if (!o) return false;
+      return (
+        o.stage === "completed" ||
+        o.deliveryStatus === "completed" ||
+        o.orderCompleted === true ||
+        o.status === "منتهي" ||
+        o.status === "تم وصول الطلب"
+      );
     }
 
     function syncAuthView() {
@@ -554,6 +623,25 @@
         document.getElementById(`sec-${t}`).style.display = t === tab ? "block" : "none";
       });
       renderAll();
+    };
+
+    window.switchOrdersSubSection = function (sub) {
+      ordersSubSection = sub === "completed" ? "completed" : "active";
+      document.getElementById("subtab-active-orders").classList.toggle("active", ordersSubSection === "active");
+      document.getElementById("subtab-completed-orders").classList.toggle("active", ordersSubSection === "completed");
+      document.getElementById("orders-active-panel").style.display = ordersSubSection === "active" ? "block" : "none";
+      document.getElementById("orders-completed-panel").style.display = ordersSubSection === "completed" ? "block" : "none";
+      renderOrdersAndCash();
+    };
+
+    window.toggleRequireDeliveryPhoto = async function (checked) {
+      await set(ref(db, "appSettings/requireDeliveryPhoto"), Boolean(checked));
+      notify(
+        checked
+          ? "تم تفعيل شرط الصورة (كاميرا / استوديو) قبل تأكيد وصول الطلب."
+          : "تم جعل الصورة (كاميرا / استوديو) اختيارية للزيادة والتأكيد.",
+        "success"
+      );
     };
 
     window.clearAdminPreview = function (inputId, prevId, delBtnId, key) {
@@ -605,6 +693,95 @@
       reader.readAsDataURL(file);
     };
 
+    window.triggerAdminOrderPhotoPick = function (orderId, mode) {
+      const inputId = mode === "camera" ? `admin-cam-${orderId}` : `admin-gal-${orderId}`;
+      const el = document.getElementById(inputId);
+      if (el) el.click();
+    };
+
+    window.handleAdminOrderPhotoFile = function (inputEl, orderId) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const img = new Image();
+        img.onload = function () {
+          const maxDim = 1400;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          adminDeliveryProofs[orderId] = canvas.toDataURL("image/jpeg", 0.9);
+          renderOrdersAndCash();
+          notify("تم إرفاق صورة التأكيد للطلب.", "success");
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.clearAdminOrderPhoto = function (orderId) {
+      adminDeliveryProofs[orderId] = "";
+      const c = document.getElementById(`admin-cam-${orderId}`);
+      const g = document.getElementById(`admin-gal-${orderId}`);
+      if (c) c.value = "";
+      if (g) g.value = "";
+      renderOrdersAndCash();
+      notify("تم حذف صورة التأكيد المؤقتة.", "info");
+    };
+
+    window.markOrderArrivedAdmin = async function (orderId) {
+      const o = store.orders[orderId];
+      if (!o) return notify("الطلب غير موجود.", "error");
+
+      const photoData = adminDeliveryProofs[orderId] || o.deliveryImage || o.receiptImage || "";
+      if (store.appSettings?.requireDeliveryPhoto && !photoData) {
+        return notify("الصورة مفعلة إجبارية من إعدادات الأدمن — التقط أو اختر صورة أولاً.", "error");
+      }
+
+      const now = Date.now();
+      const completedLabel = "تم وصول الطلب";
+
+      await update(ref(db, `orders/${orderId}`), {
+        stage: "completed",
+        orderCompleted: true,
+        deliveryStatus: "completed",
+        status: completedLabel,
+        userAlertMessage: completedLabel,
+        deliveryImage: photoData,
+        completedAt: now,
+        completedBy: "admin"
+      });
+
+      if (o.challengeId) {
+        await update(ref(db, `challenges/${o.challengeId}`), {
+          completed: true,
+          status: "مكتملة",
+          completedAt: now
+        });
+      }
+
+      delete adminDeliveryProofs[orderId];
+
+      // الانتقال مباشرة إلى تبويب الطلبات ثم قسم الطلبات والتحديات المنتهية
+      window.switchTab("orders");
+      window.switchOrdersSubSection("completed");
+      showAdminDeliveryBanner(orderId, "تم وصول الطلب وانتقل إلى الطلبات والتحديات المنتهية");
+      notify(`تم وصول الطلب #${orderId.slice(-6)} وانتقل إلى الطلبات والتحديات المنتهية والمهام المكتملة.`, "success");
+    };
+
+    window.deleteCompletedOrder = async function (orderId) {
+      const ok = confirm(`هل تريد حذف الطلب #${String(orderId).slice(-6)} نهائياً من الطلبات المنتهية؟ (نعم / لا)`);
+      if (!ok) return;
+      await remove(ref(db, `orders/${orderId}`));
+      notify(`تم حذف الطلب #${String(orderId).slice(-6)} بنجاح.`, "success");
+    };
+
     function allDepts() {
       const extra = Array.isArray(store.departments) ? store.departments : [];
       return [...new Set([...DEFAULT_DEPARTMENTS, ...extra])];
@@ -621,6 +798,9 @@
         <div class="stat-tile"><div class="val">${allDepts().length}</div><div class="lbl">الأقسام</div></div>
         <div class="stat-tile"><div class="val">${Object.keys(store.orders || {}).length}</div><div class="lbl">الطلبات</div></div>
       `;
+
+      const reqToggle = document.getElementById("require-photo-toggle");
+      if (reqToggle) reqToggle.checked = Boolean(store.appSettings?.requireDeliveryPhoto);
 
       renderRequests();
       renderUsersAndInspector();
@@ -865,25 +1045,54 @@
 
     function renderChallenges() {
       const chals = Object.entries(store.challenges || {});
-      document.getElementById("all-challenges-list").innerHTML = chals.length
-        ? chals.map(([id, c]) => `
-          <div class="box" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      const completedOrderChalIds = new Set(
+        Object.values(store.orders || {})
+          .filter((o) => isOrderCompleted(o) && o.challengeId)
+          .map((o) => o.challengeId)
+      );
+
+      const pendingChals = chals.filter(([id, c]) => !c.completed && !completedOrderChalIds.has(id));
+      const completedChals = chals.filter(([id, c]) => c.completed || completedOrderChalIds.has(id));
+
+      document.getElementById("pending-challenges-list").innerHTML = pendingChals.length
+        ? pendingChals.map(([id, c]) => `
+          <div class="box" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
             <div>
               <strong>${esc(c.title)}</strong> • مكافأة: <strong>${Number(c.reward) || 0} جنيه</strong><br/>
               <span style="font-size:12px; color:#64748b;">${esc(c.details || "")}</span>
             </div>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-success" onclick="markChallengeCompleted('${esc(id)}')">تأكيد اكتمال المهمة</button>
+              <button type="button" class="btn-danger" onclick="delChallenge('${esc(id)}')">حذف</button>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد مهام معلّقة حالياً.</div>`;
+
+      document.getElementById("completed-challenges-list").innerHTML = completedChals.length
+        ? completedChals.map(([id, c]) => `
+          <div class="box completed-box" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+            <div>
+              <span class="badge-status completed">مكتملة ✓</span> <strong>${esc(c.title)}</strong> • مكافأة: <strong>${Number(c.reward) || 0} جنيه</strong><br/>
+              <span style="font-size:12px; color:#166534;">${esc(c.details || "")}</span>
+            </div>
             <button type="button" class="btn-danger" onclick="delChallenge('${esc(id)}')">حذف</button>
           </div>
         `).join("")
-        : `<div class="box">لا توجد تحديات.</div>`;
+        : `<div class="box">لا توجد مهام مكتملة بعد.</div>`;
     }
+
+    window.markChallengeCompleted = async function (id) {
+      await update(ref(db, `challenges/${id}`), { completed: true, status: "مكتملة", completedAt: Date.now() });
+      notify("تم نقل المهمة إلى المهام المكتملة.", "success");
+    };
 
     window.addChallenge = async function () {
       const title = document.getElementById("chal-title").value.trim();
       const reward = Number(document.getElementById("chal-reward").value) || 0;
       const details = document.getElementById("chal-details").value.trim();
       if (!title) return notify("أدخل عنوان التحدي.", "error");
-      await set(push(ref(db, "challenges")), { title, reward, details, createdAt: Date.now() });
+      await set(push(ref(db, "challenges")), { title, reward, details, completed: false, createdAt: Date.now() });
       document.getElementById("chal-title").value = "";
       document.getElementById("chal-reward").value = "";
       document.getElementById("chal-details").value = "";
@@ -1003,22 +1212,25 @@
         `).join("")
         : `<div style="font-size:13px; color:#64748b;">لا توجد أرقام كاش.</div>`;
 
-      const orders = Object.entries(store.orders || {}).sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0));
+      const sortedOrders = Object.entries(store.orders || {}).sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0));
+      const activeOrders = sortedOrders.filter(([, o]) => !isOrderCompleted(o));
+      const completedOrders = sortedOrders.filter(([, o]) => isOrderCompleted(o));
       const receiptsEntries = Object.entries(store.paymentReceipts || {});
 
-      const latestConfirmedOrder = orders.find(
+      const latestConfirmedOrder = activeOrders.find(
         ([, o]) => o && (o.paymentStatus === "confirmed" || o.paymentConfirmed === true || o.deliveryStatus === "out_for_delivery")
       );
       if (latestConfirmedOrder) {
         showAdminDeliveryBanner(latestConfirmedOrder[0]);
       }
 
-      document.getElementById("all-orders-list").innerHTML = orders.length
-        ? orders.map(([id, o]) => {
+      document.getElementById("all-orders-list").innerHTML = activeOrders.length
+        ? activeOrders.map(([id, o]) => {
             const linkedReceipt = receiptsEntries.find(([, r]) => r.orderId === id);
             const receiptId = linkedReceipt ? linkedReceipt[0] : "";
             const receiptObj = linkedReceipt ? linkedReceipt[1] : null;
             const receiptImg = (receiptObj && receiptObj.receiptImage) || o.receiptImage || "";
+            const attachedProof = adminDeliveryProofs[id] || o.deliveryImage || "";
             const payerPhone = o.payerPhone || (receiptObj && receiptObj.payerPhone) || o.buyerPhone || "غير محدد";
             const paymentSourceLabel =
               (o.paymentSourceType || receiptObj?.paymentSourceType) === "other"
@@ -1058,8 +1270,30 @@
                         </button>
                       </div>
                     `
-                    : `<div style="font-size:12px; color:#64748b; margin-top:8px;">لا توجد صورة مرفقة (تم حذفها أو لم تُرفع).</div>`
+                    : `<div style="font-size:12px; color:#64748b; margin-top:8px;">لا توجد صورة إيصال مرفقة.</div>`
                 }
+
+                <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #cbd5e1;">
+                  <div style="font-size:12px; font-weight:bold; color:#334155; margin-bottom:6px;">
+                    إضافة صورة تأكيد وصول (اختياري للزيادة والتأكيد${store.appSettings?.requireDeliveryPhoto ? " — إجباري حالياً" : ""}):
+                  </div>
+                  <input type="file" id="admin-cam-${esc(id)}" accept="image/*" capture="environment" style="display:none;" onchange="handleAdminOrderPhotoFile(this, '${esc(id)}')" />
+                  <input type="file" id="admin-gal-${esc(id)}" accept="image/*" style="display:none;" onchange="handleAdminOrderPhotoFile(this, '${esc(id)}')" />
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <button type="button" class="btn-dark" onclick="triggerAdminOrderPhotoPick('${esc(id)}', 'camera')">📷 كاميرا</button>
+                    <button type="button" class="btn-amber" onclick="triggerAdminOrderPhotoPick('${esc(id)}', 'gallery')">🖼️ استوديو</button>
+                    ${
+                      attachedProof
+                        ? `<button type="button" class="btn-danger" onclick="clearAdminOrderPhoto('${esc(id)}')">🗑️ حذف صورة التأكيد</button>`
+                        : ""
+                    }
+                  </div>
+                  ${
+                    attachedProof
+                      ? `<img src="${attachedProof}" class="receipt-thumb" style="margin-top:8px;" alt="صورة التأكيد" onclick="window.open(this.src, '_blank')" />`
+                      : ""
+                  }
+                </div>
 
                 <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
                   <button type="button" class="btn-success" onclick="confirmOrderPayment('${esc(id)}', '${esc(receiptId)}')">
@@ -1068,11 +1302,45 @@
                   <button type="button" class="btn-danger" onclick="rejectOrderPayment('${esc(id)}', '${esc(receiptId)}')">
                     رفض الدفع
                   </button>
+                  <button type="button" class="btn-dark" onclick="markOrderArrivedAdmin('${esc(id)}')">
+                    تم وصول الطلب
+                  </button>
                 </div>
               </div>
             `;
           }).join("")
-        : `<div class="box">لا توجد طلبات.</div>`;
+        : `<div class="box">لا توجد طلبات جارية حالياً.</div>`;
+
+      document.getElementById("completed-orders-list").innerHTML = completedOrders.length
+        ? completedOrders.map(([id, o]) => {
+            const itemsSummary = Array.isArray(o.items) && o.items.length
+              ? o.items.map((it) => `${esc(it.title)} (${Number(it.price) || 0} جنيه)`).join(" ، ")
+              : esc(o.challengeTitle || "طلب / تحدي");
+            const proofImg = o.deliveryImage || o.receiptImage || "";
+
+            return `
+              <div class="box completed-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                  <strong>طلب #${esc(id.slice(-6))} • ${esc(o.buyerName || "مستخدم")} (${esc(o.buyerPhone || "")})</strong>
+                  <span class="badge-status completed">تم وصول الطلب ✓</span>
+                </div>
+                <div style="font-size:14px; font-weight:bold; color:#166534;">الإجمالي: ${Number(o.totalAmount) || 0} جنيه</div>
+                <div style="font-size:13px; color:#334155;">الأصناف / المهمة: ${itemsSummary}</div>
+                <div style="font-size:12px; color:#475569; margin-top:4px;">
+                  تاريخ الإنهاء: ${o.completedAt ? new Date(o.completedAt).toLocaleString("ar-EG") : "منتهي"}
+                </div>
+                ${
+                  proofImg
+                    ? `<img src="${proofImg}" class="receipt-thumb" style="margin-top:8px;" alt="صورة وصول الطلب" onclick="window.open(this.src, '_blank')" />`
+                    : ""
+                }
+                <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+                  <button type="button" class="btn-danger" onclick="deleteCompletedOrder('${esc(id)}')">حذف الطلب</button>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : `<div class="box">لا توجد طلبات أو تحديات منتهية حتى الآن.</div>`;
     }
 
     window.addCashPhone = async function () {
@@ -1095,6 +1363,10 @@
       notify("تم حذف الرقم.", "info");
     };
 
+    onValue(ref(db, "appSettings"), (s) => {
+      store.appSettings = Object.assign({ requireDeliveryPhoto: false }, s.val() || {});
+      renderAll();
+    });
     onValue(ref(db, "users"), (s) => { store.users = s.val() || {}; renderAll(); });
     onValue(ref(db, "banned"), (s) => { store.banned = s.val() || {}; renderAll(); });
     onValue(ref(db, "clientRegRequests"), (s) => { store.clientRegRequests = s.val() || {}; renderAll(); });
