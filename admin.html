@@ -14,6 +14,11 @@
       color: #0f172a;
       line-height: 1.65;
     }
+    @keyframes adminBtnPop {
+      0% { transform: scale(1); }
+      45% { transform: scale(0.92) translateY(2px); }
+      100% { transform: scale(1) translateY(0); }
+    }
     .wrap {
       max-width: 1040px;
       margin: 0 auto;
@@ -89,6 +94,18 @@
       padding: 10px 15px;
       font-size: 14px;
       font-weight: bold;
+      transition: transform 0.13s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease, filter 0.15s ease;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+    button:active:not(:disabled) {
+      transform: scale(0.92) translateY(2px);
+      filter: brightness(0.93);
+    }
+    button.btn-motion-active {
+      animation: adminBtnPop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .tab-btn { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; }
     .tab-btn.active { background: linear-gradient(90deg, #7c3aed, #ec4899); color: #ffffff; border-color: transparent; }
@@ -409,6 +426,15 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
+    document.addEventListener("click", function (ev) {
+      const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
+      if (!btn) return;
+      btn.classList.remove("btn-motion-active");
+      void btn.offsetWidth;
+      btn.classList.add("btn-motion-active");
+      setTimeout(() => btn.classList.remove("btn-motion-active"), 260);
+    }, true);
 
     let unlocked = sessionStorage.getItem("engz_admin_auth_v1") === "1";
     let currentTab = "requests";
@@ -833,17 +859,20 @@
       const orderObj = store.orders[orderId];
       if (!orderObj) return notify("الطلب غير موجود.", "error");
       const now = Date.now();
+      const executionText = "جارى تنفيذ طلبك";
 
       await update(ref(db, `orders/${orderId}`), {
         paymentConfirmed: true,
         paymentStatus: "confirmed",
-        status: "تم تأكيد الدفع وجاري التنفيذ",
+        userAlertMessage: executionText,
+        status: executionText,
         confirmedAt: now
       });
 
       if (receiptId && store.paymentReceipts[receiptId]) {
         await update(ref(db, `paymentReceipts/${receiptId}`), {
           paymentStatus: "confirmed",
+          userAlertMessage: executionText,
           confirmedAt: now
         });
       }
@@ -857,11 +886,11 @@
         receiverPhone: orderObj.cashReceiverPhone || "",
         amount: Number(orderObj.totalAmount) || 0,
         method: orderObj.paymentSourceType === "other" ? "دفع من رقم آخر + إيصال" : "دفع من نفس الرقم + إيصال",
-        status: "مقبول ومؤكد",
+        status: executionText,
         createdAt: now
       });
 
-      notify(`تم قبول وتأكيد دفع الطلب #${orderId.slice(-6)} بنجاح.`, "success");
+      notify(`تم قبول وتأكيد دفع الطلب #${orderId.slice(-6)} وإرسال تنبيه (جارى تنفيذ طلبك) للمستخدم.`, "success");
     };
 
     window.rejectOrderPayment = async function (orderId, receiptId = "") {
@@ -872,6 +901,7 @@
       await update(ref(db, `orders/${orderId}`), {
         paymentConfirmed: false,
         paymentStatus: "rejected",
+        userAlertMessage: "",
         status: "مرفوض / بانتظار مراجعة الإيصال",
         rejectedAt: now
       });
@@ -915,7 +945,7 @@
             const isConfirmed = o.paymentStatus === "confirmed" || o.paymentConfirmed === true;
             const isRejected = o.paymentStatus === "rejected";
             const statusClass = isConfirmed ? "confirmed" : isRejected ? "rejected" : "";
-            const statusBadgeText = isConfirmed ? "تم قبول وتأكيد الدفع ✓" : isRejected ? "مرفوض" : "بانتظار قبول الدفع";
+            const statusBadgeText = isConfirmed ? "جارى تنفيذ طلبك ✓" : isRejected ? "مرفوض" : "بانتظار قبول الدفع";
 
             const itemsSummary = Array.isArray(o.items) && o.items.length
               ? o.items.map((it) => `${esc(it.title)} (${Number(it.price) || 0} جنيه)`).join(" ، ")
