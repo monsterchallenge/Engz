@@ -287,6 +287,7 @@
       padding: 11px 16px;
       font-size: 14px;
       font-weight: bold;
+      touch-action: manipulation;
     }
 
     .form-group {
@@ -632,6 +633,7 @@
   </style>
 </head>
 <body>
+  <!-- شاشة التحميل 30 ثانية -->
   <div id="splash-screen">
     <div class="splash-card">
       <div class="splash-badge">تطبيق انجز • ENGZ</div>
@@ -654,14 +656,14 @@
     <div class="top-header">
       <div>
         <h1 class="brand-name">انجز • ENGZ</h1>
-        <div id="active-user-summary" style="font-size:13px; opacity:0.95;">زائر</div>
+        <div id="active-user-summary" style="font-size:13px; opacity:0.95;">مسار العميل</div>
         <div id="user-points-counter" style="display:none; font-size:13px; margin-top:3px; color:#fde047; font-weight:bold;">
           عداد النقاط (point): <span id="user-points-value">0</span>
         </div>
       </div>
       <div class="header-actions">
         <div class="user-pill">رصيدي: <span id="user-wallet-display">0</span> جنيه</div>
-        <button class="cart-fab" id="cart-open-btn" onclick="openCartScreen()">
+        <button type="button" class="cart-fab" id="cart-open-btn" onclick="openCartScreen()">
           عربة التسوق <span class="cart-count" id="cart-count-badge">0</span>
         </button>
       </div>
@@ -677,119 +679,123 @@
           <div id="my-referral-stats-text" style="font-size:12px; color:#475569; margin-top:4px;"></div>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-dark" onclick="copyMyReferralLink()">نسخ رابطي</button>
-          <button id="convert-points-btn" class="btn-success" style="display:none;" onclick="convertClientPointsToMoney()">
+          <button type="button" class="btn-dark" onclick="copyMyReferralLink()">نسخ رابطي</button>
+          <button type="button" id="convert-points-btn" class="btn-success" style="display:none;" onclick="convertClientPointsToMoney()">
             تحويل النقاط إلى رصيد
           </button>
         </div>
       </div>
     </div>
 
-    <!-- صفحة البداية: عميل أم تحدى + زر تأكيد + زر عودة (سؤال الخروج) -->
+    <!-- 1. صفحة البداية: عميل أم تحدى -->
     <div id="screen-choice" class="screen active">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة البداية: عميل أم تحدى</h2>
       <p class="screen-sub">اختر <strong>عميل</strong> أو <strong>تحدى</strong> ثم اضغط <strong>تأكيد</strong> للانتقال إلى صفحة التسجيل والمشاركة.</p>
       <div class="two-big-btns">
-        <button id="choice-btn-client" class="big-choice-btn btn-client selected-path" onclick="selectHomePath('client')">عميل</button>
-        <button id="choice-btn-challenge" class="big-choice-btn btn-challenge" onclick="selectHomePath('challenger')">تحدى</button>
+        <button type="button" id="choice-btn-client" class="big-choice-btn btn-client selected-path" onclick="selectHomePath('client')">عميل</button>
+        <button type="button" id="choice-btn-challenge" class="big-choice-btn btn-challenge" onclick="selectHomePath('challenger')">تحدى</button>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
-        <button class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmHomePathSelection()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" id="btn-confirm-home-path" class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmHomePathSelection()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
 
       <div id="exit-prompt-box" class="exit-confirm-box" style="display:none;">
         <p style="font-size:18px; font-weight:bold; color:#78350f; margin:0 0 14px;">هل تريد الخروج من التطبيق</p>
         <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-          <button class="btn-danger" style="padding:12px 24px; font-size:15px;" onclick="handleExitYes()">نعم</button>
-          <button class="btn-success" style="padding:12px 24px; font-size:15px;" onclick="handleExitNo()">لا</button>
+          <button type="button" class="btn-danger" style="padding:12px 24px; font-size:15px;" onclick="handleExitYes()">نعم</button>
+          <button type="button" class="btn-success" style="padding:12px 24px; font-size:15px;" onclick="handleExitNo()">لا</button>
         </div>
       </div>
     </div>
 
-    <!-- صفحة التسجيل والمشاركة للعميل: تسجيل / مشترك / تأكيد / عودة -->
+    <!-- 2. صفحة التسجيل والمشاركة (عميل) -->
     <div id="screen-client-entry" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة التسجيل والمشاركة (عميل)</h2>
       <p class="screen-sub">اختر <strong>تسجيل</strong> إذا لم تكن مشتركاً، أو <strong>مشترك</strong> إذا كنت مسجلاً من قبل، ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="two-big-btns">
-        <button id="client-mode-reg-btn" class="big-choice-btn btn-client selected-path" onclick="chooseEntryMode('client', 'register')">تسجيل</button>
-        <button id="client-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('client', 'subscriber')">مشترك</button>
+        <button type="button" id="client-mode-reg-btn" class="big-choice-btn btn-client selected-path" onclick="chooseEntryMode('client', 'register')">تسجيل</button>
+        <button type="button" id="client-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('client', 'subscriber')">مشترك</button>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('client')">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" id="btn-confirm-client-entry" class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('client')">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 3. صفحة إدخال بيانات تسجيل عميل جديد -->
     <div id="screen-client-register" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">تسجيل عميل جديد</h2>
-      <p class="screen-sub">الاسم يجب أن يكون فريداً ورقم الموبايل يجب أن يكون مرتبطاً بمستخدم وحيد (11 رقماً مصرياً).</p>
+      <p class="screen-sub">أدخل الاسم ورقم التلفون (11 رقماً مصرياً) ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="form-group">
-        <label for="reg-client-name">الاسم (فريد غير مكرر)</label>
+        <label for="reg-client-name">الاسم</label>
         <input type="text" id="reg-client-name" placeholder="مثال: أحمد محمود" />
       </div>
       <div class="form-group">
-        <label for="reg-client-phone">رقم الموبايل (مصر - 11 رقم)</label>
+        <label for="reg-client-phone">رقم التلفون (مصر - 11 رقم)</label>
         <input type="tel" id="reg-client-phone" placeholder="مثال: 01012345678" maxlength="11" />
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-success" onclick="submitClientRegistration()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" id="btn-submit-client-reg" class="btn-success" onclick="submitClientRegistration()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 4. صفحة دخول مشترك (عميل) -->
     <div id="screen-client-subscriber" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">دخول المشتركين (عميل)</h2>
-      <p class="screen-sub">كل رقم موبايل مرتبط بمستخدم وحيد ولا يمكن تكراره لحساب آخر.</p>
+      <p class="screen-sub">أدخل الاسم ورقم التلفون الأساسي (ويمكن إضافة رقم إضافي مرتبط بنفس الحساب) ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="form-group">
-        <label for="sub-client-name">الاسم المسجل / غير المكرر</label>
+        <label for="sub-client-name">الاسم</label>
         <input type="text" id="sub-client-name" placeholder="اكتب اسمك..." />
       </div>
       <div class="form-group">
-        <label for="sub-client-phone1">رقم الموبايل الأساسي (مصر)</label>
+        <label for="sub-client-phone1">رقم التلفون الأساسي (مصر - 11 رقم)</label>
         <input type="tel" id="sub-client-phone1" placeholder="01xxxxxxxxx" maxlength="11" />
       </div>
       <div class="form-group">
-        <label for="sub-client-phone2">رقم موبايل إضافي مرتبط بنفس الحساب (اختياري - مصر)</label>
+        <label for="sub-client-phone2">رقم تلفون إضافي مرتبط بنفس الحساب (اختياري - مصر)</label>
         <input type="tel" id="sub-client-phone2" placeholder="01xxxxxxxxx" maxlength="11" />
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-success" onclick="loginClientSubscriber()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-success" onclick="loginClientSubscriber()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 5. صفحة الطلبات والأقسام -->
     <div id="screen-orders-home" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة الطلبات والأقسام</h2>
       <p class="screen-sub">اضغط على أي قسم لفتح أنواعه ومنتجاته وعروضه — ضغطة واحدة على الصورة لتكبيرها، وضغط 3 ثوانٍ على الكارت لتحديد أو إلغاء تحديد الصنف في العربة.</p>
       <div id="departments-container" class="dept-grid"></div>
       <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-amber" onclick="openCartScreen()">عرض عربة التسوق (<span class="cart-count-inline">0</span>)</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-amber" onclick="openCartScreen()">عرض عربة التسوق (<span class="cart-count-inline">0</span>)</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 6. صفحة القسم والأنواع والسلع والعروض -->
     <div id="screen-department-view" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackInsideDepartment()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackInsideDepartment()">عودة</button>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-amber" onclick="openCartScreen()">عربة التسوق (<span class="cart-count-inline">0</span>)</button>
-          <button class="btn-soft" onclick="goScreen('screen-orders-home')">كل الأقسام</button>
+          <button type="button" class="btn-amber" onclick="openCartScreen()">عربة التسوق (<span class="cart-count-inline">0</span>)</button>
+          <button type="button" class="btn-soft" onclick="goScreen('screen-orders-home')">كل الأقسام</button>
         </div>
       </div>
       <h2 class="screen-title" id="current-dept-title" style="margin:0 0 10px;">القسم</h2>
@@ -798,9 +804,10 @@
       <div id="dept-items-container" class="items-grid"></div>
     </div>
 
+    <!-- 7. عربة التسوق -->
     <div id="screen-cart" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">عربة التسوق</h2>
       <p class="screen-sub">الأصناف والعروض والخدمات المحددة من مختلف الأقسام — يمكنك إزالة أو تعديل اختياراتك في أي وقت.</p>
@@ -809,28 +816,30 @@
         الإجمالي: 0 جنيه
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-success" onclick="goToCheckoutConfirmation()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-success" onclick="goToCheckoutConfirmation()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 8. تأكيد الشراء -->
     <div id="screen-confirm-purchase" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">تأكيد الشراء</h2>
       <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى صفحة الدفع من رقمك.</p>
       <div id="confirm-cards-grid" class="items-grid"></div>
       <div id="confirm-total-line" class="box-card" style="margin-top:14px; font-size:18px; font-weight:bold;"></div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-success" onclick="openPaymentMethodsScreen()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-success" onclick="openPaymentMethodsScreen()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 9. صفحة الدفع -->
     <div id="screen-payment" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة الدفع من رقمك</h2>
       <p class="screen-sub">اختر رقم الاستقبال المحدد من الأدمن ثم أكد قرارك.</p>
@@ -843,80 +852,85 @@
       <div id="confirm-purchase-prompt-box" class="box-card">
         <p style="font-size:17px; font-weight:bold; color:#1e1b4b; margin-top:0;">هل تريد تأكيد طلب الشراء</p>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn-success" onclick="confirmPurchaseYes()">نعم</button>
-          <button class="btn-danger" onclick="confirmPurchaseNo()">لا</button>
+          <button type="button" class="btn-success" onclick="confirmPurchaseYes()">نعم</button>
+          <button type="button" class="btn-danger" onclick="confirmPurchaseNo()">لا</button>
         </div>
       </div>
 
       <div id="payment-result-box"></div>
     </div>
 
-    <!-- صفحة التسجيل والمشاركة للتحدى: تسجيل / مشترك / تأكيد / عودة -->
+    <!-- 10. صفحة التسجيل والمشاركة (تحدى) -->
     <div id="screen-challenger-entry" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة التسجيل والمشاركة (تحدى)</h2>
       <p class="screen-sub">اختر <strong>تسجيل</strong> إذا لم تكن مشتركاً، أو <strong>مشترك</strong> إذا كنت مسجلاً من قبل، ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="two-big-btns">
-        <button id="chal-mode-reg-btn" class="big-choice-btn btn-challenge selected-path" onclick="chooseEntryMode('challenger', 'register')">تسجيل</button>
-        <button id="chal-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('challenger', 'subscriber')">مشترك</button>
+        <button type="button" id="chal-mode-reg-btn" class="big-choice-btn btn-challenge selected-path" onclick="chooseEntryMode('challenger', 'register')">تسجيل</button>
+        <button type="button" id="chal-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('challenger', 'subscriber')">مشترك</button>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('challenger')">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" id="btn-confirm-chal-entry" class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('challenger')">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 11. تسجيل متسابق جديد -->
     <div id="screen-challenger-register" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">تسجيل متسابق جديد</h2>
+      <p class="screen-sub">أدخل الاسم ورقم التلفون (11 رقماً مصرياً) ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="form-group">
-        <label for="reg-chal-name">اسم مقدم الطلب (فريد)</label>
+        <label for="reg-chal-name">الاسم</label>
         <input type="text" id="reg-chal-name" placeholder="مثال: كريم حسن" />
       </div>
       <div class="form-group">
-        <label for="reg-chal-phone">رقم الموبايل (مصر - 11 رقم)</label>
+        <label for="reg-chal-phone">رقم التلفون (مصر - 11 رقم)</label>
         <input type="tel" id="reg-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-success" onclick="submitChallengerRegistration()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-success" onclick="submitChallengerRegistration()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 12. دخول متسابق مشترك -->
     <div id="screen-challenger-subscriber" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">دخول متسابق مشترك</h2>
+      <p class="screen-sub">أدخل الاسم ورقم التلفون ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="form-group">
-        <label for="sub-chal-name">اسم المتسابق</label>
+        <label for="sub-chal-name">الاسم</label>
         <input type="text" id="sub-chal-name" placeholder="اكتب اسمك..." />
       </div>
       <div class="form-group">
-        <label for="sub-chal-phone">رقم الموبايل (مصر - 11 رقم)</label>
+        <label for="sub-chal-phone">رقم التلفون (مصر - 11 رقم)</label>
         <input type="tel" id="sub-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn-success" onclick="loginChallengerSubscriber()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-success" onclick="loginChallengerSubscriber()">تأكيد</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
+    <!-- 13. صفحة التحديات -->
     <div id="screen-challenges-hub" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة التحديات</h2>
       <p class="screen-sub">يمكنك اختيار مهمة واحدة نشطة في كل مرة حتى يتم تأكيد انتهائها.</p>
 
       <div class="sub-tabs">
-        <button class="sub-tab-btn active" id="stab-available" onclick="switchChallengerSubTab('available')">قائمة التحديات</button>
-        <button class="sub-tab-btn" id="stab-active" onclick="switchChallengerSubTab('active')">الطلبات النشطة</button>
-        <button class="sub-tab-btn" id="stab-rewards" onclick="switchChallengerSubTab('rewards')">الهدايا والوصولات</button>
+        <button type="button" class="sub-tab-btn active" id="stab-available" onclick="switchChallengerSubTab('available')">قائمة التحديات</button>
+        <button type="button" class="sub-tab-btn" id="stab-active" onclick="switchChallengerSubTab('active')">الطلبات النشطة</button>
+        <button type="button" class="sub-tab-btn" id="stab-rewards" onclick="switchChallengerSubTab('rewards')">الهدايا والوصولات</button>
       </div>
 
       <div id="chal-panel-available">
@@ -932,24 +946,226 @@
       </div>
 
       <div style="margin-top:16px;">
-        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
   </div>
 
-  <!-- نافذة تكبير الصورة عند الضغط لمرة واحدة -->
+  <!-- نافذة تكبير الصورة -->
   <div id="image-zoom-modal" class="zoom-modal-backdrop" onclick="closeImageZoomModal()">
     <div class="zoom-modal-card" onclick="event.stopPropagation()">
       <h3 id="zoom-modal-title" style="margin:0 0 10px;">معاينة الصورة</h3>
       <img id="zoom-modal-img" class="zoom-modal-img" alt="صورة مكبرة" />
       <div id="zoom-modal-meta" style="font-size:14px; color:#fde047; font-weight:bold; margin-bottom:12px;"></div>
       <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-        <button id="zoom-modal-toggle-cart-btn" class="btn-success" style="display:none;" onclick="toggleCartFromZoomModal()">تحديد / إلغاء في العربة</button>
-        <button class="btn-soft" onclick="closeImageZoomModal()">إغلاق</button>
+        <button type="button" id="zoom-modal-toggle-cart-btn" class="btn-success" style="display:none;" onclick="toggleCartFromZoomModal()">تحديد / إلغاء في العربة</button>
+        <button type="button" class="btn-soft" onclick="closeImageZoomModal()">إغلاق</button>
       </div>
     </div>
   </div>
 
+  <!-- سكريبت فوري للتنقل والأزرار وشاشة الـ 30 ثانية -->
+  <script>
+    window.__engzHistory = ["screen-choice"];
+    window.__engzDeptHistory = ["الكل"];
+    window.__engzHomePath = "client";
+    window.__engzClientMode = "register";
+    window.__engzChalMode = "register";
+    window.__engzSplashTimer = null;
+    window.__engzSplashRunning = false;
+
+    window.engzNotify = function (msg, type) {
+      var el = document.getElementById("global-notice");
+      if (!el) return;
+      el.style.display = "block";
+      el.className = "status-banner" + (type === "error" ? " error" : type === "success" ? " success" : "");
+      el.textContent = msg;
+    };
+
+    window.engzActivateScreen = function (screenId) {
+      var screens = document.querySelectorAll(".screen");
+      for (var i = 0; i < screens.length; i++) {
+        screens[i].classList.remove("active");
+      }
+      var target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add("active");
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      if (typeof window.__engzOnScreenChange === "function") {
+        window.__engzOnScreenChange(screenId);
+      }
+    };
+
+    window.goScreen = function (screenId, recordHistory) {
+      if (recordHistory === undefined) recordHistory = true;
+      var hist = window.__engzHistory;
+      var last = hist[hist.length - 1];
+      if (recordHistory && screenId !== last) {
+        hist.push(screenId);
+      }
+      window.engzActivateScreen(screenId);
+    };
+
+    window.goBackOneStep = function () {
+      var hist = window.__engzHistory;
+      if (hist.length > 1) {
+        hist.pop();
+        window.engzActivateScreen(hist[hist.length - 1]);
+      } else {
+        window.engzActivateScreen("screen-choice");
+        var exitBox = document.getElementById("exit-prompt-box");
+        if (exitBox) {
+          exitBox.style.display = exitBox.style.display === "block" ? "none" : "block";
+        }
+      }
+    };
+
+    window.selectHomePath = function (pathRole) {
+      window.__engzHomePath = pathRole === "challenger" ? "challenger" : "client";
+      var cBtn = document.getElementById("choice-btn-client");
+      var hBtn = document.getElementById("choice-btn-challenge");
+      if (cBtn) cBtn.classList.toggle("selected-path", window.__engzHomePath === "client");
+      if (hBtn) hBtn.classList.toggle("selected-path", window.__engzHomePath === "challenger");
+      var exitBox = document.getElementById("exit-prompt-box");
+      if (exitBox) exitBox.style.display = "none";
+      var summary = document.getElementById("active-user-summary");
+      if (summary && !window.__engzHasUser) {
+        summary.textContent = window.__engzHomePath === "challenger" ? "مسار التحدي" : "مسار العميل";
+      }
+    };
+
+    window.confirmHomePathSelection = function () {
+      var exitBox = document.getElementById("exit-prompt-box");
+      if (exitBox) exitBox.style.display = "none";
+      if (window.__engzHomePath === "challenger") {
+        window.goScreen("screen-challenger-entry");
+      } else {
+        window.goScreen("screen-client-entry");
+      }
+    };
+
+    window.chooseEntryMode = function (role, mode) {
+      if (role === "challenger") {
+        window.__engzChalMode = mode === "subscriber" ? "subscriber" : "register";
+        document.getElementById("chal-mode-reg-btn").classList.toggle("selected-path", window.__engzChalMode === "register");
+        document.getElementById("chal-mode-sub-btn").classList.toggle("selected-path", window.__engzChalMode === "subscriber");
+      } else {
+        window.__engzClientMode = mode === "subscriber" ? "subscriber" : "register";
+        document.getElementById("client-mode-reg-btn").classList.toggle("selected-path", window.__engzClientMode === "register");
+        document.getElementById("client-mode-sub-btn").classList.toggle("selected-path", window.__engzClientMode === "subscriber");
+      }
+    };
+
+    window.confirmEntryModeSelection = function (role) {
+      if (role === "challenger") {
+        window.goScreen(window.__engzChalMode === "subscriber" ? "screen-challenger-subscriber" : "screen-challenger-register");
+      } else {
+        window.goScreen(window.__engzClientMode === "subscriber" ? "screen-client-subscriber" : "screen-client-register");
+      }
+    };
+
+    window.startFull30SecSplash = function (onDone) {
+      if (window.__engzSplashTimer) {
+        clearInterval(window.__engzSplashTimer);
+      }
+      window.__engzSplashRunning = true;
+      var splash = document.getElementById("splash-screen");
+      var app = document.getElementById("main-app");
+      var secEl = document.getElementById("splash-seconds");
+      var barEl = document.getElementById("splash-progress-bar");
+      var pctEl = document.getElementById("splash-percent");
+      var total = 30;
+      var rem = 30;
+      secEl.textContent = "30";
+      barEl.style.width = "0%";
+      pctEl.textContent = "0%";
+      splash.style.display = "flex";
+      app.style.display = "none";
+
+      window.__engzSplashTimer = setInterval(function () {
+        rem -= 1;
+        var clamped = Math.max(0, rem);
+        var pct = Math.round(((total - clamped) / total) * 100);
+        secEl.textContent = String(clamped);
+        barEl.style.width = pct + "%";
+        pctEl.textContent = pct + "%";
+        if (clamped <= 0) {
+          clearInterval(window.__engzSplashTimer);
+          window.__engzSplashTimer = null;
+          window.__engzSplashRunning = false;
+          splash.style.display = "none";
+          app.style.display = "block";
+          if (typeof onDone === "function") onDone();
+        }
+      }, 1000);
+    };
+
+    window.handleExitYes = function () {
+      try {
+        localStorage.setItem("engz_exited_flag_v1", "1");
+      } catch (e) {}
+      try {
+        if (window.AndroidInterface && typeof window.AndroidInterface.exitApp === "function") {
+          window.AndroidInterface.exitApp();
+        }
+      } catch (e) {}
+      try {
+        if (window.Android && typeof window.Android.closeApp === "function") {
+          window.Android.closeApp();
+        }
+      } catch (e) {}
+      try {
+        window.open("", "_self");
+        window.close();
+      } catch (e) {}
+      document.getElementById("main-app").innerHTML =
+        '<div class="screen active" style="text-align:center; padding:36px 20px;">' +
+        '<h2 class="screen-title" style="color:#be123c;">تم الخروج من التطبيق</h2>' +
+        '<p class="screen-sub">للدخول مرة أخرى وبدء شريط التحميل 30 ثانية كاملة، أعد فتح التطبيق أو اضغط إعادة الفتح.</p>' +
+        '<button type="button" class="btn-success" onclick="window.location.reload()">إعادة فتح التطبيق (30 ثانية)</button>' +
+        "</div>";
+    };
+
+    window.handleExitNo = function () {
+      var exitBox = document.getElementById("exit-prompt-box");
+      if (exitBox) exitBox.style.display = "none";
+      window.startFull30SecSplash(function () {
+        window.__engzHistory = ["screen-choice"];
+        window.engzActivateScreen("screen-choice");
+      });
+    };
+
+    try {
+      if (localStorage.getItem("engz_exited_flag_v1") === "1") {
+        localStorage.removeItem("engz_exited_flag_v1");
+      }
+    } catch (e) {}
+
+    window.startFull30SecSplash(function () {
+      window.__engzHistory = ["screen-choice"];
+      window.engzActivateScreen("screen-choice");
+    });
+
+    window.addEventListener("popstate", function () {
+      if (!window.__engzSplashRunning) {
+        window.goBackOneStep();
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var b1 = document.getElementById("btn-confirm-client-entry");
+      if (b1) b1.addEventListener("click", function () { window.confirmEntryModeSelection("client"); });
+
+      var b2 = document.getElementById("btn-confirm-chal-entry");
+      if (b2) b2.addEventListener("click", function () { window.confirmEntryModeSelection("challenger"); });
+
+      var b3 = document.getElementById("btn-confirm-home-path");
+      if (b3) b3.addEventListener("click", function () { window.confirmHomePathSelection(); });
+    });
+  </script>
+
+  <!-- سكريبت Firebase الكامل لجميع الشاشات والعمليات -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -964,7 +1180,6 @@
 
     const POINT_VALUE_EGP = 33.333333333333;
     const CART_STORAGE_KEY = "engz_persistent_cart_v1";
-    const EXIT_FLAG_KEY = "engz_exited_flag_v1";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
@@ -993,64 +1208,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const incomingRefCode = (urlParams.get("ref") || "").trim();
 
-    let splashTimerInterval = null;
-    let isSplashRunning = false;
-
-    function startFull30SecSplash(onCompleteCallback) {
-      if (splashTimerInterval) {
-        clearInterval(splashTimerInterval);
-        splashTimerInterval = null;
-      }
-      isSplashRunning = true;
-
-      const splashEl = document.getElementById("splash-screen");
-      const mainAppEl = document.getElementById("main-app");
-      const secEl = document.getElementById("splash-seconds");
-      const barEl = document.getElementById("splash-progress-bar");
-      const pctEl = document.getElementById("splash-percent");
-
-      const totalSec = 30;
-      let remaining = totalSec;
-
-      secEl.textContent = String(remaining);
-      barEl.style.width = "0%";
-      pctEl.textContent = "0%";
-      splashEl.style.display = "flex";
-      mainAppEl.style.display = "none";
-
-      splashTimerInterval = setInterval(() => {
-        remaining -= 1;
-        const clamped = Math.max(0, remaining);
-        const progress = Math.round(((totalSec - clamped) / totalSec) * 100);
-
-        secEl.textContent = String(clamped);
-        barEl.style.width = progress + "%";
-        pctEl.textContent = progress + "%";
-
-        if (clamped <= 0) {
-          clearInterval(splashTimerInterval);
-          splashTimerInterval = null;
-          isSplashRunning = false;
-          splashEl.style.display = "none";
-          mainAppEl.style.display = "block";
-          if (typeof onCompleteCallback === "function") {
-            onCompleteCallback();
-          }
-        }
-      }, 1000);
-    }
-
-    // عند فتح التطبيق لأول مرة أو إعادة فتحه بعد الخروج في WebView
-    try {
-      if (localStorage.getItem(EXIT_FLAG_KEY) === "1") {
-        localStorage.removeItem(EXIT_FLAG_KEY);
-      }
-    } catch {}
-
-    startFull30SecSplash(() => {
-      resetToHomeChoiceScreen();
-    });
-
     function loadSavedCart() {
       try {
         const raw = localStorage.getItem(CART_STORAGE_KEY);
@@ -1068,14 +1225,8 @@
     }
 
     let autoRedirectedAfterApproval = false;
-    const screenHistory = ["screen-choice"];
-    const deptFilterHistory = ["الكل"];
     const productsCatalog = {};
     let currentZoomUid = null;
-
-    let selectedHomePath = "client";
-    let selectedClientMode = "register";
-    let selectedChallengerMode = "register";
 
     const state = {
       currentRole: null,
@@ -1105,107 +1256,14 @@
 
     updateCartBadges();
 
-    window.selectHomePath = function (pathRole) {
-      selectedHomePath = pathRole === "challenger" ? "challenger" : "client";
-      state.currentRole = selectedHomePath;
-      document.getElementById("choice-btn-client").classList.toggle("selected-path", selectedHomePath === "client");
-      document.getElementById("choice-btn-challenge").classList.toggle("selected-path", selectedHomePath === "challenger");
-      document.getElementById("exit-prompt-box").style.display = "none";
-      syncUserHeader();
-    };
-
-    window.confirmHomePathSelection = function () {
-      document.getElementById("exit-prompt-box").style.display = "none";
-      if (selectedHomePath === "challenger") {
-        goScreen("screen-challenger-entry");
-      } else {
-        goScreen("screen-client-entry");
-      }
-    };
-
-    window.chooseEntryMode = function (role, mode) {
-      if (role === "challenger") {
-        selectedChallengerMode = mode === "subscriber" ? "subscriber" : "register";
-        document.getElementById("chal-mode-reg-btn").classList.toggle("selected-path", selectedChallengerMode === "register");
-        document.getElementById("chal-mode-sub-btn").classList.toggle("selected-path", selectedChallengerMode === "subscriber");
-      } else {
-        selectedClientMode = mode === "subscriber" ? "subscriber" : "register";
-        document.getElementById("client-mode-reg-btn").classList.toggle("selected-path", selectedClientMode === "register");
-        document.getElementById("client-mode-sub-btn").classList.toggle("selected-path", selectedClientMode === "subscriber");
-      }
-    };
-
-    window.confirmEntryModeSelection = function (role) {
-      if (role === "challenger") {
-        if (selectedChallengerMode === "subscriber") {
-          goScreen("screen-challenger-subscriber");
-        } else {
-          goScreen("screen-challenger-register");
-        }
-      } else {
-        if (selectedClientMode === "subscriber") {
-          goScreen("screen-client-subscriber");
-        } else {
-          goScreen("screen-client-register");
-        }
-      }
-    };
-
-    function resetToHomeChoiceScreen() {
-      screenHistory.length = 0;
-      screenHistory.push("screen-choice");
-      document.getElementById("exit-prompt-box").style.display = "none";
-      activateScreenWithoutHistory("screen-choice");
-    }
-
-    window.handleExitYes = function () {
-      try {
-        localStorage.setItem(EXIT_FLAG_KEY, "1");
-      } catch {}
-
-      try {
-        if (window.AndroidInterface && typeof window.AndroidInterface.exitApp === "function") {
-          window.AndroidInterface.exitApp();
-        }
-      } catch {}
-
-      try {
-        if (window.Android && typeof window.Android.closeApp === "function") {
-          window.Android.closeApp();
-        }
-      } catch {}
-
-      try {
-        window.open("", "_self");
-        window.close();
-      } catch {}
-
-      // في حال منع المتصفح/WebView إغلاق النافذة تلقائياً، نعرض شاشة خروج واضحة تبدأ 30 ثانية عند إعادة الفتح
-      document.getElementById("main-app").innerHTML = `
-        <div class="screen active" style="text-align:center; padding:36px 20px;">
-          <h2 class="screen-title" style="color:#be123c;">تم الخروج من التطبيق</h2>
-          <p class="screen-sub">للدخول مرة أخرى وبدء شريط التحميل 30 ثانية كاملة، أعد فتح التطبيق أو اضغط إعادة التشغيل.</p>
-          <button class="btn-success" onclick="restartFromZeroAfterExit()">إعادة فتح التطبيق (30 ثانية)</button>
-        </div>
-      `;
-    };
-
-    window.restartFromZeroAfterExit = function () {
-      window.location.reload();
-    };
-
-    window.handleExitNo = function () {
-      document.getElementById("exit-prompt-box").style.display = "none";
-      startFull30SecSplash(() => {
-        resetToHomeChoiceScreen();
-      });
+    window.__engzOnScreenChange = function (screenId) {
+      if (screenId === "screen-orders-home") renderDepartments();
+      if (screenId === "screen-challenges-hub") renderChallengesHub();
+      if (screenId === "screen-payment") renderPaymentScreen();
     };
 
     function notify(msg, type = "info") {
-      const el = document.getElementById("global-notice");
-      el.style.display = "block";
-      el.className = "status-banner" + (type === "error" ? " error" : type === "success" ? " success" : "");
-      el.textContent = msg;
+      window.engzNotify(msg, type);
     }
 
     function isValidEgyptianPhone(phone) {
@@ -1223,21 +1281,17 @@
     function isPhoneBoundToAnotherUser(phone, excludeUserId = null) {
       const p = String(phone || "").trim();
       if (!p) return false;
-
       const inUsers = Object.entries(state.db.users || {}).some(
         ([uid, u]) => uid !== excludeUserId && (u.phone === p || u.phone2 === p)
       );
       if (inUsers) return true;
-
       const inClientReqs = Object.values(state.db.clientRegRequests || {}).some(
         (r) => r.status === "pending" && r.phone === p
       );
       if (inClientReqs) return true;
-
-      const inChalReqs = Object.values(state.db.challengerRegRequests || {}).some(
+      return Object.values(state.db.challengerRegRequests || {}).some(
         (r) => r.status === "pending" && r.phone === p
       );
-      return inChalReqs;
     }
 
     function buildPersonalReferralUrl(userId) {
@@ -1273,12 +1327,10 @@
 
       pointsCounterBox.style.display = "block";
       pointsValEl.textContent = String(pts);
-
       convertBtn.style.display = state.currentUser.role === "client" && pts > 0 ? "inline-block" : "none";
 
       bar.style.display = "block";
-      const myLink = buildPersonalReferralUrl(state.currentUser.id);
-      document.getElementById("my-referral-link-text").textContent = myLink;
+      document.getElementById("my-referral-link-text").textContent = buildPersonalReferralUrl(state.currentUser.id);
 
       const refMap = state.db.referrals[state.currentUser.id] || {};
       const invitedEntries = Object.values(refMap);
@@ -1295,13 +1347,11 @@
       if (currentPts <= 0) {
         return notify("لا توجد نقاط متاحة للتحويل.", "error");
       }
-
       const addedMoney = Number((currentPts * POINT_VALUE_EGP).toFixed(2));
       await update(ref(db, `users/${uid}`), {
         points: 0,
         wallet: Number(((Number(state.db.users[uid]?.wallet) || 0) + addedMoney).toFixed(2))
       });
-
       notify(`تم تحويل ${currentPts} point إلى رصيدك (${addedMoney} جنيه) بنجاح.`, "success");
     };
 
@@ -1372,6 +1422,7 @@
       const role = userRecord.role || (state.trackedApplicant && state.trackedApplicant.kind) || "client";
       state.currentUser = { id: uid, ...userRecord, role, status: "approved" };
       state.currentRole = role;
+      window.__engzHasUser = true;
 
       if (incomingRefCode || userRecord.invitedBy) {
         await recordReferralJoin(incomingRefCode || userRecord.invitedBy, uid, userRecord.name);
@@ -1382,9 +1433,9 @@
       notify("تمت الموافقه على طلبك انت الان مشترك", "success");
 
       if (role === "challenger") {
-        goScreen("screen-challenges-hub");
+        window.goScreen("screen-challenges-hub");
       } else {
-        goScreen("screen-orders-home");
+        window.goScreen("screen-orders-home");
       }
     }
 
@@ -1428,48 +1479,10 @@
       notify("جاري طلب التسجيل", "info");
     }
 
-    function activateScreenWithoutHistory(screenId) {
-      document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
-      const target = document.getElementById(screenId);
-      if (target) target.classList.add("active");
-      if (screenId === "screen-orders-home") renderDepartments();
-      if (screenId === "screen-challenges-hub") renderChallengesHub();
-      if (screenId === "screen-payment") renderPaymentScreen();
-    }
-
-    window.goScreen = function (screenId, recordHistory = true) {
-      const currentActive = screenHistory[screenHistory.length - 1];
-      if (recordHistory && screenId !== currentActive) {
-        screenHistory.push(screenId);
-      }
-      activateScreenWithoutHistory(screenId);
-    };
-
-    window.goBackOneStep = function () {
-      if (screenHistory.length > 1) {
-        screenHistory.pop();
-        const prevScreen = screenHistory[screenHistory.length - 1];
-        activateScreenWithoutHistory(prevScreen);
-      } else {
-        activateScreenWithoutHistory("screen-choice");
-        const exitBox = document.getElementById("exit-prompt-box");
-        if (exitBox) {
-          exitBox.style.display = exitBox.style.display === "block" ? "none" : "block";
-        }
-      }
-    };
-
-    // دعم زر الرجوع في نظام أندرويد / WebView أيضاً
-    window.addEventListener("popstate", () => {
-      if (!isSplashRunning) {
-        window.goBackOneStep();
-      }
-    });
-
     window.goBackInsideDepartment = function () {
-      if (deptFilterHistory.length > 1) {
-        deptFilterHistory.pop();
-        state.selectedTypeFilter = deptFilterHistory[deptFilterHistory.length - 1];
+      if (window.__engzDeptHistory.length > 1) {
+        window.__engzDeptHistory.pop();
+        state.selectedTypeFilter = window.__engzDeptHistory[window.__engzDeptHistory.length - 1];
         if (state.selectedDept) {
           renderDepartmentItems(state.selectedDept);
           return;
@@ -1482,11 +1495,13 @@
       const summary = document.getElementById("active-user-summary");
       const walletEl = document.getElementById("user-wallet-display");
       if (!state.currentUser) {
-        summary.textContent = state.currentRole === "challenger" ? "مسار التحدي" : "مسار العميل";
+        window.__engzHasUser = false;
+        summary.textContent = window.__engzHomePath === "challenger" ? "مسار التحدي" : "مسار العميل";
         walletEl.textContent = "0";
         renderReferralAndWalletBar();
         return;
       }
+      window.__engzHasUser = true;
       const latest = state.db.users[state.currentUser.id] || state.currentUser;
       state.currentUser = { ...state.currentUser, ...latest };
       const roleLabel = state.currentUser.role === "challenger" ? "متسابق مشترك" : "عميل";
@@ -1514,10 +1529,10 @@
       const phone = document.getElementById("reg-client-phone").value.trim();
 
       if (!name) return notify("من فضلك أدخل الاسم.", "error");
-      if (!isValidEgyptianPhone(phone)) return notify("رقم الموبايل يجب أن يكون رقماً مصرياً صحيحاً مكوناً من 11 رقماً.", "error");
+      if (!isValidEgyptianPhone(phone)) return notify("رقم التلفون يجب أن يكون رقماً مصرياً صحيحاً مكوناً من 11 رقماً.", "error");
       if (isBanned(name, phone)) return notify("عذراً، هذه البيانات محظورة من الدخول.", "error");
       if (isNameTaken(name)) return notify("هذا الاسم مستخدم بالفعل، اختر اسماً فريداً غير مكرر.", "error");
-      if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم موبايل يجب أن يكون لمستخدم وحيد.", "error");
+      if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم تلفون يجب أن يكون لمستخدم وحيد.", "error");
 
       autoRedirectedAfterApproval = false;
       state.trackedApplicant = { name, phone, kind: "client" };
@@ -1542,7 +1557,7 @@
       const phone2 = document.getElementById("sub-client-phone2").value.trim();
 
       if (!name || !isValidEgyptianPhone(phone1)) {
-        return notify("أدخل اسماً ورقم موبايل مصرياً صحيحاً.", "error");
+        return notify("أدخل الاسم ورقم التلفون المصري الصحيح (11 رقماً).", "error");
       }
       if (phone2 && !isValidEgyptianPhone(phone2)) {
         return notify("الرقم الإضافي الثاني غير صالح للعمل في مصر.", "error");
@@ -1571,7 +1586,7 @@
         }
         const ownsPhone1 = uData.phone === phone1 || uData.phone2 === phone1;
         if (!ownsPhone1 && isPhoneBoundToAnotherUser(phone1, uid)) {
-          return notify("رقم الموبايل الأساسي مرتبط بمستخدم وحيد آخر.", "error");
+          return notify("رقم التلفون الأساسي مرتبط بمستخدم وحيد آخر.", "error");
         }
         if (phone2 && isPhoneBoundToAnotherUser(phone2, uid)) {
           return notify("الرقم الإضافي مرتبط بمستخدم وحيد آخر.", "error");
@@ -1589,7 +1604,7 @@
         }
         syncUserHeader();
         notify("تمت الموافقه على طلبك انت الان مشترك", "success");
-        goScreen("screen-orders-home");
+        window.goScreen("screen-orders-home");
         return;
       }
 
@@ -1617,7 +1632,7 @@
       }
       syncUserHeader();
       notify("تمت الموافقه على طلبك انت الان مشترك", "success");
-      goScreen("screen-orders-home");
+      window.goScreen("screen-orders-home");
     };
 
     window.submitChallengerRegistration = async function () {
@@ -1625,11 +1640,11 @@
       const phone = document.getElementById("reg-chal-phone").value.trim();
 
       if (!name || !isValidEgyptianPhone(phone)) {
-        return notify("أدخل اسم مقدم الطلب ورقم موبايل مصري صحيح (11 رقماً).", "error");
+        return notify("أدخل الاسم ورقم التلفون المصري الصحيح (11 رقماً).", "error");
       }
       if (isBanned(name, phone)) return notify("عذراً، هذه البيانات محظورة.", "error");
       if (isNameTaken(name)) return notify("هذا الاسم مسجل بالفعل، اختر اسماً فريداً.", "error");
-      if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم موبايل يجب أن يكون لمستخدم وحيد.", "error");
+      if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم تلفون يجب أن يكون لمستخدم وحيد.", "error");
 
       autoRedirectedAfterApproval = false;
       state.trackedApplicant = { name, phone, kind: "challenger" };
@@ -1653,7 +1668,7 @@
       const phone = document.getElementById("sub-chal-phone").value.trim();
 
       if (!name || !isValidEgyptianPhone(phone)) {
-        return notify("أدخل اسم المتسابق ورقم موبايل مصري صحيح.", "error");
+        return notify("أدخل الاسم ورقم التلفون المصري الصحيح.", "error");
       }
       if (isBanned(name, phone)) {
         return notify("عذراً، هذا الحساب محظور ولا يمكنه الدخول.", "error");
@@ -1687,7 +1702,7 @@
         return notify("هذا الحساب مسجل كعميل وليس متسابقاً.", "error");
       }
       if (uData.phone && uData.phone !== phone) {
-        return notify("رقم الموبايل لا يطابق رقم المستخدم الوحيد المسجل لهذا الحساب.", "error");
+        return notify("رقم التلفون لا يطابق رقم المستخدم الوحيد المسجل لهذا الحساب.", "error");
       }
 
       state.currentUser = { id: uid, ...uData, phone };
@@ -1697,7 +1712,7 @@
       }
       syncUserHeader();
       notify("تمت الموافقه على طلبك انت الان مشترك", "success");
-      goScreen("screen-challenges-hub");
+      window.goScreen("screen-challenges-hub");
     };
 
     function getAllDepartments() {
@@ -1724,13 +1739,11 @@
         .join("");
     }
 
-    // تكبير الصورة عند الضغط لمرة واحدة
     window.openImageZoomModal = function (title, imgSrc, priceText, uid = null) {
       if (!imgSrc) return;
       currentZoomUid = uid;
       document.getElementById("zoom-modal-title").textContent = title || "معاينة الصورة";
-      const imgEl = document.getElementById("zoom-modal-img");
-      imgEl.src = imgSrc;
+      document.getElementById("zoom-modal-img").src = imgSrc;
       document.getElementById("zoom-modal-meta").textContent = priceText ? `السعر: ${priceText}` : "";
 
       const toggleBtn = document.getElementById("zoom-modal-toggle-cart-btn");
@@ -1757,7 +1770,6 @@
       document.getElementById("zoom-modal-toggle-cart-btn").textContent = isSel ? "إلغاء التحديد من العربة" : "تحديد في العربة";
     };
 
-    // ضغط 3 ثوانٍ لتحديد أو إلغاء التحديد مع إلغاء تلقائي عند السحب
     const holdTimers = {};
     const holdStartCoords = {};
 
@@ -1802,7 +1814,7 @@
       }
       const item = productsCatalog[uid];
       if (!item || !item.image) return;
-      openImageZoomModal(item.title, item.image, `${item.price} جنيه`, uid);
+      window.openImageZoomModal(item.title, item.image, `${item.price} جنيه`, uid);
     };
 
     function toggleCartSelection(itemPayload) {
@@ -1828,17 +1840,17 @@
     window.openDepartment = function (deptName) {
       state.selectedDept = deptName;
       state.selectedTypeFilter = "الكل";
-      deptFilterHistory.length = 0;
-      deptFilterHistory.push("الكل");
+      window.__engzDeptHistory.length = 0;
+      window.__engzDeptHistory.push("الكل");
       document.getElementById("current-dept-title").textContent = deptName;
       renderDepartmentItems(deptName);
-      goScreen("screen-department-view");
+      window.goScreen("screen-department-view");
     };
 
     window.selectDepartmentTypeFilter = function (typeName) {
       state.selectedTypeFilter = typeName;
-      if (deptFilterHistory[deptFilterHistory.length - 1] !== typeName) {
-        deptFilterHistory.push(typeName);
+      if (window.__engzDeptHistory[window.__engzDeptHistory.length - 1] !== typeName) {
+        window.__engzDeptHistory.push(typeName);
       }
       if (state.selectedDept) renderDepartmentItems(state.selectedDept);
     };
@@ -1853,7 +1865,7 @@
       typesBar.innerHTML = distinctTypes
         .map(
           (tp) =>
-            `<button class="type-chip ${state.selectedTypeFilter === tp ? "active" : ""}" onclick="selectDepartmentTypeFilter('${esc(tp)}')">${esc(tp)}</button>`
+            `<button type="button" class="type-chip ${state.selectedTypeFilter === tp ? "active" : ""}" onclick="selectDepartmentTypeFilter('${esc(tp)}')">${esc(tp)}</button>`
         )
         .join("");
 
@@ -1916,7 +1928,7 @@
       if (!state.cart.length) {
         listEl.innerHTML = `<div class="box-card">عربة التسوق فارغة حالياً. حدد أي صنف بضغط 3 ثوانٍ.</div>`;
         totalBox.textContent = "الإجمالي: 0 جنيه";
-        goScreen("screen-cart");
+        window.goScreen("screen-cart");
         return;
       }
 
@@ -1930,21 +1942,21 @@
                 <strong>${esc(item.title)}</strong> <span style="font-size:12px; color:#64748b;">(${esc(item.dept)})</span><br/>
                 <span style="color:#be185d; font-weight:bold;">${Math.max(0, Number(item.price) || 0)} جنيه</span>
               </div>
-              <button class="btn-soft" onclick="removeFromCart('${esc(item.uid)}')">إزالة</button>
+              <button type="button" class="btn-soft" onclick="removeFromCart('${esc(item.uid)}')">إزالة</button>
             </div>
           `;
         })
         .join("");
 
       totalBox.textContent = `الإجمالي: ${total} جنيه`;
-      goScreen("screen-cart");
+      window.goScreen("screen-cart");
     };
 
     window.removeFromCart = function (uid) {
       state.cart = state.cart.filter((i) => i.uid !== uid);
       saveCartToStorage(state.cart);
       updateCartBadges();
-      openCartScreen();
+      window.openCartScreen();
     };
 
     window.goToCheckoutConfirmation = function () {
@@ -1975,7 +1987,7 @@
         .join("");
 
       document.getElementById("confirm-total-line").textContent = `إجمالي المشتريات: ${total} جنيه`;
-      goScreen("screen-confirm-purchase");
+      window.goScreen("screen-confirm-purchase");
     };
 
     function getCartTotal() {
@@ -1984,7 +1996,7 @@
 
     window.openPaymentMethodsScreen = function () {
       document.getElementById("payment-result-box").innerHTML = "";
-      goScreen("screen-payment");
+      window.goScreen("screen-payment");
     };
 
     function renderPaymentScreen() {
@@ -2004,7 +2016,7 @@
           return `
             <div class="box-card" style="display:flex; justify-content:space-between; align-items:center; ${isPicked ? "border-color:#10b981;" : ""}">
               <strong>${esc(ph)}</strong>
-              <button class="${isPicked ? "btn-success" : "btn-dark"}" onclick="selectCashReceiver('${esc(ph)}')">
+              <button type="button" class="${isPicked ? "btn-success" : "btn-dark"}" onclick="selectCashReceiver('${esc(ph)}')">
                 ${isPicked ? "محدد ✓" : "اختيار هذا الرقم"}
               </button>
             </div>
@@ -2021,7 +2033,7 @@
 
     window.confirmPurchaseNo = function () {
       notify("تم إلغاء تأكيد الشراء والعودة إلى صفحة اختيار السلع.", "info");
-      goScreen("screen-orders-home");
+      window.goScreen("screen-orders-home");
     };
 
     window.confirmPurchaseYes = async function () {
@@ -2104,7 +2116,7 @@
         <div class="receipt-box">
           <h3 style="margin-top:0; color:#065f46;">تم تأكيد طلب الشراء وإرسال المبلغ</h3>
           <p>تم خصم <strong>${total} جنيه</strong> من حسابك وإرسالها إلى رقم الأدمن: <strong>${esc(receiverPhone)}</strong>.</p>
-          <button class="btn-dark" onclick="goScreen('screen-orders-home')">العودة إلى الأقسام</button>
+          <button type="button" class="btn-dark" onclick="goScreen('screen-orders-home')">العودة إلى الأقسام</button>
         </div>
       `;
       notify("تم تأكيد طلب الشراء وإرسال المبلغ بنجاح.", "success");
@@ -2117,7 +2129,6 @@
         img.onload = function () {
           let w = img.width;
           let h = img.height;
-
           if (w > maxDim || h > maxDim) {
             if (w >= h) {
               h = Math.round((h * maxDim) / w);
@@ -2127,7 +2138,6 @@
               h = maxDim;
             }
           }
-
           const canvas = document.createElement("canvas");
           canvas.width = w;
           canvas.height = h;
@@ -2135,10 +2145,8 @@
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, w, h);
-
           const isPng = file.type === "image/png";
           let dataUrl = isPng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", quality);
-
           let q = quality;
           while (!isPng && dataUrl.length > 1800000 && q > 0.7) {
             q = Number((q - 0.05).toFixed(2));
@@ -2211,7 +2219,7 @@
                 <span style="color:#059669; font-weight:bold;">مكافأة: ${Number(c.reward) || 0} جنيه</span>
               </div>
               <p style="margin:6px 0 10px;">${esc(c.details)}</p>
-              <button class="btn-success" ${myActiveOrder ? "disabled" : ""} onclick="acceptChallenge('${esc(c.id)}')">
+              <button type="button" class="btn-success" ${myActiveOrder ? "disabled" : ""} onclick="acceptChallenge('${esc(c.id)}')">
                 ${myActiveOrder ? "أنهِ مهمتك النشطة أولاً" : "قبول"}
               </button>
             </div>
@@ -2249,7 +2257,7 @@
                   <select id="transfer-chal-select">
                     ${otherChallengers.map((oc) => `<option value="${esc(oc.id)}">${esc(oc.name)} (${esc(oc.phone)})</option>`).join("")}
                   </select>
-                  <button class="btn-amber" onclick="transferOrderToOther('${esc(myActiveOrder.id)}')">تحويل</button>
+                  <button type="button" class="btn-amber" onclick="transferOrderToOther('${esc(myActiveOrder.id)}')">تحويل</button>
                 </div>
               </div>
             `
@@ -2265,7 +2273,7 @@
               </div>
             </div>
 
-            <button class="btn-success" onclick="completeActiveOrder('${esc(myActiveOrder.id)}', '${esc(myActiveOrder.challengeId || "")}')">
+            <button type="button" class="btn-success" onclick="completeActiveOrder('${esc(myActiveOrder.id)}', '${esc(myActiveOrder.challengeId || "")}')">
               تأكيد انتهاء المهمه
             </button>
           </div>
