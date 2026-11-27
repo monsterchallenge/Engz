@@ -568,6 +568,11 @@
       margin-bottom: 12px;
     }
 
+    .box-card.completed-card {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+
     .status-banner {
       padding: 12px 14px;
       border-radius: 12px;
@@ -949,6 +954,15 @@
       <h2 class="screen-title">صفحة الطلبات والأقسام</h2>
       <p class="screen-sub">اضغط على أي قسم لفتح أنواعه ومنتجاته وعروضه — ضغطة واحدة على الصورة لتكبيرها، وضغط 3 ثوانٍ على الكارت لتحديد أو إلغاء تحديد الصنف في العربة.</p>
       <div id="departments-container" class="dept-grid"></div>
+
+      <div id="client-orders-tracker-section" style="margin-top:22px;">
+        <h3 style="margin:0 0 10px; color:#1e1b4b;">طلباتي الحالية</h3>
+        <div id="client-active-orders-list"></div>
+
+        <h3 style="margin:18px 0 10px; color:#166534;">الطلبات المنتهية</h3>
+        <div id="client-completed-orders-list"></div>
+      </div>
+
       <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
         <button type="button" class="btn-amber" onclick="openCartScreen()">عرض عربة التسوق (<span class="cart-count-inline">0</span>)</button>
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
@@ -1086,7 +1100,8 @@
 
       <div class="sub-tabs">
         <button type="button" class="sub-tab-btn active" id="stab-available" onclick="switchChallengerSubTab('available')">قائمة التحديات</button>
-        <button type="button" class="sub-tab-btn" id="stab-active" onclick="switchChallengerSubTab('active')">الطلبات النشطة</button>
+        <button type="button" class="sub-tab-btn" id="stab-active" onclick="switchChallengerSubTab('active')">المهام المعلّقة / النشطة</button>
+        <button type="button" class="sub-tab-btn" id="stab-completed" onclick="switchChallengerSubTab('completed')">المهام المكتملة</button>
         <button type="button" class="sub-tab-btn" id="stab-rewards" onclick="switchChallengerSubTab('rewards')">الهدايا والوصولات</button>
       </div>
 
@@ -1096,6 +1111,10 @@
 
       <div id="chal-panel-active" style="display:none;">
         <div id="active-challenger-order-box"></div>
+      </div>
+
+      <div id="chal-panel-completed" style="display:none;">
+        <div id="completed-challenger-orders-box"></div>
       </div>
 
       <div id="chal-panel-rewards" style="display:none;">
@@ -1338,6 +1357,7 @@
       push,
       onValue,
       update,
+      remove,
       runTransaction
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -1393,6 +1413,7 @@
     const productsCatalog = {};
     let currentZoomUid = null;
     const seenConfirmedOrderIds = new Set();
+    const clientOrderProofs = {};
 
     const locks = {
       cartStep: false,
@@ -1424,14 +1445,18 @@
         challenges: {},
         gifts: {},
         receipts: {},
-        referrals: {}
+        referrals: {},
+        appSettings: { requireDeliveryPhoto: false }
       }
     };
 
     updateCartBadges();
 
     window.__engzOnScreenChange = function (screenId) {
-      if (screenId === "screen-orders-home") renderDepartments();
+      if (screenId === "screen-orders-home") {
+        renderDepartments();
+        renderClientOrdersTracker();
+      }
       if (screenId === "screen-challenges-hub") renderChallengesHub();
       if (screenId === "screen-payment") {
         locks.sendReceipt = false;
@@ -1446,6 +1471,17 @@
 
     function notify(msg, type = "info") {
       window.engzNotify(msg, type);
+    }
+
+    function isOrderCompleted(o) {
+      if (!o) return false;
+      return (
+        o.stage === "completed" ||
+        o.deliveryStatus === "completed" ||
+        o.orderCompleted === true ||
+        o.status === "منتهي" ||
+        o.status === "تم وصول الطلب"
+      );
     }
 
     function showExecutionAndDeliveryAlerts(orderId) {
@@ -1480,7 +1516,7 @@
       const currentUid = state.currentUser?.id || "";
 
       for (const [orderId, ord] of Object.entries(ordersObj)) {
-        if (!ord) continue;
+        if (!ord || isOrderCompleted(ord)) continue;
         const isConfirmed =
           ord.paymentStatus === "confirmed" ||
           ord.paymentConfirmed === true ||
@@ -2007,6 +2043,147 @@
           `;
         })
         .join("");
+    }
+
+    window.triggerClientOrderPhoto = function (orderId, mode) {
+      const id = mode === "camera" ? `client-cam-${orderId}` : `client-gal-${orderId}`;
+      const el = document.getElementById(id);
+      if (el) el.click();
+    };
+
+    window.handleClientOrderPhotoFile = function (inputEl, orderId) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      encodeHighQualityImage(file, (dataUrl) => {
+        clientOrderProofs[orderId] = dataUrl;
+        renderClientOrdersTracker();
+        notify("تم إرفاق صورة تأكيد وصول الطلب.", "success");
+      });
+    };
+
+    window.clearClientOrderPhoto = function (orderId) {
+      clientOrderProofs[orderId] = "";
+      const c = document.getElementById(`client-cam-${orderId}`);
+      const g = document.getElementById(`client-gal-${orderId}`);
+      if (c) c.value = "";
+      if (g) g.value = "";
+      renderClientOrdersTracker();
+      notify("تم حذف الصورة.", "info");
+    };
+
+    window.markOrderArrivedClient = async function (orderId) {
+      const ord = state.db.orders[orderId];
+      if (!ord) return notify("الطلب غير موجود.", "error");
+
+      const photoData = clientOrderProofs[orderId] || ord.deliveryImage || ord.receiptImage || "";
+      if (state.db.appSettings?.requireDeliveryPhoto && !photoData) {
+        return notify("تصوير أو اختيار صورة (كاميرا / استوديو) مطلوب قبل الضغط على تم وصول الطلب.", "error");
+      }
+
+      const now = Date.now();
+      await update(ref(db, `orders/${orderId}`), {
+        stage: "completed",
+        orderCompleted: true,
+        deliveryStatus: "completed",
+        status: "تم وصول الطلب",
+        userAlertMessage: "تم وصول الطلب",
+        deliveryImage: photoData,
+        completedAt: now,
+        completedBy: "client"
+      });
+
+      if (ord.challengeId) {
+        await update(ref(db, `challenges/${ord.challengeId}`), {
+          completed: true,
+          status: "مكتملة",
+          completedAt: now
+        });
+      }
+
+      delete clientOrderProofs[orderId];
+      notify("تم وصول الطلب بنجاح وانتقل إلى الطلبات المنتهية.", "success");
+      renderClientOrdersTracker();
+    };
+
+    window.deleteCompletedOrderClient = async function (orderId) {
+      const ok = confirm("هل تريد حذف هذا الطلب من قائمة الطلبات المنتهية؟ (نعم / لا)");
+      if (!ok) return;
+      await remove(ref(db, `orders/${orderId}`));
+      notify("تم حذف الطلب بنجاح.", "success");
+      renderClientOrdersTracker();
+    };
+
+    function renderClientOrdersTracker() {
+      const activeBox = document.getElementById("client-active-orders-list");
+      const completedBox = document.getElementById("client-completed-orders-list");
+      if (!activeBox || !completedBox) return;
+
+      const uid = state.currentUser?.id || "";
+      const phone = state.currentUser?.phone || "";
+      const name = (state.currentUser?.name || "").trim().toLowerCase();
+
+      const myOrders = Object.entries(state.db.orders || {})
+        .filter(([, o]) => {
+          if (!o) return false;
+          if (!uid && !phone && !name) return true;
+          return (
+            (uid && o.buyerId === uid) ||
+            (phone && (o.buyerPhone === phone || o.payerPhone === phone)) ||
+            (name && (o.buyerName || "").trim().toLowerCase() === name)
+          );
+        })
+        .sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0));
+
+      const activeList = myOrders.filter(([, o]) => !isOrderCompleted(o));
+      const completedList = myOrders.filter(([, o]) => isOrderCompleted(o));
+
+      activeBox.innerHTML = activeList.length
+        ? activeList.map(([id, o]) => {
+            const proof = clientOrderProofs[id] || o.deliveryImage || "";
+            const itemsText = Array.isArray(o.items) && o.items.length
+              ? o.items.map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ")
+              : esc(o.challengeTitle || "طلب");
+
+            return `
+              <div class="box-card">
+                <div><strong>طلب #${esc(id.slice(-6))}</strong> • الحالة: <strong style="color:#0284c7;">${esc(o.status || "قيد التنفيذ")}</strong></div>
+                <div style="font-size:13px; color:#334155; margin-top:4px;">الأصناف: ${itemsText} • الإجمالي: <strong>${Number(o.totalAmount) || 0} جنيه</strong></div>
+
+                <input type="file" id="client-cam-${esc(id)}" accept="image/*" capture="environment" style="display:none;" onchange="handleClientOrderPhotoFile(this, '${esc(id)}')" />
+                <input type="file" id="client-gal-${esc(id)}" accept="image/*" style="display:none;" onchange="handleClientOrderPhotoFile(this, '${esc(id)}')" />
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; align-items:center;">
+                  <button type="button" class="btn-dark" onclick="triggerClientOrderPhoto('${esc(id)}', 'camera')">📷 كاميرا</button>
+                  <button type="button" class="btn-amber" onclick="triggerClientOrderPhoto('${esc(id)}', 'gallery')">🖼️ استوديو</button>
+                  ${proof ? `<button type="button" class="btn-danger" onclick="clearClientOrderPhoto('${esc(id)}')">🗑️ حذف الصورة</button>` : ""}
+                </div>
+                ${proof ? `<img src="${proof}" class="thumb-preview" style="display:block;" alt="صورة وصول الطلب" />` : ""}
+
+                <div style="margin-top:10px;">
+                  <button type="button" class="btn-success" onclick="markOrderArrivedClient('${esc(id)}')">تم وصول الطلب</button>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : `<div class="box-card">لا توجد طلبات حالية.</div>`;
+
+      completedBox.innerHTML = completedList.length
+        ? completedList.map(([id, o]) => {
+            const itemsText = Array.isArray(o.items) && o.items.length
+              ? o.items.map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ")
+              : esc(o.challengeTitle || "طلب");
+
+            return `
+              <div class="box-card completed-card" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                <div>
+                  <strong>طلب #${esc(id.slice(-6))}</strong> • <strong style="color:#166534;">تم وصول الطلب ✓</strong><br/>
+                  <span style="font-size:13px; color:#334155;">${itemsText} • الإجمالي: <strong>${Number(o.totalAmount) || 0} جنيه</strong></span>
+                </div>
+                <button type="button" class="btn-danger" onclick="deleteCompletedOrderClient('${esc(id)}')">حذف الطلب</button>
+              </div>
+            `;
+          }).join("")
+        : `<div class="box-card">لا توجد طلبات منتهية بعد.</div>`;
     }
 
     window.openImageZoomModal = function (title, imgSrc, priceText, uid = null) {
@@ -2647,6 +2824,12 @@
       notify("تم حذف الصورة.", "info");
     };
 
+    window.triggerChallengerProofPick = function (mode) {
+      const id = mode === "camera" ? "delivery-proof-camera" : "delivery-proof-gallery";
+      const el = document.getElementById(id);
+      if (el) el.click();
+    };
+
     window.previewCompressedImage = function (inputEl, previewImgId, key, delBtnId) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
@@ -2663,7 +2846,7 @@
     };
 
     window.switchChallengerSubTab = function (tab) {
-      ["available", "active", "rewards"].forEach((t) => {
+      ["available", "active", "completed", "rewards"].forEach((t) => {
         document.getElementById(`stab-${t}`).classList.toggle("active", t === tab);
         document.getElementById(`chal-panel-${t}`).style.display = t === tab ? "block" : "none";
       });
@@ -2673,12 +2856,17 @@
     function renderChallengesHub() {
       const chalId = state.currentUser ? state.currentUser.id : "";
       const allOrders = Object.entries(state.db.orders || {}).map(([id, o]) => ({ id, ...o }));
-      const myActiveOrder = allOrders.find((o) => o.assignedChallengerId === chalId && o.stage === "active");
+      const myActiveOrder = allOrders.find(
+        (o) => o.assignedChallengerId === chalId && !isOrderCompleted(o)
+      );
+      const myCompletedOrders = allOrders.filter(
+        (o) => o.assignedChallengerId === chalId && isOrderCompleted(o)
+      );
 
       const availEl = document.getElementById("available-challenges-list");
       const challenges = Object.entries(state.db.challenges || {})
         .map(([id, c]) => ({ id, ...c }))
-        .filter((c) => !c.acceptedBy);
+        .filter((c) => !c.acceptedBy && !c.completed);
 
       if (!challenges.length) {
         availEl.innerHTML = `<div class="box-card">لا توجد تحديات متاحة حالياً.</div>`;
@@ -2704,7 +2892,7 @@
 
       const activeBox = document.getElementById("active-challenger-order-box");
       if (!myActiveOrder) {
-        activeBox.innerHTML = `<div class="box-card">لا يوجد طلب نشط لك حالياً.</div>`;
+        activeBox.innerHTML = `<div class="box-card">لا توجد مهام معلّقة / نشطة لك حالياً.</div>`;
       } else {
         const otherChallengers = Object.values(state.db.users || {}).filter(
           (u) => u.role === "challenger" && u.status === "approved" && u.id !== chalId
@@ -2715,7 +2903,7 @@
 
         activeBox.innerHTML = `
           <div class="box-card">
-            <h3 style="margin-top:0;">مهمة / طلب نشط</h3>
+            <h3 style="margin-top:0;">مهمة / طلب معلّق</h3>
             <p><strong>اسم المتسابق:</strong> ${esc(myActiveOrder.assignedChallengerName)}</p>
             <p><strong>رقم التلفون:</strong> ${esc(myActiveOrder.assignedChallengerPhone)}</p>
             <p><strong>وقت بدء التوصيل / القبول:</strong> ${new Date(myActiveOrder.deliveryStartAt || myActiveOrder.acceptedAt).toLocaleString("ar-EG")}</p>
@@ -2739,20 +2927,37 @@
             }
 
             <div class="form-group" style="margin-top:12px;">
-              <label>صورة تأكيد وصول الطلب (كاميرا / استوديو)</label>
-              <input type="file" id="delivery-proof-input" accept="image/*" capture="environment" onchange="previewCompressedImage(this, 'delivery-proof-prev', 'deliveryProof', 'del-delivery-proof-btn')" />
+              <label>صورة تأكيد وصول الطلب (اختياري للزيادة والتأكيد${state.db.appSettings?.requireDeliveryPhoto ? " — إجباري حالياً من الأدمن" : ""})</label>
+              <input type="file" id="delivery-proof-camera" accept="image/*" capture="environment" style="display:none;" onchange="previewCompressedImage(this, 'delivery-proof-prev', 'deliveryProof', 'del-delivery-proof-btn')" />
+              <input type="file" id="delivery-proof-gallery" accept="image/*" style="display:none;" onchange="previewCompressedImage(this, 'delivery-proof-prev', 'deliveryProof', 'del-delivery-proof-btn')" />
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn-dark" onclick="triggerChallengerProofPick('camera')">📷 كاميرا</button>
+                <button type="button" class="btn-amber" onclick="triggerChallengerProofPick('gallery')">🖼️ استوديو</button>
+              </div>
               <div class="preview-actions-row">
                 <img id="delivery-proof-prev" class="thumb-preview" alt="صورة التسليم" />
-                <button type="button" id="del-delivery-proof-btn" class="btn-danger" style="display:none;" onclick="clearPreviewImage('delivery-proof-input', 'delivery-proof-prev', 'del-delivery-proof-btn', 'deliveryProof')">🗑️ حذف الصورة</button>
+                <button type="button" id="del-delivery-proof-btn" class="btn-danger" style="display:none;" onclick="clearPreviewImage('delivery-proof-gallery', 'delivery-proof-prev', 'del-delivery-proof-btn', 'deliveryProof')">🗑️ حذف الصورة</button>
               </div>
             </div>
 
-            <button type="button" class="btn-success" onclick="completeActiveOrder('${esc(myActiveOrder.id)}', '${esc(myActiveOrder.challengeId || "")}')">
-              تأكيد انتهاء المهمه
-            </button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button type="button" class="btn-success" onclick="completeActiveOrder('${esc(myActiveOrder.id)}', '${esc(myActiveOrder.challengeId || "")}')">
+                تم وصول الطلب
+              </button>
+            </div>
           </div>
         `;
       }
+
+      const compBox = document.getElementById("completed-challenger-orders-box");
+      compBox.innerHTML = myCompletedOrders.length
+        ? myCompletedOrders.map((o) => `
+          <div class="box-card completed-card">
+            <strong>مهمة / طلب #${esc(o.id.slice(-6))}</strong> • <strong style="color:#166534;">مكتملة ✓</strong><br/>
+            <span style="font-size:13px; color:#334155;">${esc(o.challengeTitle || (o.items || []).map((i) => i.title).join(" ، ") || "مهمة")}</span>
+          </div>
+        `).join("")
+        : `<div class="box-card">لا توجد مهام مكتملة بعد.</div>`;
 
       const rewBox = document.getElementById("user-gifts-and-receipts-box");
       const myGifts = Object.values(state.db.gifts || {}).filter(
@@ -2826,7 +3031,7 @@
         status: "نشط"
       });
 
-      notify("تم قبول التحدي وإضافته إلى الطلبات النشطة.", "success");
+      notify("تم قبول التحدي وإضافته إلى المهام المعلّقة / النشطة.", "success");
       switchChallengerSubTab("active");
     };
 
@@ -2873,23 +3078,36 @@
     };
 
     window.completeActiveOrder = async function (orderId, challengeId) {
-      if (!state.uploadedImages.deliveryProof) {
-        return notify("يرجى التقاط أو اختيار صورة تأكيد وصول الطلب أولاً.", "error");
+      const orderObj = state.db.orders[orderId] || {};
+      const proofImg = state.uploadedImages.deliveryProof || orderObj.deliveryImage || "";
+
+      if (state.db.appSettings?.requireDeliveryPhoto && !proofImg) {
+        return notify("تصوير أو اختيار صورة (كاميرا / استوديو) مطلوب قبل تأكيد وصول الطلب.", "error");
       }
 
       const now = Date.now();
-      const orderObj = state.db.orders[orderId] || {};
       const startTs = Number(orderObj.deliveryStartAt || orderObj.acceptedAt) || now;
       const elapsedSec = Math.max(1, Math.round((now - startTs) / 1000));
       const rewardVal = Math.max(0, Number(orderObj.totalAmount) || Number(state.db.challenges[challengeId]?.reward) || 0);
 
       await update(ref(db, `orders/${orderId}`), {
         stage: "completed",
-        status: "منتهي",
-        deliveryImage: state.uploadedImages.deliveryProof,
+        orderCompleted: true,
+        deliveryStatus: "completed",
+        status: "تم وصول الطلب",
+        userAlertMessage: "تم وصول الطلب",
+        deliveryImage: proofImg,
         completedAt: now,
         deliveryDurationSec: elapsedSec
       });
+
+      if (challengeId) {
+        await update(ref(db, `challenges/${challengeId}`), {
+          completed: true,
+          status: "مكتملة",
+          completedAt: now
+        });
+      }
 
       if (state.currentUser) {
         const statsRef = ref(db, `challengersStats/${state.currentUser.id}`);
@@ -2917,10 +3135,13 @@
       }
 
       state.uploadedImages.deliveryProof = "";
-      notify(`تم تأكيد انتهاء المهمة بنجاح (الوقت المستغرق: ${elapsedSec} ثانية).`, "success");
-      renderChallengesHub();
+      notify(`تم وصول الطلب وانتقلت المهمة إلى المهام المكتملة والطلبات المنتهية.`, "success");
+      switchChallengerSubTab("completed");
     };
 
+    onValue(ref(db, "appSettings"), (s) => {
+      state.db.appSettings = Object.assign({ requireDeliveryPhoto: false }, s.val() || {});
+    });
     onValue(ref(db, "users"), (s) => {
       state.db.users = s.val() || {};
       tryApplyAdminUserAccess();
@@ -2964,6 +3185,9 @@
     onValue(ref(db, "orders"), (s) => {
       state.db.orders = s.val() || {};
       monitorConfirmedOrdersForUser();
+      if (document.getElementById("screen-orders-home").classList.contains("active")) {
+        renderClientOrdersTracker();
+      }
       if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
         renderChallengesHub();
       }
