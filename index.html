@@ -31,6 +31,17 @@
       line-height: 1.65;
     }
 
+    @keyframes btnPulsePop {
+      0% { transform: scale(1); }
+      45% { transform: scale(0.92) translateY(2px); }
+      100% { transform: scale(1) translateY(0); }
+    }
+
+    @keyframes bannerSlideIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     #splash-screen {
       position: fixed;
       inset: 0;
@@ -186,6 +197,12 @@
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 8px 20px rgba(234, 88, 12, 0.4);
+      transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.14s ease, filter 0.14s ease;
+    }
+
+    .cart-fab:active {
+      transform: scale(0.92) translateY(2px);
+      filter: brightness(0.95);
     }
 
     .cart-count {
@@ -253,7 +270,7 @@
       color: #ffffff;
       cursor: pointer;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.14s ease, filter 0.14s ease;
     }
 
     .big-choice-btn.selected-path {
@@ -263,7 +280,8 @@
     }
 
     .big-choice-btn:active {
-      transform: scale(0.98);
+      transform: scale(0.94) translateY(3px);
+      filter: brightness(0.94);
     }
 
     .btn-client { background: linear-gradient(135deg, #ec4899, #8b5cf6); }
@@ -283,6 +301,30 @@
       font-size: 14px;
       font-weight: bold;
       touch-action: manipulation;
+      transition: transform 0.13s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.16);
+      filter: brightness(1.03);
+    }
+
+    button:active:not(:disabled) {
+      transform: scale(0.92) translateY(2px);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+      filter: brightness(0.93);
+    }
+
+    button.btn-motion-active {
+      animation: btnPulsePop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    button:disabled {
+      opacity: 0.58;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     .form-group {
@@ -334,6 +376,11 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+    }
+
+    .dept-card:active {
+      transform: scale(0.95);
     }
 
     .dept-card-img {
@@ -373,6 +420,11 @@
       font-size: 13px;
       font-weight: bold;
       cursor: pointer;
+      transition: transform 0.13s ease, background 0.15s ease;
+    }
+
+    .type-chip:active {
+      transform: scale(0.93);
     }
 
     .type-chip.active {
@@ -413,7 +465,7 @@
 
     .product-card.holding-3s {
       border-color: #f59e0b;
-      transform: scale(0.99);
+      transform: scale(0.98);
     }
 
     .product-img-wrap {
@@ -525,6 +577,7 @@
       background: #eff6ff;
       color: #1e3a8a;
       border: 1px solid #bfdbfe;
+      animation: bannerSlideIn 0.24s ease-out;
     }
 
     .status-banner.error {
@@ -537,6 +590,20 @@
       background: #ecfdf5;
       color: #065f46;
       border-color: #a7f3d0;
+    }
+
+    .admin-approval-alert {
+      background: linear-gradient(120deg, #059669 0%, #10b981 55%, #0d9488 100%);
+      color: #ffffff;
+      border: 2px solid #a7f3d0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 10px 24px rgba(5, 150, 105, 0.35);
+      animation: bannerSlideIn 0.28s ease-out;
+      display: none;
     }
 
     .receipt-box {
@@ -693,6 +760,7 @@
       </div>
     </div>
 
+    <div id="admin-approval-banner" class="admin-approval-alert"></div>
     <div id="global-notice" class="status-banner" style="display:none;"></div>
 
     <div id="personal-referral-wallet-bar" class="box-card" style="display:none;">
@@ -899,7 +967,7 @@
         الإجمالي: 0 جنيه
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="btn-success" onclick="goToCheckoutConfirmation()">تأكيد</button>
+        <button type="button" id="btn-cart-confirm" class="btn-success" onclick="goToCheckoutConfirmation()">تأكيد</button>
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
@@ -914,7 +982,7 @@
       <div id="confirm-cards-grid" class="items-grid"></div>
       <div id="confirm-total-line" class="box-card" style="margin-top:14px; font-size:18px; font-weight:bold;"></div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="btn-success" onclick="openPaymentMethodsScreen()">تأكيد</button>
+        <button type="button" id="btn-confirm-purchase-step" class="btn-success" onclick="openPaymentMethodsScreen()">تأكيد</button>
         <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
@@ -968,7 +1036,7 @@
           <button type="button" class="btn-amber" onclick="document.getElementById('receipt-gallery-input').click()">
             🖼️ استوديو (اختيار صورة)
           </button>
-          <button type="button" class="btn-success" onclick="sendPaymentReceiptToAdmin()">
+          <button type="button" id="btn-send-receipt-admin" class="btn-success" onclick="sendPaymentReceiptToAdmin()">
             📤 إرسال الإيصال إلى الأدمن
           </button>
         </div>
@@ -985,8 +1053,8 @@
       <div id="confirm-purchase-prompt-box" class="box-card">
         <p style="font-size:17px; font-weight:bold; color:#1e1b4b; margin-top:0;">هل تريد تأكيد طلب الشراء</p>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button type="button" class="btn-success" onclick="confirmPurchaseYes()">نعم</button>
-          <button type="button" class="btn-danger" onclick="confirmPurchaseNo()">لا</button>
+          <button type="button" id="btn-confirm-purchase-yes" class="btn-success" onclick="confirmPurchaseYes()">نعم</button>
+          <button type="button" id="btn-confirm-purchase-no" class="btn-danger" onclick="confirmPurchaseNo()">لا</button>
         </div>
       </div>
 
@@ -1045,6 +1113,17 @@
     window.__engzChalMode = "register";
     window.__engzSplashTimer = null;
     window.__engzSplashRunning = false;
+
+    document.addEventListener("click", function (ev) {
+      var btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
+      if (!btn) return;
+      btn.classList.remove("btn-motion-active");
+      void btn.offsetWidth;
+      btn.classList.add("btn-motion-active");
+      setTimeout(function () {
+        btn.classList.remove("btn-motion-active");
+      }, 260);
+    }, true);
 
     window.engzNotify = function (msg, type) {
       var el = document.getElementById("global-notice");
@@ -1298,6 +1377,14 @@
     let appliedImpersonation = false;
     const productsCatalog = {};
     let currentZoomUid = null;
+    const seenConfirmedOrderIds = new Set();
+
+    const locks = {
+      cartStep: false,
+      confirmStep: false,
+      sendReceipt: false,
+      confirmPurchase: false
+    };
 
     const state = {
       currentRole: null,
@@ -1331,11 +1418,56 @@
     window.__engzOnScreenChange = function (screenId) {
       if (screenId === "screen-orders-home") renderDepartments();
       if (screenId === "screen-challenges-hub") renderChallengesHub();
-      if (screenId === "screen-payment") renderPaymentScreen();
+      if (screenId === "screen-payment") {
+        locks.sendReceipt = false;
+        locks.confirmPurchase = false;
+        const bSend = document.getElementById("btn-send-receipt-admin");
+        const bYes = document.getElementById("btn-confirm-purchase-yes");
+        if (bSend) bSend.disabled = false;
+        if (bYes) bYes.disabled = false;
+        renderPaymentScreen();
+      }
     };
 
     function notify(msg, type = "info") {
       window.engzNotify(msg, type);
+    }
+
+    function showAdminApprovalExecutionNotice(orderId) {
+      const banner = document.getElementById("admin-approval-banner");
+      if (!banner) return;
+      const suffix = orderId ? ` • رقم الطلب #${String(orderId).slice(-6)}` : "";
+      banner.textContent = `جارى تنفيذ طلبك${suffix}`;
+      banner.style.display = "block";
+      banner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      notify("جارى تنفيذ طلبك", "success");
+      if (navigator.vibrate) {
+        try { navigator.vibrate([120, 60, 120]); } catch {}
+      }
+    }
+
+    function monitorConfirmedOrdersForUser() {
+      const ordersObj = state.db.orders || {};
+      const currentName = (state.currentUser?.name || "").trim().toLowerCase();
+      const currentPhone = (state.currentUser?.phone || "").trim();
+      const currentUid = state.currentUser?.id || "";
+
+      for (const [orderId, ord] of Object.entries(ordersObj)) {
+        if (!ord) continue;
+        const isConfirmed = ord.paymentStatus === "confirmed" || ord.paymentConfirmed === true;
+        if (!isConfirmed) continue;
+
+        const matchesUser =
+          (currentUid && ord.buyerId === currentUid) ||
+          (currentPhone && (ord.buyerPhone === currentPhone || ord.payerPhone === currentPhone)) ||
+          (currentName && (ord.buyerName || "").trim().toLowerCase() === currentName) ||
+          !currentUid;
+
+        if (matchesUser && !seenConfirmedOrderIds.has(orderId)) {
+          seenConfirmedOrderIds.add(orderId);
+          showAdminApprovalExecutionNotice(orderId);
+        }
+      }
     }
 
     function isValidEgyptianPhone(phone) {
@@ -2030,6 +2162,10 @@
     }
 
     window.openCartScreen = function () {
+      locks.cartStep = false;
+      const bCart = document.getElementById("btn-cart-confirm");
+      if (bCart) bCart.disabled = false;
+
       const listEl = document.getElementById("cart-items-list");
       const totalBox = document.getElementById("cart-total-box");
 
@@ -2068,9 +2204,14 @@
     };
 
     window.goToCheckoutConfirmation = function () {
+      if (locks.cartStep) return;
       if (!state.cart.length) {
         return notify("اختر صنفاً واحداً على الأقل قبل التأكيد.", "error");
       }
+      locks.cartStep = true;
+      const btn = document.getElementById("btn-cart-confirm");
+      if (btn) btn.disabled = true;
+
       const grid = document.getElementById("confirm-cards-grid");
       let total = 0;
       grid.innerHTML = state.cart
@@ -2096,6 +2237,10 @@
 
       document.getElementById("confirm-total-line").textContent = `إجمالي المشتريات: ${total} جنيه`;
       window.goScreen("screen-confirm-purchase");
+      setTimeout(() => {
+        locks.cartStep = false;
+        if (btn) btn.disabled = false;
+      }, 450);
     };
 
     function getCartTotal() {
@@ -2157,6 +2302,10 @@
     window.handlePaymentReceiptFile = function (inputEl) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
+      locks.sendReceipt = false;
+      const bSend = document.getElementById("btn-send-receipt-admin");
+      if (bSend) bSend.disabled = false;
+
       encodeHighQualityImage(file, (highResDataUrl) => {
         state.uploadedImages.paymentReceipt = highResDataUrl;
         const prev = document.getElementById("payment-receipt-preview");
@@ -2172,6 +2321,9 @@
 
     window.clearPaymentReceiptImage = function () {
       state.uploadedImages.paymentReceipt = "";
+      locks.sendReceipt = false;
+      const bSend = document.getElementById("btn-send-receipt-admin");
+      if (bSend) bSend.disabled = false;
       document.getElementById("receipt-camera-input").value = "";
       document.getElementById("receipt-gallery-input").value = "";
       const prev = document.getElementById("payment-receipt-preview");
@@ -2186,6 +2338,7 @@
     };
 
     window.sendPaymentReceiptToAdmin = async function () {
+      if (locks.sendReceipt) return;
       const total = getCartTotal();
       if (total <= 0) return notify("عربة التسوق فارغة، اختر أصنافاً أولاً.", "error");
 
@@ -2209,53 +2362,71 @@
         return notify("صوّر الإيصال بالكاميرا أو اختر صورته من الاستوديو أولاً.", "error");
       }
 
-      const now = Date.now();
-      const buyerName = state.currentUser?.name || "مستخدم";
-      const buyerPhone = state.currentUser?.phone || payerPhone;
-      const buyerId = state.currentUser?.id || "";
+      locks.sendReceipt = true;
+      const bSend = document.getElementById("btn-send-receipt-admin");
+      if (bSend) bSend.disabled = true;
 
-      const orderRef = push(ref(db, "orders"));
-      await set(orderRef, {
-        id: orderRef.key,
-        buyerId,
-        buyerName,
-        buyerPhone,
-        payerPhone,
-        paymentSourceType: state.paymentSourceType,
-        items: state.cart,
-        totalAmount: total,
-        cashReceiverPhone: receiverPhone,
-        receiptImage: state.uploadedImages.paymentReceipt,
-        paymentConfirmed: false,
-        paymentStatus: "pending_review",
-        status: "تم إرسال الإيصال وبانتظار تأكيد الأدمن",
-        createdAt: now
-      });
+      try {
+        const now = Date.now();
+        const buyerName = state.currentUser?.name || "مستخدم";
+        const buyerPhone = state.currentUser?.phone || payerPhone;
+        const buyerId = state.currentUser?.id || "";
 
-      const receiptRef = push(ref(db, "paymentReceipts"));
-      await set(receiptRef, {
-        id: receiptRef.key,
-        orderId: orderRef.key,
-        buyerId,
-        buyerName,
-        buyerPhone,
-        payerPhone,
-        paymentSourceType: state.paymentSourceType,
-        cashReceiverPhone: receiverPhone,
-        totalAmount: total,
-        receiptImage: state.uploadedImages.paymentReceipt,
-        paymentStatus: "pending_review",
-        createdAt: now
-      });
+        const orderRef = push(ref(db, "orders"));
+        await set(orderRef, {
+          id: orderRef.key,
+          buyerId,
+          buyerName,
+          buyerPhone,
+          payerPhone,
+          paymentSourceType: state.paymentSourceType,
+          items: state.cart,
+          totalAmount: total,
+          cashReceiverPhone: receiverPhone,
+          receiptImage: state.uploadedImages.paymentReceipt,
+          paymentConfirmed: false,
+          paymentStatus: "pending_review",
+          status: "تم إرسال الإيصال وبانتظار تأكيد الأدمن",
+          createdAt: now
+        });
 
-      document.getElementById("receipt-send-status").textContent =
-        `تم إرسال إيصال الدفع إلى الأدمن بنجاح (رقم الدفع: ${payerPhone} • استقبال: ${receiverPhone}).`;
-      notify("تم إرسال صورة الإيصال إلى الأدمن وسيظهر طلبك فوراً في لوحة الأدمن.", "success");
+        const receiptRef = push(ref(db, "paymentReceipts"));
+        await set(receiptRef, {
+          id: receiptRef.key,
+          orderId: orderRef.key,
+          buyerId,
+          buyerName,
+          buyerPhone,
+          payerPhone,
+          paymentSourceType: state.paymentSourceType,
+          cashReceiverPhone: receiverPhone,
+          totalAmount: total,
+          receiptImage: state.uploadedImages.paymentReceipt,
+          paymentStatus: "pending_review",
+          createdAt: now
+        });
+
+        document.getElementById("receipt-send-status").textContent =
+          `تم إرسال إيصال الدفع إلى الأدمن بنجاح (رقم الدفع: ${payerPhone} • استقبال: ${receiverPhone}).`;
+        notify("تم إرسال صورة الإيصال إلى الأدمن وسيظهر طلبك فوراً في لوحة الأدمن.", "success");
+      } catch (err) {
+        locks.sendReceipt = false;
+        if (bSend) bSend.disabled = false;
+        notify("حدث خطأ أثناء إرسال الإيصال، حاول مرة أخرى.", "error");
+      }
     };
 
     window.openPaymentMethodsScreen = function () {
+      if (locks.confirmStep) return;
+      locks.confirmStep = true;
+      const btn = document.getElementById("btn-confirm-purchase-step");
+      if (btn) btn.disabled = true;
       document.getElementById("payment-result-box").innerHTML = "";
       window.goScreen("screen-payment");
+      setTimeout(() => {
+        locks.confirmStep = false;
+        if (btn) btn.disabled = false;
+      }, 450);
     };
 
     function renderPaymentScreen() {
@@ -2300,11 +2471,15 @@
     };
 
     window.confirmPurchaseNo = function () {
+      locks.confirmPurchase = false;
+      const bYes = document.getElementById("btn-confirm-purchase-yes");
+      if (bYes) bYes.disabled = false;
       notify("تم إلغاء تأكيد الشراء والعودة إلى صفحة اختيار السلع.", "info");
       window.goScreen("screen-orders-home");
     };
 
     window.confirmPurchaseYes = async function () {
+      if (locks.confirmPurchase) return;
       const total = getCartTotal();
       if (total <= 0) return notify("قيمة الطلب غير صالحة.", "error");
 
@@ -2323,97 +2498,109 @@
         return notify("يرجى تسجيل الدخول كعميل أولاً ليتم الخصم من حسابك.", "error");
       }
 
-      const userRef = ref(db, `users/${state.currentUser.id}/wallet`);
-      let paid = false;
-      await runTransaction(userRef, (currentBal) => {
-        const bal = Number(currentBal) || 0;
-        if (bal < total) return;
-        paid = true;
-        return Number((bal - total).toFixed(2));
-      });
+      locks.confirmPurchase = true;
+      const bYes = document.getElementById("btn-confirm-purchase-yes");
+      if (bYes) bYes.disabled = true;
 
-      if (!paid) {
-        return notify(`رصيدك الحالي غير كافٍ لإتمام طلب الشراء (${total} جنيه).`, "error");
-      }
+      try {
+        const userRef = ref(db, `users/${state.currentUser.id}/wallet`);
+        let paid = false;
+        await runTransaction(userRef, (currentBal) => {
+          const bal = Number(currentBal) || 0;
+          if (bal < total) return;
+          paid = true;
+          return Number((bal - total).toFixed(2));
+        });
 
-      const orderRef = push(ref(db, "orders"));
-      await set(orderRef, {
-        id: orderRef.key,
-        buyerId: state.currentUser.id,
-        buyerName: state.currentUser.name,
-        buyerPhone: state.currentUser.phone,
-        payerPhone,
-        paymentSourceType: state.paymentSourceType,
-        items: state.cart,
-        totalAmount: total,
-        cashReceiverPhone: receiverPhone,
-        receiptImage: state.uploadedImages.paymentReceipt || "",
-        paymentMethod: state.paymentSourceType === "other" ? "دفع من رقم آخر" : "دفع من نفس الرقم",
-        paymentConfirmed: false,
-        paymentStatus: "pending_review",
-        status: "جاري تنفيذ طلبك (بانتظار تأكيد الدفع من الأدمن)",
-        createdAt: Date.now()
-      });
+        if (!paid) {
+          locks.confirmPurchase = false;
+          if (bYes) bYes.disabled = false;
+          return notify(`رصيدك الحالي غير كافٍ لإتمام طلب الشراء (${total} جنيه).`, "error");
+        }
 
-      if (state.uploadedImages.paymentReceipt) {
-        await set(push(ref(db, "paymentReceipts")), {
-          orderId: orderRef.key,
+        const orderRef = push(ref(db, "orders"));
+        await set(orderRef, {
+          id: orderRef.key,
           buyerId: state.currentUser.id,
           buyerName: state.currentUser.name,
           buyerPhone: state.currentUser.phone,
           payerPhone,
           paymentSourceType: state.paymentSourceType,
-          cashReceiverPhone: receiverPhone,
+          items: state.cart,
           totalAmount: total,
-          receiptImage: state.uploadedImages.paymentReceipt,
+          cashReceiverPhone: receiverPhone,
+          receiptImage: state.uploadedImages.paymentReceipt || "",
+          paymentMethod: state.paymentSourceType === "other" ? "دفع من رقم آخر" : "دفع من نفس الرقم",
+          paymentConfirmed: false,
           paymentStatus: "pending_review",
+          status: "جاري تنفيذ طلبك (بانتظار تأكيد الدفع من الأدمن)",
           createdAt: Date.now()
         });
+
+        if (state.uploadedImages.paymentReceipt) {
+          await set(push(ref(db, "paymentReceipts")), {
+            orderId: orderRef.key,
+            buyerId: state.currentUser.id,
+            buyerName: state.currentUser.name,
+            buyerPhone: state.currentUser.phone,
+            payerPhone,
+            paymentSourceType: state.paymentSourceType,
+            cashReceiverPhone: receiverPhone,
+            totalAmount: total,
+            receiptImage: state.uploadedImages.paymentReceipt,
+            paymentStatus: "pending_review",
+            createdAt: Date.now()
+          });
+        }
+
+        await runTransaction(ref(db, `clientActivity/${state.currentUser.id}`), (curr) => {
+          const prev = curr || {
+            userId: state.currentUser.id,
+            name: state.currentUser.name,
+            phone: state.currentUser.phone,
+            orderCount: 0,
+            totalSpent: 0
+          };
+          return {
+            userId: state.currentUser.id,
+            name: state.currentUser.name,
+            phone: state.currentUser.phone,
+            orderCount: (Number(prev.orderCount) || 0) + 1,
+            totalSpent: Number(((Number(prev.totalSpent) || 0) + total).toFixed(2)),
+            lastOrderAt: Date.now()
+          };
+        });
+
+        await markReferrerFirstActionSuccess(state.currentUser.id);
+
+        await push(ref(db, "receipts"), {
+          type: "وصل دفع واستلام",
+          userId: state.currentUser.id,
+          userName: state.currentUser.name,
+          phone: payerPhone,
+          receiverPhone,
+          amount: total,
+          method: state.paymentSourceType === "other" ? "من رقم آخر إلى رقم الأدمن" : "من نفس الرقم إلى رقم الأدمن",
+          createdAt: Date.now()
+        });
+
+        state.cart = [];
+        saveCartToStorage([]);
+        updateCartBadges();
+
+        document.getElementById("payment-result-box").innerHTML = `
+          <div class="receipt-box">
+            <h3 style="margin-top:0; color:#065f46;">تم إرسال طلب الشراء إلى الأدمن</h3>
+            <p>المبلغ: <strong>${total} جنيه</strong> • رقم الدفع: <strong>${esc(payerPhone)}</strong> • رقم الاستقبال: <strong>${esc(receiverPhone)}</strong>.</p>
+            <button type="button" class="btn-dark" onclick="goScreen('screen-orders-home')">العودة إلى الأقسام</button>
+          </div>
+        `;
+        notify("تم تأكيد طلب الشراء وإرساله للأدمن بنجاح.", "success");
+      } catch (err) {
+        locks.confirmPurchase = false;
+        if (bYes) bYes.disabled = false;
+        notify("حدث خطأ أثناء تأكيد الطلب، حاول مرة أخرى.", "error");
       }
-
-      await runTransaction(ref(db, `clientActivity/${state.currentUser.id}`), (curr) => {
-        const prev = curr || {
-          userId: state.currentUser.id,
-          name: state.currentUser.name,
-          phone: state.currentUser.phone,
-          orderCount: 0,
-          totalSpent: 0
-        };
-        return {
-          userId: state.currentUser.id,
-          name: state.currentUser.name,
-          phone: state.currentUser.phone,
-          orderCount: (Number(prev.orderCount) || 0) + 1,
-          totalSpent: Number(((Number(prev.totalSpent) || 0) + total).toFixed(2)),
-          lastOrderAt: Date.now()
-        };
-      });
-
-      await markReferrerFirstActionSuccess(state.currentUser.id);
-
-      await push(ref(db, "receipts"), {
-        type: "وصل دفع واستلام",
-        userId: state.currentUser.id,
-        userName: state.currentUser.name,
-        phone: payerPhone,
-        receiverPhone,
-        amount: total,
-        method: state.paymentSourceType === "other" ? "من رقم آخر إلى رقم الأدمن" : "من نفس الرقم إلى رقم الأدمن",
-        createdAt: Date.now()
-      });
-
-      state.cart = [];
-      saveCartToStorage([]);
-      updateCartBadges();
-
-      document.getElementById("payment-result-box").innerHTML = `
-        <div class="receipt-box">
-          <h3 style="margin-top:0; color:#065f46;">تم إرسال طلب الشراء إلى الأدمن</h3>
-          <p>المبلغ: <strong>${total} جنيه</strong> • رقم الدفع: <strong>${esc(payerPhone)}</strong> • رقم الاستقبال: <strong>${esc(receiverPhone)}</strong>.</p>
-          <button type="button" class="btn-dark" onclick="goScreen('screen-orders-home')">العودة إلى الأقسام</button>
-        </div>
-      `;
-      notify("تم تأكيد طلب الشراء وإرساله للأدمن بنجاح.", "success");
     };
 
     window.clearPreviewImage = function (inputId, previewImgId, delBtnId, key) {
@@ -2709,6 +2896,7 @@
       tryApplyAdminUserAccess();
       syncUserHeader();
       checkRegistrationStatusBanner();
+      monitorConfirmedOrdersForUser();
     });
     onValue(ref(db, "banned"), (s) => { state.db.banned = s.val() || {}; });
     onValue(ref(db, "clientRegRequests"), (s) => {
@@ -2745,6 +2933,7 @@
     });
     onValue(ref(db, "orders"), (s) => {
       state.db.orders = s.val() || {};
+      monitorConfirmedOrdersForUser();
       if (document.getElementById("screen-challenges-hub").classList.contains("active")) {
         renderChallengesHub();
       }
