@@ -19,6 +19,10 @@
       45% { transform: scale(0.92) translateY(2px); }
       100% { transform: scale(1) translateY(0); }
     }
+    @keyframes adminAlertIn {
+      from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
     .wrap {
       max-width: 1040px;
       margin: 0 auto;
@@ -57,9 +61,24 @@
       background: #eff6ff;
       color: #1e3a8a;
       border: 1px solid #bfdbfe;
+      animation: adminAlertIn 0.24s ease-out;
     }
     .notice.error { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
     .notice.success { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+
+    .admin-delivery-banner {
+      display: none;
+      background: linear-gradient(120deg, #0284c7 0%, #2563eb 60%, #4f46e5 100%);
+      color: #ffffff;
+      border: 2px solid #bae6fd;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      font-size: 15px;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+      animation: adminAlertIn 0.25s ease-out;
+    }
 
     .stats-grid {
       display: grid;
@@ -156,7 +175,6 @@
       max-width: 260px;
       max-height: 220px;
       border-radius: 12px;
-      margin-top: 10px;
       display: block;
       border: 2px solid #cbd5e1;
       object-fit: contain;
@@ -180,8 +198,8 @@
       color: #92400e;
     }
     .badge-status.confirmed {
-      background: #d1fae5;
-      color: #065f46;
+      background: #dbeafe;
+      color: #1e40af;
     }
     .badge-status.rejected {
       background: #fee2e2;
@@ -202,6 +220,7 @@
       </div>
     </div>
 
+    <div id="admin-delivery-banner" class="admin-delivery-banner"></div>
     <div id="admin-notice" class="notice"></div>
 
     <!-- شاشة تسجيل دخول الأدمن -->
@@ -279,7 +298,10 @@
             <div class="form-group">
               <label for="dept-img-file">صورة القسم (اختياري)</label>
               <input type="file" id="dept-img-file" accept="image/*" onchange="handleImg(this, 'dept-img-prev', 'deptImg')" />
-              <img id="dept-img-prev" class="thumb" alt="معاينة القسم" />
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+                <img id="dept-img-prev" class="thumb" style="margin-top:0;" alt="معاينة القسم" />
+                <button type="button" id="del-dept-img-btn" class="btn-danger" style="display:none;" onclick="clearAdminPreview('dept-img-file', 'dept-img-prev', 'del-dept-img-btn', 'deptImg')">🗑️ حذف الصورة</button>
+              </div>
             </div>
           </div>
           <button type="button" class="btn-success" onclick="addDepartment()">حفظ القسم</button>
@@ -320,7 +342,10 @@
           <div class="form-group">
             <label for="prod-img-file">صورة المنتج</label>
             <input type="file" id="prod-img-file" accept="image/*" onchange="handleImg(this, 'prod-img-prev', 'prodImg')" />
-            <img id="prod-img-prev" class="thumb" alt="معاينة المنتج" />
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+              <img id="prod-img-prev" class="thumb" style="margin-top:0;" alt="معاينة المنتج" />
+              <button type="button" id="del-prod-img-btn" class="btn-danger" style="display:none;" onclick="clearAdminPreview('prod-img-file', 'prod-img-prev', 'del-prod-img-btn', 'prodImg')">🗑️ حذف الصورة</button>
+            </div>
           </div>
           <button type="button" class="btn-success" onclick="addProduct()">إضافة المنتج</button>
         </div>
@@ -464,6 +489,14 @@
       el.textContent = msg;
     }
 
+    function showAdminDeliveryBanner(orderId) {
+      const banner = document.getElementById("admin-delivery-banner");
+      if (!banner) return;
+      const suffix = orderId ? ` • طلب #${String(orderId).slice(-6)}` : "";
+      banner.textContent = `تنبيه: جارى التوصيل${suffix}`;
+      banner.style.display = "block";
+    }
+
     function esc(v) {
       return String(v ?? "")
         .replace(/&/g, "&amp;")
@@ -523,6 +556,20 @@
       renderAll();
     };
 
+    window.clearAdminPreview = function (inputId, prevId, delBtnId, key) {
+      imgs[key] = "";
+      const inp = document.getElementById(inputId);
+      if (inp) inp.value = "";
+      const prev = document.getElementById(prevId);
+      if (prev) {
+        prev.src = "";
+        prev.style.display = "none";
+      }
+      const btn = document.getElementById(delBtnId);
+      if (btn) btn.style.display = "none";
+      notify("تم حذف صورة المعاينة.", "info");
+    };
+
     window.handleImg = function (input, prevId, key) {
       const file = input.files && input.files[0];
       if (!file) return;
@@ -545,6 +592,13 @@
           const prev = document.getElementById(prevId);
           prev.src = dataUrl;
           prev.style.display = "block";
+          if (key === "deptImg") {
+            const b = document.getElementById("del-dept-img-btn");
+            if (b) b.style.display = "inline-block";
+          } else if (key === "prodImg") {
+            const b = document.getElementById("del-prod-img-btn");
+            if (b) b.style.display = "inline-block";
+          }
         };
         img.src = ev.target.result;
       };
@@ -771,8 +825,7 @@
         await set(ref(db, `departmentsMeta/${name}`), { image: imgs.deptImg });
       }
       document.getElementById("dept-name").value = "";
-      imgs.deptImg = "";
-      document.getElementById("dept-img-prev").style.display = "none";
+      window.clearAdminPreview("dept-img-file", "dept-img-prev", "del-dept-img-btn", "deptImg");
       notify(`تم حفظ القسم (${name}).`, "success");
     };
 
@@ -801,8 +854,7 @@
       document.getElementById("prod-price").value = "";
       document.getElementById("prod-desc").value = "";
       document.getElementById("prod-offer").checked = false;
-      imgs.prodImg = "";
-      document.getElementById("prod-img-prev").style.display = "none";
+      window.clearAdminPreview("prod-img-file", "prod-img-prev", "del-prod-img-btn", "prodImg");
       notify("تم إضافة المنتج.", "success");
     };
 
@@ -855,24 +907,46 @@
       notify("تم إرسال الهدية.", "success");
     };
 
+    window.deleteOrderReceiptImage = async function (orderId, receiptId = "") {
+      const orderObj = store.orders[orderId];
+      if (!orderObj) return notify("الطلب غير موجود.", "error");
+      try {
+        await update(ref(db, `orders/${orderId}`), { receiptImage: "" });
+        if (receiptId && store.paymentReceipts[receiptId]) {
+          await update(ref(db, `paymentReceipts/${receiptId}`), { receiptImage: "" });
+        } else {
+          const matched = Object.entries(store.paymentReceipts || {}).filter(([, r]) => r && r.orderId === orderId);
+          for (const [rId] of matched) {
+            await update(ref(db, `paymentReceipts/${rId}`), { receiptImage: "" });
+          }
+        }
+        notify(`تم حذف صورة الإيصال من الطلب #${orderId.slice(-6)} لتخفيف قاعدة البيانات.`, "success");
+      } catch (err) {
+        notify("تعذر حذف صورة الإيصال، حاول مرة أخرى.", "error");
+      }
+    };
+
     window.confirmOrderPayment = async function (orderId, receiptId = "") {
       const orderObj = store.orders[orderId];
       if (!orderObj) return notify("الطلب غير موجود.", "error");
       const now = Date.now();
-      const executionText = "جارى تنفيذ طلبك";
+      const deliveryAlertText = "جارى التوصيل";
 
       await update(ref(db, `orders/${orderId}`), {
         paymentConfirmed: true,
         paymentStatus: "confirmed",
-        userAlertMessage: executionText,
-        status: executionText,
-        confirmedAt: now
+        deliveryStatus: "out_for_delivery",
+        userAlertMessage: deliveryAlertText,
+        status: deliveryAlertText,
+        confirmedAt: now,
+        deliveryStartedAt: now
       });
 
       if (receiptId && store.paymentReceipts[receiptId]) {
         await update(ref(db, `paymentReceipts/${receiptId}`), {
           paymentStatus: "confirmed",
-          userAlertMessage: executionText,
+          deliveryStatus: "out_for_delivery",
+          userAlertMessage: deliveryAlertText,
           confirmedAt: now
         });
       }
@@ -886,11 +960,12 @@
         receiverPhone: orderObj.cashReceiverPhone || "",
         amount: Number(orderObj.totalAmount) || 0,
         method: orderObj.paymentSourceType === "other" ? "دفع من رقم آخر + إيصال" : "دفع من نفس الرقم + إيصال",
-        status: executionText,
+        status: deliveryAlertText,
         createdAt: now
       });
 
-      notify(`تم قبول وتأكيد دفع الطلب #${orderId.slice(-6)} وإرسال تنبيه (جارى تنفيذ طلبك) للمستخدم.`, "success");
+      showAdminDeliveryBanner(orderId);
+      notify(`تم قبول الدفع وإرسال تنبيه (جارى تنفيذ طلبك) ثم (جارى التوصيل) للمستخدم وللأدمن.`, "success");
     };
 
     window.rejectOrderPayment = async function (orderId, receiptId = "") {
@@ -901,6 +976,7 @@
       await update(ref(db, `orders/${orderId}`), {
         paymentConfirmed: false,
         paymentStatus: "rejected",
+        deliveryStatus: "cancelled",
         userAlertMessage: "",
         status: "مرفوض / بانتظار مراجعة الإيصال",
         rejectedAt: now
@@ -930,6 +1006,13 @@
       const orders = Object.entries(store.orders || {}).sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0));
       const receiptsEntries = Object.entries(store.paymentReceipts || {});
 
+      const latestConfirmedOrder = orders.find(
+        ([, o]) => o && (o.paymentStatus === "confirmed" || o.paymentConfirmed === true || o.deliveryStatus === "out_for_delivery")
+      );
+      if (latestConfirmedOrder) {
+        showAdminDeliveryBanner(latestConfirmedOrder[0]);
+      }
+
       document.getElementById("all-orders-list").innerHTML = orders.length
         ? orders.map(([id, o]) => {
             const linkedReceipt = receiptsEntries.find(([, r]) => r.orderId === id);
@@ -942,10 +1025,13 @@
                 ? `رقم آخر (${esc(payerPhone)})`
                 : `نفس الرقم (${esc(payerPhone)})`;
 
-            const isConfirmed = o.paymentStatus === "confirmed" || o.paymentConfirmed === true;
+            const isConfirmed =
+              o.paymentStatus === "confirmed" ||
+              o.paymentConfirmed === true ||
+              o.deliveryStatus === "out_for_delivery";
             const isRejected = o.paymentStatus === "rejected";
             const statusClass = isConfirmed ? "confirmed" : isRejected ? "rejected" : "";
-            const statusBadgeText = isConfirmed ? "جارى تنفيذ طلبك ✓" : isRejected ? "مرفوض" : "بانتظار قبول الدفع";
+            const statusBadgeText = isConfirmed ? "جارى التوصيل ✓" : isRejected ? "مرفوض" : "بانتظار قبول الدفع";
 
             const itemsSummary = Array.isArray(o.items) && o.items.length
               ? o.items.map((it) => `${esc(it.title)} (${Number(it.price) || 0} جنيه)`).join(" ، ")
@@ -960,12 +1046,19 @@
                 <div style="font-size:14px; font-weight:bold; color:#be185d;">الإجمالي: ${Number(o.totalAmount) || 0} جنيه</div>
                 <div style="font-size:13px; color:#334155;">الأصناف: ${itemsSummary}</div>
                 <div style="font-size:13px; color:#334155;">رقم الاستقبال المختار: <strong>${esc(o.cashReceiverPhone || "غير محدد")}</strong> • الدفع من: <strong>${paymentSourceLabel}</strong></div>
-                <div style="font-size:13px; color:#475569; margin-top:4px;">حالة الطلب: <strong>${esc(o.status || "")}</strong></div>
+                <div style="font-size:13px; color:#1d4ed8; margin-top:4px;">حالة الطلب: <strong>${esc(isConfirmed ? "جارى التوصيل" : (o.status || ""))}</strong></div>
 
                 ${
                   receiptImg
-                    ? `<img src="${receiptImg}" class="receipt-thumb" alt="إيصال الدفع" onclick="window.open(this.src, '_blank')" />`
-                    : `<div style="font-size:12px; color:#991b1b; margin-top:8px;">لم يتم إرفاق صورة إيصال بعد.</div>`
+                    ? `
+                      <div style="display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                        <img src="${receiptImg}" class="receipt-thumb" alt="إيصال الدفع" onclick="window.open(this.src, '_blank')" />
+                        <button type="button" class="btn-danger" onclick="deleteOrderReceiptImage('${esc(id)}', '${esc(receiptId)}')">
+                          🗑️ حذف الصورة
+                        </button>
+                      </div>
+                    `
+                    : `<div style="font-size:12px; color:#64748b; margin-top:8px;">لا توجد صورة مرفقة (تم حذفها أو لم تُرفع).</div>`
                 }
 
                 <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
