@@ -167,6 +167,7 @@
       margin-top: 6px;
       border: 1px solid #cbd5e1;
       object-fit: cover;
+      cursor: zoom-in;
     }
 
     .img-box-inline {
@@ -216,7 +217,7 @@
           <div style="font-size:12px; opacity:0.95;">العملة: جنيه • 1 point = 33.333333333333 جنيه</div>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button>
+          <button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button>
           <button class="btn-cyan" onclick="openImpersonateModal()">دخول إلى حساب مستخدم</button>
         </div>
       </div>
@@ -274,60 +275,52 @@
         </button>
       </div>
 
-      <!-- 1. إعدادات طلبات التسجيل -->
       <div id="panel-client-reqs" class="panel active">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>صفحة إعدادات طلبات التسجيل (عملاء)</h3>
         <div id="admin-client-requests-list"></div>
       </div>
 
-      <!-- 2. إدارة العملاء والنقاط والرصيد + كاميرا/استوديو وحذف صورة -->
       <div id="panel-clients-mgr" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>إدارة العملاء والنقاط (point) والرصيد (جنيه) والحذف</h3>
         <div id="admin-clients-list"></div>
       </div>
 
-      <!-- 3. العملاء النشطون وقائمة المدعوين بالترتيب -->
       <div id="panel-active-clients" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>العملاء النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد مرات الطلب)</h3>
         <div id="admin-active-clients-list"></div>
         <h3 style="margin-top:20px;">قائمة الأشخاص المرسل لهم التطبيق وترتيبهم (حتى 1000+ رقم)</h3>
         <div id="admin-invited-ranking-list"></div>
       </div>
 
-      <!-- 4. إعدادات طلبات تسجيل المتسابقين -->
       <div id="panel-chal-reqs" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>صفحة إعدادات طلبات تسجيل المتسابقين</h3>
         <div id="admin-challenger-requests-list"></div>
       </div>
 
-      <!-- 5. إعداد المتسابقين والنقاط -->
       <div id="panel-chal-mgr" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>صفحة إعداد المتسابقين والنقاط (point)</h3>
         <div id="admin-challengers-list"></div>
       </div>
 
-      <!-- 6. المتسابقون النشطون -->
       <div id="panel-active-challengers" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>المتسابقون النشطون (ترتيب تنازلي حسب المبالغ وعدد مرات النجاح والوقت المستغرق لتوصيل الأوردر)</h3>
         <div id="admin-active-challengers-list"></div>
       </div>
 
-      <!-- 7. قائمة الانتظار -->
       <div id="panel-waitlist" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>قائمة الانتظار (ترتيب تنازلي حسب تاريخ تقديم الطلب)</h3>
         <div id="admin-waitlist-list"></div>
       </div>
 
-      <!-- 8. إعداد الأقسام والأنواع والسلع والعروض مع أزرار كاميرا/استوديو وحذف صورة وأداة Gemini -->
       <div id="panel-depts-items" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>إعداد الأقسام والأنواع والسلع والعروض (جنيه)</h3>
 
         <div class="card">
@@ -381,9 +374,8 @@
         <div id="admin-dept-products-preview"></div>
       </div>
 
-      <!-- 9. إعداد أرقام الاتصال -->
       <div id="panel-cash-phones" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>إعداد أرقام الاتصال لاستقبال الكاش</h3>
         <p style="font-size:13px; color:#475569;">7 خانات أساسية مع اختيار عبر checkbox، ويمكنك إضافة أي عدد إضافي بزر (+). يظهر للعميل حتى 5 أرقام مختارة.</p>
         <div id="cash-phones-slots" class="card"></div>
@@ -394,9 +386,8 @@
         <button class="btn-green" onclick="saveSelectedCashPhones()">حفظ أرقام الكاش المختارة</button>
       </div>
 
-      <!-- 10. إعداد التحديات مع زر كاميرا/استوديو وحذف صورة -->
       <div id="panel-challenges-cfg" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>صفحة إعداد التحديات</h3>
         <div class="card">
           <label>عنوان التحدي / المهمة</label>
@@ -423,18 +414,16 @@
         <div id="admin-challenges-list"></div>
       </div>
 
-      <!-- 11. الطلبات النشطة والطلبات المنتهية -->
       <div id="panel-active-done" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>الطلبات النشطة</h3>
         <div id="admin-active-orders-list"></div>
         <h3 style="margin-top:20px;">الطلبات المنتهية (مع صورة تأكيد الوصول والوقت المستغرق)</h3>
         <div id="admin-completed-orders-list"></div>
       </div>
 
-      <!-- 12. إعداد إرسال هدية والوصولات مع زر كاميرا/استوديو وحذف صورة -->
       <div id="panel-gifts-receipts" class="panel">
-        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">عودة للخلف</button></div>
+        <div class="panel-back-row"><button class="btn-soft" onclick="goBackAdminPanel()">رجوع خطوة للخلف</button></div>
         <h3>صفحة إعداد إرسال هدية أو عرض أو مكافأة</h3>
         <div class="card">
           <input type="text" id="gift-target-input" placeholder="اسم العميل أو المتسابق (أو اتركه للجميع)" />
@@ -462,7 +451,6 @@
     </div>
   </div>
 
-  <!-- نافذة الدخول إلى حساب أي مستخدم -->
   <div id="impersonate-modal" class="modal-backdrop">
     <div class="modal-box">
       <h3 style="margin-top:0;">الدخول إلى حساب أي مستخدم</h3>
@@ -471,7 +459,6 @@
     </div>
   </div>
 
-  <!-- نافذة سجل الطلبات المنفذة لكل متسابق -->
   <div id="history-modal" class="modal-backdrop">
     <div class="modal-box">
       <h3 id="history-modal-title" style="margin-top:0;">سجل طلبات المتسابق</h3>
