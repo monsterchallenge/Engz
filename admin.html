@@ -127,13 +127,24 @@
       color: #0f172a;
     }
     .thumb {
-      max-width: 220px;
-      max-height: 170px;
+      max-width: 240px;
+      max-height: 190px;
       border-radius: 10px;
       margin-top: 8px;
       display: none;
       border: 1px solid #cbd5e1;
       object-fit: cover;
+    }
+    .receipt-thumb {
+      max-width: 260px;
+      max-height: 220px;
+      border-radius: 12px;
+      margin-top: 10px;
+      display: block;
+      border: 2px solid #cbd5e1;
+      object-fit: contain;
+      background: #0f172a;
+      cursor: zoom-in;
     }
     .account-card {
       background: linear-gradient(135deg, #eff6ff, #f0fdf4);
@@ -142,6 +153,23 @@
       padding: 16px;
       margin-top: 14px;
     }
+    .badge-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .badge-status.confirmed {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .badge-status.rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
   </style>
 </head>
 <body>
@@ -149,7 +177,7 @@
     <div class="admin-header">
       <div>
         <h1>نسخة الأدمن المنفصلة • ENGZ ADMIN</h1>
-        <div style="font-size:13px; opacity:0.92;">تحكم كامل في التطبيق والوصول إلى حسابات المستخدمين</div>
+        <div style="font-size:13px; opacity:0.92;">تحكم كامل في التطبيق والطلبات وإيصالات الدفع وحسابات المستخدمين</div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <button type="button" class="btn-amber" onclick="openUserAppWindow()">فتح نسخة المستخدم (index.html)</button>
@@ -162,7 +190,7 @@
     <!-- شاشة تسجيل دخول الأدمن -->
     <div id="admin-login-box" class="panel">
       <h2 style="margin-top:0;">تسجيل دخول الأدمن</h2>
-      <p style="color:#475569; font-size:14px;">أدخل كلمة مرور الأدمن للوصول إلى لوحة التحكم الكاملة وحسابات المستخدمين.</p>
+      <p style="color:#475569; font-size:14px;">أدخل كلمة مرور الأدمن للوصول إلى لوحة التحكم الكاملة والطلبات وإيصالات الدفع.</p>
       <div class="form-group" style="max-width:380px;">
         <label for="admin-pass-input">كلمة مرور الأدمن</label>
         <input type="password" id="admin-pass-input" placeholder="أدخل كلمة مرور الأدمن..." />
@@ -339,7 +367,7 @@
           <div id="cash-phones-list" style="margin-top:12px;"></div>
         </div>
 
-        <h3>جميع الطلبات</h3>
+        <h3>جميع الطلبات وإيصالات الدفع</h3>
         <div id="all-orders-list"></div>
       </div>
     </div>
@@ -396,6 +424,7 @@
       products: {},
       cashPhones: [],
       orders: {},
+      paymentReceipts: {},
       challenges: {},
       gifts: {},
       receipts: {},
@@ -800,6 +829,63 @@
       notify("تم إرسال الهدية.", "success");
     };
 
+    window.confirmOrderPayment = async function (orderId, receiptId = "") {
+      const orderObj = store.orders[orderId];
+      if (!orderObj) return notify("الطلب غير موجود.", "error");
+      const now = Date.now();
+
+      await update(ref(db, `orders/${orderId}`), {
+        paymentConfirmed: true,
+        paymentStatus: "confirmed",
+        status: "تم تأكيد الدفع وجاري التنفيذ",
+        confirmedAt: now
+      });
+
+      if (receiptId && store.paymentReceipts[receiptId]) {
+        await update(ref(db, `paymentReceipts/${receiptId}`), {
+          paymentStatus: "confirmed",
+          confirmedAt: now
+        });
+      }
+
+      await push(ref(db, "receipts"), {
+        type: "وصل تأكيد الدفع من الأدمن",
+        orderId,
+        userId: orderObj.buyerId || "",
+        userName: orderObj.buyerName || "عميل",
+        phone: orderObj.payerPhone || orderObj.buyerPhone || "",
+        receiverPhone: orderObj.cashReceiverPhone || "",
+        amount: Number(orderObj.totalAmount) || 0,
+        method: orderObj.paymentSourceType === "other" ? "دفع من رقم آخر + إيصال" : "دفع من نفس الرقم + إيصال",
+        status: "مقبول ومؤكد",
+        createdAt: now
+      });
+
+      notify(`تم قبول وتأكيد دفع الطلب #${orderId.slice(-6)} بنجاح.`, "success");
+    };
+
+    window.rejectOrderPayment = async function (orderId, receiptId = "") {
+      const orderObj = store.orders[orderId];
+      if (!orderObj) return notify("الطلب غير موجود.", "error");
+      const now = Date.now();
+
+      await update(ref(db, `orders/${orderId}`), {
+        paymentConfirmed: false,
+        paymentStatus: "rejected",
+        status: "مرفوض / بانتظار مراجعة الإيصال",
+        rejectedAt: now
+      });
+
+      if (receiptId && store.paymentReceipts[receiptId]) {
+        await update(ref(db, `paymentReceipts/${receiptId}`), {
+          paymentStatus: "rejected",
+          rejectedAt: now
+        });
+      }
+
+      notify(`تم رفض/إعادة مراجعة دفع الطلب #${orderId.slice(-6)}.`, "error");
+    };
+
     function renderOrdersAndCash() {
       const phones = Array.isArray(store.cashPhones) ? store.cashPhones : [];
       document.getElementById("cash-phones-list").innerHTML = phones.length
@@ -811,14 +897,58 @@
         `).join("")
         : `<div style="font-size:13px; color:#64748b;">لا توجد أرقام كاش.</div>`;
 
-      const orders = Object.entries(store.orders || {});
+      const orders = Object.entries(store.orders || {}).sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0));
+      const receiptsEntries = Object.entries(store.paymentReceipts || {});
+
       document.getElementById("all-orders-list").innerHTML = orders.length
-        ? orders.map(([id, o]) => `
-          <div class="box">
-            <strong>طلب #${esc(id.slice(-6))} • ${esc(o.buyerName || "")} (${esc(o.buyerPhone || "")})</strong> • <strong>${Number(o.totalAmount) || 0} جنيه</strong><br/>
-            <span style="font-size:13px; color:#475569;">الحالة: ${esc(o.status || "")} ${o.cashReceiverPhone ? "• كاش: " + esc(o.cashReceiverPhone) : ""}</span>
-          </div>
-        `).join("")
+        ? orders.map(([id, o]) => {
+            const linkedReceipt = receiptsEntries.find(([, r]) => r.orderId === id);
+            const receiptId = linkedReceipt ? linkedReceipt[0] : "";
+            const receiptObj = linkedReceipt ? linkedReceipt[1] : null;
+            const receiptImg = (receiptObj && receiptObj.receiptImage) || o.receiptImage || "";
+            const payerPhone = o.payerPhone || (receiptObj && receiptObj.payerPhone) || o.buyerPhone || "غير محدد";
+            const paymentSourceLabel =
+              (o.paymentSourceType || receiptObj?.paymentSourceType) === "other"
+                ? `رقم آخر (${esc(payerPhone)})`
+                : `نفس الرقم (${esc(payerPhone)})`;
+
+            const isConfirmed = o.paymentStatus === "confirmed" || o.paymentConfirmed === true;
+            const isRejected = o.paymentStatus === "rejected";
+            const statusClass = isConfirmed ? "confirmed" : isRejected ? "rejected" : "";
+            const statusBadgeText = isConfirmed ? "تم قبول وتأكيد الدفع ✓" : isRejected ? "مرفوض" : "بانتظار قبول الدفع";
+
+            const itemsSummary = Array.isArray(o.items) && o.items.length
+              ? o.items.map((it) => `${esc(it.title)} (${Number(it.price) || 0} جنيه)`).join(" ، ")
+              : esc(o.challengeTitle || "طلب");
+
+            return `
+              <div class="box">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                  <strong>طلب #${esc(id.slice(-6))} • ${esc(o.buyerName || "مستخدم")} (${esc(o.buyerPhone || "")})</strong>
+                  <span class="badge-status ${statusClass}">${statusBadgeText}</span>
+                </div>
+                <div style="font-size:14px; font-weight:bold; color:#be185d;">الإجمالي: ${Number(o.totalAmount) || 0} جنيه</div>
+                <div style="font-size:13px; color:#334155;">الأصناف: ${itemsSummary}</div>
+                <div style="font-size:13px; color:#334155;">رقم الاستقبال المختار: <strong>${esc(o.cashReceiverPhone || "غير محدد")}</strong> • الدفع من: <strong>${paymentSourceLabel}</strong></div>
+                <div style="font-size:13px; color:#475569; margin-top:4px;">حالة الطلب: <strong>${esc(o.status || "")}</strong></div>
+
+                ${
+                  receiptImg
+                    ? `<img src="${receiptImg}" class="receipt-thumb" alt="إيصال الدفع" onclick="window.open(this.src, '_blank')" />`
+                    : `<div style="font-size:12px; color:#991b1b; margin-top:8px;">لم يتم إرفاق صورة إيصال بعد.</div>`
+                }
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+                  <button type="button" class="btn-success" onclick="confirmOrderPayment('${esc(id)}', '${esc(receiptId)}')">
+                    قبول وتأكيد الدفع
+                  </button>
+                  <button type="button" class="btn-danger" onclick="rejectOrderPayment('${esc(id)}', '${esc(receiptId)}')">
+                    رفض الدفع
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("")
         : `<div class="box">لا توجد طلبات.</div>`;
     }
 
@@ -848,13 +978,14 @@
     onValue(ref(db, "challengerRegRequests"), (s) => { store.challengerRegRequests = s.val() || {}; renderAll(); });
     onValue(ref(db, "departments"), (s) => { store.departments = s.val() || []; renderAll(); });
     onValue(ref(db, "departmentsMeta"), (s) => { store.departmentsMeta = s.val() || {}; renderAll(); });
-    onValue(ref(db, "products"), (s) => { store.products = s.val() || {}; });
-    onValue(ref(db, "cashPhones"), (s) => { store.cashPhones = s.val() || []; });
-    onValue(ref(db, "orders"), (s) => { store.orders = s.val() || {}; });
-    onValue(ref(db, "challenges"), (s) => { store.challenges = s.val() || {}; });
-    onValue(ref(db, "gifts"), (s) => { store.gifts = s.val() || {}; });
-    onValue(ref(db, "receipts"), (s) => { store.receipts = s.val() || {}; });
-    onValue(ref(db, "referrals"), (s) => { store.referrals = s.val() || {}; });
+    onValue(ref(db, "products"), (s) => { store.products = s.val() || {}; renderAll(); });
+    onValue(ref(db, "cashPhones"), (s) => { store.cashPhones = s.val() || []; renderAll(); });
+    onValue(ref(db, "orders"), (s) => { store.orders = s.val() || {}; renderAll(); });
+    onValue(ref(db, "paymentReceipts"), (s) => { store.paymentReceipts = s.val() || {}; renderAll(); });
+    onValue(ref(db, "challenges"), (s) => { store.challenges = s.val() || {}; renderAll(); });
+    onValue(ref(db, "gifts"), (s) => { store.gifts = s.val() || {}; renderAll(); });
+    onValue(ref(db, "receipts"), (s) => { store.receipts = s.val() || {}; renderAll(); });
+    onValue(ref(db, "referrals"), (s) => { store.referrals = s.val() || {}; renderAll(); });
 
     syncAuthView();
   </script>
