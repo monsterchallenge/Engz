@@ -250,15 +250,21 @@
     }
 
     .big-choice-btn {
-      padding: 24px 18px;
-      border: none;
+      padding: 22px 18px;
+      border: 3px solid transparent;
       border-radius: 18px;
       font-size: 20px;
       font-weight: bold;
       color: #ffffff;
       cursor: pointer;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .big-choice-btn.selected-path {
+      border-color: #0f172a;
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.65);
+      transform: translateY(-2px);
     }
 
     .big-choice-btn:active {
@@ -614,6 +620,15 @@
       display: block;
       margin: 0 auto 12px;
     }
+
+    .exit-confirm-box {
+      border: 2px solid #f59e0b;
+      background: #fffbeb;
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 16px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -670,34 +685,51 @@
       </div>
     </div>
 
+    <!-- صفحة البداية: عميل أم تحدى + زر تأكيد + زر عودة (سؤال الخروج) -->
     <div id="screen-choice" class="screen active">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
-      <h2 class="screen-title">اختر مسارك داخل تطبيق انجز</h2>
-      <p class="screen-sub">يمكنك الدخول كعميل لطلب المنتجات والخدمات أو الدخول كمتسابق لتنفيذ التحديات.</p>
+      <h2 class="screen-title">صفحة البداية: عميل أم تحدى</h2>
+      <p class="screen-sub">اختر <strong>عميل</strong> أو <strong>تحدى</strong> ثم اضغط <strong>تأكيد</strong> للانتقال إلى صفحة التسجيل والمشاركة.</p>
       <div class="two-big-btns">
-        <button class="big-choice-btn btn-client" onclick="goScreen('screen-client-entry')">عميل</button>
-        <button class="big-choice-btn btn-challenge" onclick="goScreen('screen-challenger-entry')">تحدى</button>
+        <button id="choice-btn-client" class="big-choice-btn btn-client selected-path" onclick="selectHomePath('client')">عميل</button>
+        <button id="choice-btn-challenge" class="big-choice-btn btn-challenge" onclick="selectHomePath('challenger')">تحدى</button>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+        <button class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmHomePathSelection()">تأكيد</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
+
+      <div id="exit-prompt-box" class="exit-confirm-box" style="display:none;">
+        <p style="font-size:18px; font-weight:bold; color:#78350f; margin:0 0 14px;">هل تريد الخروج من التطبيق</p>
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+          <button class="btn-danger" style="padding:12px 24px; font-size:15px;" onclick="handleExitYes()">نعم</button>
+          <button class="btn-success" style="padding:12px 24px; font-size:15px;" onclick="handleExitNo()">لا</button>
+        </div>
       </div>
     </div>
 
+    <!-- صفحة التسجيل والمشاركة للعميل: تسجيل / مشترك / تأكيد / عودة -->
     <div id="screen-client-entry" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
-      <h2 class="screen-title">صفحة العميل</h2>
-      <p class="screen-sub">اختر تسجيل حساب جديد أو الدخول كمشترك مسجل من قبل.</p>
+      <h2 class="screen-title">صفحة التسجيل والمشاركة (عميل)</h2>
+      <p class="screen-sub">اختر <strong>تسجيل</strong> إذا لم تكن مشتركاً، أو <strong>مشترك</strong> إذا كنت مسجلاً من قبل، ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="two-big-btns">
-        <button class="big-choice-btn btn-client" onclick="goScreen('screen-client-register')">تسجيل</button>
-        <button class="big-choice-btn btn-amber" onclick="goScreen('screen-client-subscriber')">مشترك</button>
+        <button id="client-mode-reg-btn" class="big-choice-btn btn-client selected-path" onclick="chooseEntryMode('client', 'register')">تسجيل</button>
+        <button id="client-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('client', 'subscriber')">مشترك</button>
       </div>
-      <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('client')">تأكيد</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
     </div>
 
     <div id="screen-client-register" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">تسجيل عميل جديد</h2>
       <p class="screen-sub">الاسم يجب أن يكون فريداً ورقم الموبايل يجب أن يكون مرتبطاً بمستخدم وحيد (11 رقماً مصرياً).</p>
@@ -711,13 +743,13 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="submitClientRegistration()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
     <div id="screen-client-subscriber" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">دخول المشتركين (عميل)</h2>
       <p class="screen-sub">كل رقم موبايل مرتبط بمستخدم وحيد ولا يمكن تكراره لحساب آخر.</p>
@@ -735,26 +767,26 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="loginClientSubscriber()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
     <div id="screen-orders-home" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة الطلبات والأقسام</h2>
       <p class="screen-sub">اضغط على أي قسم لفتح أنواعه ومنتجاته وعروضه — ضغطة واحدة على الصورة لتكبيرها، وضغط 3 ثوانٍ على الكارت لتحديد أو إلغاء تحديد الصنف في العربة.</p>
       <div id="departments-container" class="dept-grid"></div>
       <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-amber" onclick="openCartScreen()">عرض عربة التسوق (<span class="cart-count-inline">0</span>)</button>
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
     <div id="screen-department-view" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackInsideDepartment()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackInsideDepartment()">عودة</button>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button class="btn-amber" onclick="openCartScreen()">عربة التسوق (<span class="cart-count-inline">0</span>)</button>
           <button class="btn-soft" onclick="goScreen('screen-orders-home')">كل الأقسام</button>
@@ -768,7 +800,7 @@
 
     <div id="screen-cart" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">عربة التسوق</h2>
       <p class="screen-sub">الأصناف والعروض والخدمات المحددة من مختلف الأقسام — يمكنك إزالة أو تعديل اختياراتك في أي وقت.</p>
@@ -778,13 +810,13 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="goToCheckoutConfirmation()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
     <div id="screen-confirm-purchase" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">تأكيد الشراء</h2>
       <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى صفحة الدفع من رقمك.</p>
@@ -792,13 +824,13 @@
       <div id="confirm-total-line" class="box-card" style="margin-top:14px; font-size:18px; font-weight:bold;"></div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="openPaymentMethodsScreen()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
     <div id="screen-payment" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة الدفع من رقمك</h2>
       <p class="screen-sub">اختر رقم الاستقبال المحدد من الأدمن ثم أكد قرارك.</p>
@@ -819,22 +851,26 @@
       <div id="payment-result-box"></div>
     </div>
 
+    <!-- صفحة التسجيل والمشاركة للتحدى: تسجيل / مشترك / تأكيد / عودة -->
     <div id="screen-challenger-entry" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
-      <h2 class="screen-title">صفحة المتسابق (تحدى)</h2>
-      <p class="screen-sub">اختر تسجيل كمتسابق جديد أو الدخول كمتسابق مشترك.</p>
+      <h2 class="screen-title">صفحة التسجيل والمشاركة (تحدى)</h2>
+      <p class="screen-sub">اختر <strong>تسجيل</strong> إذا لم تكن مشتركاً، أو <strong>مشترك</strong> إذا كنت مسجلاً من قبل، ثم اضغط <strong>تأكيد</strong>.</p>
       <div class="two-big-btns">
-        <button class="big-choice-btn btn-challenge" onclick="goScreen('screen-challenger-register')">تسجيل</button>
-        <button class="big-choice-btn btn-amber" onclick="goScreen('screen-challenger-subscriber')">مشترك</button>
+        <button id="chal-mode-reg-btn" class="big-choice-btn btn-challenge selected-path" onclick="chooseEntryMode('challenger', 'register')">تسجيل</button>
+        <button id="chal-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('challenger', 'subscriber')">مشترك</button>
       </div>
-      <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('challenger')">تأكيد</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      </div>
     </div>
 
     <div id="screen-challenger-register" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">تسجيل متسابق جديد</h2>
       <div class="form-group">
@@ -847,13 +883,13 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="submitChallengerRegistration()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
     <div id="screen-challenger-subscriber" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">دخول متسابق مشترك</h2>
       <div class="form-group">
@@ -866,13 +902,13 @@
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-success" onclick="loginChallengerSubscriber()">تأكيد</button>
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
 
     <div id="screen-challenges-hub" class="screen">
       <div class="screen-top-bar">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
       <h2 class="screen-title">صفحة التحديات</h2>
       <p class="screen-sub">يمكنك اختيار مهمة واحدة نشطة في كل مرة حتى يتم تأكيد انتهائها.</p>
@@ -896,7 +932,7 @@
       </div>
 
       <div style="margin-top:16px;">
-        <button class="btn-soft" onclick="goBackOneStep()">رجوع خطوة للخلف</button>
+        <button class="btn-soft" onclick="goBackOneStep()">عودة</button>
       </div>
     </div>
   </div>
@@ -928,6 +964,7 @@
 
     const POINT_VALUE_EGP = 33.333333333333;
     const CART_STORAGE_KEY = "engz_persistent_cart_v1";
+    const EXIT_FLAG_KEY = "engz_exited_flag_v1";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
@@ -956,14 +993,32 @@
     const urlParams = new URLSearchParams(window.location.search);
     const incomingRefCode = (urlParams.get("ref") || "").trim();
 
-    (function runSplash30Sec() {
-      const totalSec = 30;
-      let remaining = totalSec;
+    let splashTimerInterval = null;
+    let isSplashRunning = false;
+
+    function startFull30SecSplash(onCompleteCallback) {
+      if (splashTimerInterval) {
+        clearInterval(splashTimerInterval);
+        splashTimerInterval = null;
+      }
+      isSplashRunning = true;
+
+      const splashEl = document.getElementById("splash-screen");
+      const mainAppEl = document.getElementById("main-app");
       const secEl = document.getElementById("splash-seconds");
       const barEl = document.getElementById("splash-progress-bar");
       const pctEl = document.getElementById("splash-percent");
 
-      const timer = setInterval(() => {
+      const totalSec = 30;
+      let remaining = totalSec;
+
+      secEl.textContent = String(remaining);
+      barEl.style.width = "0%";
+      pctEl.textContent = "0%";
+      splashEl.style.display = "flex";
+      mainAppEl.style.display = "none";
+
+      splashTimerInterval = setInterval(() => {
         remaining -= 1;
         const clamped = Math.max(0, remaining);
         const progress = Math.round(((totalSec - clamped) / totalSec) * 100);
@@ -973,12 +1028,28 @@
         pctEl.textContent = progress + "%";
 
         if (clamped <= 0) {
-          clearInterval(timer);
-          document.getElementById("splash-screen").style.display = "none";
-          document.getElementById("main-app").style.display = "block";
+          clearInterval(splashTimerInterval);
+          splashTimerInterval = null;
+          isSplashRunning = false;
+          splashEl.style.display = "none";
+          mainAppEl.style.display = "block";
+          if (typeof onCompleteCallback === "function") {
+            onCompleteCallback();
+          }
         }
       }, 1000);
-    })();
+    }
+
+    // عند فتح التطبيق لأول مرة أو إعادة فتحه بعد الخروج في WebView
+    try {
+      if (localStorage.getItem(EXIT_FLAG_KEY) === "1") {
+        localStorage.removeItem(EXIT_FLAG_KEY);
+      }
+    } catch {}
+
+    startFull30SecSplash(() => {
+      resetToHomeChoiceScreen();
+    });
 
     function loadSavedCart() {
       try {
@@ -1001,6 +1072,10 @@
     const deptFilterHistory = ["الكل"];
     const productsCatalog = {};
     let currentZoomUid = null;
+
+    let selectedHomePath = "client";
+    let selectedClientMode = "register";
+    let selectedChallengerMode = "register";
 
     const state = {
       currentRole: null,
@@ -1029,6 +1104,102 @@
     };
 
     updateCartBadges();
+
+    window.selectHomePath = function (pathRole) {
+      selectedHomePath = pathRole === "challenger" ? "challenger" : "client";
+      state.currentRole = selectedHomePath;
+      document.getElementById("choice-btn-client").classList.toggle("selected-path", selectedHomePath === "client");
+      document.getElementById("choice-btn-challenge").classList.toggle("selected-path", selectedHomePath === "challenger");
+      document.getElementById("exit-prompt-box").style.display = "none";
+      syncUserHeader();
+    };
+
+    window.confirmHomePathSelection = function () {
+      document.getElementById("exit-prompt-box").style.display = "none";
+      if (selectedHomePath === "challenger") {
+        goScreen("screen-challenger-entry");
+      } else {
+        goScreen("screen-client-entry");
+      }
+    };
+
+    window.chooseEntryMode = function (role, mode) {
+      if (role === "challenger") {
+        selectedChallengerMode = mode === "subscriber" ? "subscriber" : "register";
+        document.getElementById("chal-mode-reg-btn").classList.toggle("selected-path", selectedChallengerMode === "register");
+        document.getElementById("chal-mode-sub-btn").classList.toggle("selected-path", selectedChallengerMode === "subscriber");
+      } else {
+        selectedClientMode = mode === "subscriber" ? "subscriber" : "register";
+        document.getElementById("client-mode-reg-btn").classList.toggle("selected-path", selectedClientMode === "register");
+        document.getElementById("client-mode-sub-btn").classList.toggle("selected-path", selectedClientMode === "subscriber");
+      }
+    };
+
+    window.confirmEntryModeSelection = function (role) {
+      if (role === "challenger") {
+        if (selectedChallengerMode === "subscriber") {
+          goScreen("screen-challenger-subscriber");
+        } else {
+          goScreen("screen-challenger-register");
+        }
+      } else {
+        if (selectedClientMode === "subscriber") {
+          goScreen("screen-client-subscriber");
+        } else {
+          goScreen("screen-client-register");
+        }
+      }
+    };
+
+    function resetToHomeChoiceScreen() {
+      screenHistory.length = 0;
+      screenHistory.push("screen-choice");
+      document.getElementById("exit-prompt-box").style.display = "none";
+      activateScreenWithoutHistory("screen-choice");
+    }
+
+    window.handleExitYes = function () {
+      try {
+        localStorage.setItem(EXIT_FLAG_KEY, "1");
+      } catch {}
+
+      try {
+        if (window.AndroidInterface && typeof window.AndroidInterface.exitApp === "function") {
+          window.AndroidInterface.exitApp();
+        }
+      } catch {}
+
+      try {
+        if (window.Android && typeof window.Android.closeApp === "function") {
+          window.Android.closeApp();
+        }
+      } catch {}
+
+      try {
+        window.open("", "_self");
+        window.close();
+      } catch {}
+
+      // في حال منع المتصفح/WebView إغلاق النافذة تلقائياً، نعرض شاشة خروج واضحة تبدأ 30 ثانية عند إعادة الفتح
+      document.getElementById("main-app").innerHTML = `
+        <div class="screen active" style="text-align:center; padding:36px 20px;">
+          <h2 class="screen-title" style="color:#be123c;">تم الخروج من التطبيق</h2>
+          <p class="screen-sub">للدخول مرة أخرى وبدء شريط التحميل 30 ثانية كاملة، أعد فتح التطبيق أو اضغط إعادة التشغيل.</p>
+          <button class="btn-success" onclick="restartFromZeroAfterExit()">إعادة فتح التطبيق (30 ثانية)</button>
+        </div>
+      `;
+    };
+
+    window.restartFromZeroAfterExit = function () {
+      window.location.reload();
+    };
+
+    window.handleExitNo = function () {
+      document.getElementById("exit-prompt-box").style.display = "none";
+      startFull30SecSplash(() => {
+        resetToHomeChoiceScreen();
+      });
+    };
 
     function notify(msg, type = "info") {
       const el = document.getElementById("global-notice");
@@ -1281,8 +1452,19 @@
         activateScreenWithoutHistory(prevScreen);
       } else {
         activateScreenWithoutHistory("screen-choice");
+        const exitBox = document.getElementById("exit-prompt-box");
+        if (exitBox) {
+          exitBox.style.display = exitBox.style.display === "block" ? "none" : "block";
+        }
       }
     };
+
+    // دعم زر الرجوع في نظام أندرويد / WebView أيضاً
+    window.addEventListener("popstate", () => {
+      if (!isSplashRunning) {
+        window.goBackOneStep();
+      }
+    });
 
     window.goBackInsideDepartment = function () {
       if (deptFilterHistory.length > 1) {
