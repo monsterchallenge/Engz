@@ -164,8 +164,8 @@
       <h2 style="margin-top:0;">تسجيل دخول الأدمن</h2>
       <p style="color:#475569; font-size:14px;">أدخل كلمة مرور الأدمن للوصول إلى لوحة التحكم الكاملة وحسابات المستخدمين.</p>
       <div class="form-group" style="max-width:380px;">
-        <label for="admin-pass-input">رمز دخول الأدمن</label>
-        <input type="password" id="admin-pass-input" placeholder="أدخل رمز الأدمن..." />
+        <label for="admin-pass-input">كلمة مرور الأدمن</label>
+        <input type="password" id="admin-pass-input" placeholder="أدخل كلمة مرور الأدمن..." />
       </div>
       <button type="button" class="btn-success" onclick="unlockAdmin()">دخول لوحة الأدمن</button>
     </div>
@@ -357,7 +357,7 @@
       remove
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const ADMIN_PASSWORDS = ["engz-admin-2026", "123456"];
+    const ADMIN_PASSWORD = "38512385";
     const DEFAULT_DEPARTMENTS = [
       "كتابة وتلخيص",
       "مطعم",
@@ -430,8 +430,8 @@
 
     window.unlockAdmin = function () {
       const pass = document.getElementById("admin-pass-input").value.trim();
-      if (!ADMIN_PASSWORDS.includes(pass)) {
-        return notify("رمز دخول الأدمن غير صحيح.", "error");
+      if (pass !== ADMIN_PASSWORD) {
+        return notify("كلمة مرور الأدمن غير صحيحة.", "error");
       }
       unlocked = true;
       sessionStorage.setItem("engz_admin_auth_v1", "1");
@@ -848,13 +848,13 @@
     onValue(ref(db, "challengerRegRequests"), (s) => { store.challengerRegRequests = s.val() || {}; renderAll(); });
     onValue(ref(db, "departments"), (s) => { store.departments = s.val() || []; renderAll(); });
     onValue(ref(db, "departmentsMeta"), (s) => { store.departmentsMeta = s.val() || {}; renderAll(); });
-    onValue(ref(db, "products"), (s) => { store.products = s.val() || {}; renderAll(); });
-    onValue(ref(db, "cashPhones"), (s) => { store.cashPhones = s.val() || []; renderAll(); });
-    onValue(ref(db, "orders"), (s) => { store.orders = s.val() || {}; renderAll(); });
-    onValue(ref(db, "challenges"), (s) => { store.challenges = s.val() || {}; renderAll(); });
-    onValue(ref(db, "gifts"), (s) => { store.gifts = s.val() || {}; renderAll(); });
-    onValue(ref(db, "receipts"), (s) => { store.receipts = s.val() || {}; renderAll(); });
-    onValue(ref(db, "referrals"), (s) => { store.referrals = s.val() || {}; renderAll(); });
+    onValue(ref(db, "products"), (s) => { store.products = s.val() || {}; });
+    onValue(ref(db, "cashPhones"), (s) => { store.cashPhones = s.val() || []; });
+    onValue(ref(db, "orders"), (s) => { store.orders = s.val() || {}; });
+    onValue(ref(db, "challenges"), (s) => { store.challenges = s.val() || {}; });
+    onValue(ref(db, "gifts"), (s) => { store.gifts = s.val() || {}; });
+    onValue(ref(db, "receipts"), (s) => { store.receipts = s.val() || {}; });
+    onValue(ref(db, "referrals"), (s) => { store.referrals = s.val() || {}; });
 
     syncAuthView();
   </script>
