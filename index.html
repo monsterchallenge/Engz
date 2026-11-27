@@ -1036,7 +1036,7 @@
       }
     }
 
-    // التوجيه التلقائي الفوري للصفحة التالية عند قبول الأدمن للطلب
+    // عند موافقة الأدمن: إرسال رسالة "تمت الموافقه على طلبك انت الان مشترك" والانتقال التلقائي
     async function finalizeApprovedUserAndRedirect(userRecord, preferredId = null) {
       if (!userRecord || autoRedirectedAfterApproval) return;
       autoRedirectedAfterApproval = true;
@@ -1081,12 +1081,11 @@
 
       syncUserHeader();
       state.trackedApplicant = null;
+      notify("تمت الموافقه على طلبك انت الان مشترك", "success");
 
       if (role === "challenger") {
-        notify("تم قبول طلبك، جاري نقلك إلى صفحة التحديات...", "success");
         goScreen("screen-challenges-hub");
       } else {
-        notify("تم قبول طلبك، جاري نقلك إلى صفحة الطلبات والأقسام...", "success");
         goScreen("screen-orders-home");
       }
     }
@@ -1124,11 +1123,11 @@
 
       if (rejectedEntry && !isStillPending) {
         state.trackedApplicant = null;
-        notify("تم رفض طلب التسجيل الخاص بك.", "error");
+        notify("تم رفض طلبك", "error");
         return;
       }
 
-      notify("جاري مراجعه طلبك", "info");
+      notify("جاري طلب التسجيل", "info");
     }
 
     window.goScreen = function (screenId) {
@@ -1195,7 +1194,7 @@
 
       document.getElementById("reg-client-name").value = "";
       document.getElementById("reg-client-phone").value = "";
-      notify("جاري مراجعه طلبك", "info");
+      notify("جاري طلب التسجيل", "info");
     };
 
     window.loginClientSubscriber = async function () {
@@ -1219,7 +1218,7 @@
       if (pendingClient) {
         autoRedirectedAfterApproval = false;
         state.trackedApplicant = { name, phone: phone1, kind: "client" };
-        return notify("جاري مراجعه طلبك", "info");
+        return notify("جاري طلب التسجيل", "info");
       }
 
       const existingEntry = Object.entries(state.db.users).find(
@@ -1229,7 +1228,7 @@
       if (existingEntry) {
         const [uid, uData] = existingEntry;
         if (uData.status === "rejected") {
-          return notify("تم رفض طلب التسجيل الخاص بك.", "error");
+          return notify("تم رفض طلبك", "error");
         }
         const ownsPhone1 = uData.phone === phone1 || uData.phone2 === phone1;
         if (!ownsPhone1 && isPhoneBoundToAnotherUser(phone1, uid)) {
@@ -1250,7 +1249,7 @@
           await recordReferralJoin(incomingRefCode || uData.invitedBy, uid, name);
         }
         syncUserHeader();
-        notify("تم قبول حسابك بنجاح، أهلاً بك في صفحة الطلبات.", "success");
+        notify("تمت الموافقه على طلبك انت الان مشترك", "success");
         goScreen("screen-orders-home");
         return;
       }
@@ -1278,7 +1277,7 @@
         await recordReferralJoin(incomingRefCode, newRef.key, name);
       }
       syncUserHeader();
-      notify("تم قبول الدخول كمشترك بنجاح.", "success");
+      notify("تمت الموافقه على طلبك انت الان مشترك", "success");
       goScreen("screen-orders-home");
     };
 
@@ -1307,7 +1306,7 @@
 
       document.getElementById("reg-chal-name").value = "";
       document.getElementById("reg-chal-phone").value = "";
-      notify("جاري مراجعه طلبك", "info");
+      notify("جاري طلب التسجيل", "info");
     };
 
     window.loginChallengerSubscriber = async function () {
@@ -1327,7 +1326,7 @@
       if (pendingChal) {
         autoRedirectedAfterApproval = false;
         state.trackedApplicant = { name, phone, kind: "challenger" };
-        return notify("جاري مراجعه طلبك", "info");
+        return notify("جاري طلب التسجيل", "info");
       }
 
       const found = Object.entries(state.db.users).find(
@@ -1340,7 +1339,7 @@
 
       const [uid, uData] = found;
       if (uData.status === "rejected") {
-        return notify("تم رفض طلب التسجيل الخاص بك.", "error");
+        return notify("تم رفض طلبك", "error");
       }
       if (uData.status === "waiting") {
         return notify("طلبك حالياً في قائمة الانتظار لدى الإدارة.", "info");
@@ -1358,7 +1357,7 @@
         await recordReferralJoin(incomingRefCode || uData.invitedBy, uid, name);
       }
       syncUserHeader();
-      notify("تم قبول طلبك كمتسابق، مرحباً بك في صفحة التحديات.", "success");
+      notify("تمت الموافقه على طلبك انت الان مشترك", "success");
       goScreen("screen-challenges-hub");
     };
 
@@ -1598,13 +1597,11 @@
       notify(`تم اختيار رقم الاستقبال المحدد من الأدمن: ${phone}.`, "info");
     };
 
-    // اختيار "لا" -> يعود العميل إلى صفحة اختيار السلع
     window.confirmPurchaseNo = function () {
       notify("تم إلغاء تأكيد الشراء والعودة إلى صفحة اختيار السلع.", "info");
       goScreen("screen-orders-home");
     };
 
-    // اختيار "نعم" -> يتم إرسال المبلغ من حساب العميل إلى الرقم الذي يحدده الأدمن
     window.confirmPurchaseYes = async function () {
       const total = getCartTotal();
       if (total <= 0) return notify("قيمة الطلب غير صالحة.", "error");
