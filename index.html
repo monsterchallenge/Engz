@@ -327,14 +327,20 @@
       cursor: pointer;
       overflow: hidden;
       background: linear-gradient(135deg, #7c3aed, #ec4899);
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     .dept-card-img {
       width: 100%;
-      height: 110px;
+      height: 125px;
       object-fit: cover;
       display: block;
       border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     .dept-card-label {
@@ -391,6 +397,9 @@
       background: #ffffff;
       position: relative;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
       transition: border-color 0.2s ease, transform 0.15s ease;
     }
 
@@ -401,9 +410,12 @@
 
     .product-img-wrap {
       position: relative;
-      height: 190px;
-      background: #0f172a;
+      height: 225px;
+      background: #f8fafc;
       overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     .product-img-wrap img {
@@ -411,6 +423,10 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      pointer-events: none;
     }
 
     .price-overlay {
@@ -539,12 +555,13 @@
     }
 
     .thumb-preview {
-      max-width: 180px;
-      max-height: 140px;
+      max-width: 240px;
+      max-height: 190px;
       border-radius: 10px;
       margin-top: 8px;
       display: none;
       border: 1px solid #cbd5e1;
+      object-fit: cover;
     }
 
     .preview-actions-row {
@@ -1424,9 +1441,11 @@
       container.innerHTML = depts
         .map((d) => {
           const meta = state.db.departmentsMeta[d] || {};
-          const imgHtml = meta.image ? `<img src="${meta.image}" alt="${esc(d)}" class="dept-card-img" />` : "";
+          const imgHtml = meta.image
+            ? `<img src="${meta.image}" alt="${esc(d)}" class="dept-card-img" draggable="false" oncontextmenu="return false;" />`
+            : "";
           return `
-            <div class="dept-card" onclick="openDepartment('${esc(d)}')">
+            <div class="dept-card" onclick="openDepartment('${esc(d)}')" oncontextmenu="return false;">
               ${imgHtml}
               <div class="dept-card-label">${esc(d)}</div>
             </div>
@@ -1521,11 +1540,12 @@
 
           return `
             <div class="product-card ${isSelected ? "selected" : ""}"
+                 oncontextmenu="return false;"
                  onpointerdown="startLongPress3Sec('${esc(uid)}', JSON.parse(decodeURIComponent('${payloadStr}')))"
                  onpointerup="cancelLongPress3Sec('${esc(uid)}')"
                  onpointerleave="cancelLongPress3Sec('${esc(uid)}')">
-              <div class="product-img-wrap">
-                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" />` : ""}
+              <div class="product-img-wrap" oncontextmenu="return false;">
+                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" draggable="false" oncontextmenu="return false;" />` : ""}
                 ${item.isOffer ? `<div class="offer-ribbon">عرض خاص</div>` : ""}
                 <div class="select-indicator">${isSelected ? "محدد ✓" : "اضغط 3 ثوانٍ"}</div>
                 <div class="price-overlay">${priceNum} جنيه</div>
@@ -1590,9 +1610,9 @@
           const p = Math.max(0, Number(item.price) || 0);
           total += p;
           return `
-            <div class="product-card selected">
-              <div class="product-img-wrap">
-                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" />` : ""}
+            <div class="product-card selected" oncontextmenu="return false;">
+              <div class="product-img-wrap" oncontextmenu="return false;">
+                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" draggable="false" oncontextmenu="return false;" />` : ""}
                 <div class="price-overlay">${p} جنيه</div>
               </div>
               <div class="product-body">
@@ -1739,6 +1759,47 @@
       notify("تم تأكيد طلب الشراء وإرسال المبلغ بنجاح.", "success");
     };
 
+    function encodeHighQualityImage(file, cb, maxDim = 1600, quality = 0.92) {
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const img = new Image();
+        img.onload = function () {
+          let w = img.width;
+          let h = img.height;
+
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, 0, 0, w, h);
+
+          const isPng = file.type === "image/png";
+          let dataUrl = isPng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", quality);
+
+          let q = quality;
+          while (!isPng && dataUrl.length > 1800000 && q > 0.7) {
+            q = Number((q - 0.05).toFixed(2));
+            dataUrl = canvas.toDataURL("image/jpeg", q);
+          }
+          cb(dataUrl);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     window.clearPreviewImage = function (inputId, previewImgId, delBtnId, key) {
       state.uploadedImages[key] = "";
       const inp = document.getElementById(inputId);
@@ -1756,39 +1817,16 @@
     window.previewCompressedImage = function (inputEl, previewImgId, key, delBtnId) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (ev) {
-        const img = new Image();
-        img.onload = function () {
-          const canvas = document.createElement("canvas");
-          const maxDim = 640;
-          let w = img.width;
-          let h = img.height;
-          if (w > h && w > maxDim) {
-            h = (h * maxDim) / w;
-            w = maxDim;
-          } else if (h > maxDim) {
-            w = (w * maxDim) / h;
-            h = maxDim;
-          }
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, w, h);
-          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.65);
-          state.uploadedImages[key] = compressedDataUrl;
-
-          const prev = document.getElementById(previewImgId);
-          if (prev) {
-            prev.src = compressedDataUrl;
-            prev.style.display = "block";
-          }
-          const btn = document.getElementById(delBtnId);
-          if (btn) btn.style.display = "inline-block";
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
+      encodeHighQualityImage(file, (highResDataUrl) => {
+        state.uploadedImages[key] = highResDataUrl;
+        const prev = document.getElementById(previewImgId);
+        if (prev) {
+          prev.src = highResDataUrl;
+          prev.style.display = "block";
+        }
+        const btn = document.getElementById(delBtnId);
+        if (btn) btn.style.display = "inline-block";
+      });
     };
 
     window.switchChallengerSubTab = function (tab) {
