@@ -278,7 +278,7 @@
 <body>
   <div id="splash-screen" class="splash-screen">
     <div class="splash-card">
-      <div class="splash-title">مرحبا بك فى تطبيق انجز للخصومات واللمهام واللمكافآت</div>
+      <div class="splash-title">مرحبا بك فى تطبيق انجز للخصومات والمهام والمكافآت</div>
       <div class="countdown-num" id="splash-countdown">30</div>
       <div class="progress-track">
         <div class="progress-fill" id="splash-progress-fill"></div>
@@ -618,6 +618,7 @@
         o.deliveryStatus === "completed" ||
         o.orderCompleted === true ||
         o.status === "تم التوصيل" ||
+        o.status === "تم التوصيل والاستلام" ||
         o.status === "تم وصول الطلب" ||
         o.status === "منتهي"
       );
@@ -1241,6 +1242,43 @@
       notifyUser("تم إرسال الإيصال والطلب للأدمن.", "success");
     };
 
+    window.finishActiveOrderOnReceipt = async function (orderId) {
+      const ord = dbState.orders?.[orderId];
+      if (!ord) return;
+      const now = Date.now();
+      await update(ref(db, `orders/${orderId}`), {
+        stage: "completed",
+        orderCompleted: true,
+        deliveryStatus: "completed",
+        status: "تم التوصيل والاستلام",
+        completedAt: now,
+        completedAtFormatted: new Date(now).toLocaleString("ar-EG")
+      });
+
+      const rec = {
+        orderId,
+        buyerId: ord.buyerId || "",
+        buyerName: ord.buyerName || "عميل",
+        assignedChallengerId: ord.assignedChallengerId || "",
+        assignedChallengerName: ord.assignedChallengerName || "",
+        challengeTitle: ord.challengeTitle || "",
+        items: ord.items || [],
+        totalAmount: Number(ord.totalAmount) || 0,
+        status: "تم التوصيل والاستلام",
+        deliveryImage: ord.deliveryImage || "",
+        completedAt: now,
+        dateTimeText: new Date(now).toLocaleString("ar-EG")
+      };
+
+      if (ord.buyerId) {
+        await set(ref(db, `userOrderHistory/${sKey(ord.buyerId)}/${orderId}`), rec);
+      }
+      if (ord.assignedChallengerId) {
+        await set(ref(db, `challengerHistory/${sKey(ord.assignedChallengerId)}/${orderId}`), rec);
+      }
+      notifyUser("تم إنهاء الطلب عند التوصيل والاستلام ونقله إلى السجل.", "success");
+    };
+
     window.acceptChallengeTask = async function (chalId) {
       if (!currentUser?.id) return;
       const chal = dbState.challenges?.[chalId];
@@ -1312,16 +1350,13 @@
     window.confirmTaskFinishedByRunner = async function (orderId) {
       const ord = dbState.orders?.[orderId];
       if (!ord) return;
-      const proof = challengerProofImgs[orderId] || "";
-      if (!proof) {
-        return notifyUser("اختر أو صوّر صورة من الكاميرا أو الاستوديو لتأكيد وصول الطلب.", "error");
-      }
+      const proof = challengerProofImgs[orderId] || ord.deliveryImage || "";
       const now = Date.now();
       await update(ref(db, `orders/${orderId}`), {
         stage: "completed",
         orderCompleted: true,
         deliveryStatus: "completed",
-        status: "تم التوصيل",
+        status: "تم التوصيل والاستلام",
         deliveryImage: proof,
         completedAt: now,
         completedAtFormatted: new Date(now).toLocaleString("ar-EG")
@@ -1336,7 +1371,7 @@
           assignedChallengerName: currentUser.name,
           assignedChallengerPhone: currentUser.phone || "",
           totalAmount: Number(ord.totalAmount) || 0,
-          status: "تم التوصيل",
+          status: "تم التوصيل والاستلام",
           deliveryImage: proof,
           completedAt: now,
           dateTimeText: new Date(now).toLocaleString("ar-EG")
@@ -1350,7 +1385,7 @@
         });
       }
       delete challengerProofImgs[orderId];
-      notifyUser("تم تأكيد انتهاء المهمة وإرسال الصورة.", "success");
+      notifyUser("تم إنهاء المهمة عند التوصيل والاستلام.", "success");
     };
 
     function renderCurrentView() {
@@ -1401,6 +1436,9 @@
                 <div class="box">
                   <strong>طلب #${esc(id.slice(-6))}</strong> • <strong>${esc(statusTxt)}</strong><br/>
                   <span style="font-size:13px;">الإجمالي: <strong>${Number(o.totalAmount) || 0} جنيه</strong></span>
+                  <div style="margin-top:8px;">
+                    <button type="button" class="btn-success" onclick="finishActiveOrderOnReceipt('${esc(id)}')">تم التوصيل والاستلام (إنهاء)</button>
+                  </div>
                 </div>
               `;
             }).join("")
@@ -1415,7 +1453,7 @@
         document.getElementById("client-history-list").innerHTML = histArr.length
           ? histArr.map((h) => `
             <div class="box done-box">
-              <strong>طلب #${esc(String(h.orderId || "").slice(-6))}</strong> • <strong>${esc(h.status || "تم التوصيل")}</strong><br/>
+              <strong>طلب #${esc(String(h.orderId || "").slice(-6))}</strong> • <strong>${esc(h.status || "تم التوصيل والاستلام")}</strong><br/>
               <span style="font-size:13px;">الإجمالي: <strong>${Number(h.totalAmount) || 0} جنيه</strong>${h.dateTimeText ? ` • ${esc(h.dateTimeText)}` : ""}</span>
             </div>
           `).join("")
@@ -1487,7 +1525,7 @@
                     <button type="button" class="btn-dark" onclick="document.getElementById('runner-cam-${esc(id)}').click()">📷 كاميرا</button>
                     <button type="button" class="btn-amber" onclick="document.getElementById('runner-gal-${esc(id)}').click()">🖼️ استوديو</button>
                     <button type="button" class="btn-blue" onclick="transferTaskToAnotherRunner('${esc(id)}')">تحويل لمتسابق آخر</button>
-                    <button type="button" class="btn-success" onclick="confirmTaskFinishedByRunner('${esc(id)}')">تأكيد انتهاء المهمة</button>
+                    <button type="button" class="btn-success" onclick="confirmTaskFinishedByRunner('${esc(id)}')">تم التوصيل والاستلام (إنهاء)</button>
                   </div>
                   ${proof ? `<img src="${proof}" class="thumb-sm" alt="صورة وصول الطلب" />` : ""}
                 </div>
