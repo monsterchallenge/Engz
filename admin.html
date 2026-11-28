@@ -53,7 +53,7 @@
     .notice.error { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
     .notice.success { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
 
-    .tabs { display: flex; gap: 8px; flex-wrap:wrap; margin-bottom: 16px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
     button {
       font-family: inherit;
       cursor: pointer;
@@ -124,6 +124,17 @@
       padding: 2px 6px;
       font-size: 15px;
       text-decoration: underline;
+    }
+    .chip {
+      display: inline-block;
+      background: #ede9fe;
+      color: #4c1d95;
+      border: 1px solid #c4b5fd;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 2px;
     }
   </style>
 </head>
@@ -211,7 +222,7 @@
 
       <div id="asec-catalog" style="display:none;">
         <div class="box">
-          <h3 style="margin-top:0; color:#3b0764;">إضافة قسم رئيسي + صورة تعبر عن القسم</h3>
+          <h3 style="margin-top:0; color:#3b0764;">1) إضافة قسم رئيسي + صورة تعبر عن القسم</h3>
           <div class="form-row-2">
             <div class="form-group">
               <label for="new-dept-name">اسم القسم</label>
@@ -233,7 +244,7 @@
         </div>
 
         <div class="box">
-          <h3 style="margin-top:0; color:#3b0764;">إضافة / إدارة الأقسام الفرعية في كل قسم</h3>
+          <h3 style="margin-top:0; color:#3b0764;">2) إنشاء قسم فرعي داخل كل قسم + خانات للأنواع والأحجام داخل القسم الفرعي</h3>
           <div class="form-row-2">
             <div class="form-group">
               <label for="sub-parent-dept">اختر القسم الرئيسي</label>
@@ -244,6 +255,18 @@
               <input type="text" id="sub-dept-title" placeholder="مثال: أجبان، ألبان، مكرونات، مجمدات..." />
             </div>
           </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="sub-dept-types">خانات الأنواع داخل القسم الفرعي (افصل بفاصلة أو سطر جديد)</label>
+              <textarea id="sub-dept-types" rows="2" placeholder="مثال: كامل الدسم، خالي الدسم، طبيعي، نباتي"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="sub-dept-sizes">خانات الأحجام داخل القسم الفرعي (افصل بفاصلة أو سطر جديد)</label>
+              <textarea id="sub-dept-sizes" rows="2" placeholder="مثال: نص لتر، 1 لتر، 2 لتر أو صغير، وسط، كبير"></textarea>
+            </div>
+          </div>
+
           <div class="form-group">
             <label>صورة القسم الفرعي (اختياري — كاميرا / استوديو)</label>
             <input type="file" id="sub-cam" accept="image/*" capture="environment" style="display:none;" onchange="pickImg(this, 'sub')" />
@@ -254,32 +277,63 @@
             </div>
             <img id="prev-sub" class="thumb" style="display:none;" alt="معاينة القسم الفرعي" />
           </div>
-          <button type="button" class="btn-success" onclick="saveSubDepartment()">إضافة قسم فرعي</button>
-          <div id="admin-subdepts-grid" class="grid-3" style="margin-top:12px;"></div>
+          <button type="button" class="btn-success" onclick="saveSubDepartment()">حفظ القسم الفرعي وأنواعه وأحجامه</button>
+
+          <div id="admin-subdepts-grid" class="grid-3" style="margin-top:14px;"></div>
+
+          <div id="subdept-types-sizes-editor" class="box" style="display:none; margin-top:14px; background:#faf5ff; border-color:#c084fc;">
+            <h4 style="margin-top:0; color:#3b0764;" id="editing-subdept-heading">إدارة أنواع وأحجام القسم الفرعي</h4>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="edit-sub-types-in">الأنواع (فاصلة أو سطر جديد)</label>
+                <textarea id="edit-sub-types-in" rows="2"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="edit-sub-sizes-in">الأحجام (فاصلة أو سطر جديد)</label>
+                <textarea id="edit-sub-sizes-in" rows="2"></textarea>
+              </div>
+            </div>
+            <button type="button" class="btn-blue" onclick="saveEditedSubDeptOptions()">تحديث الأنواع والأحجام للقسم الفرعي</button>
+          </div>
         </div>
 
         <div class="box">
-          <h3 style="margin-top:0; color:#3b0764;">إضافة سلعة / نوع / حجم / عرض (دمج السعر بدقة عالية كجزء من الصورة)</h3>
+          <h3 style="margin-top:0; color:#3b0764;">3) إضافة سلعة / منتج / عرض داخل القسم والقسم الفرعي (مع اختيار النوع والحجم)</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="item-dept">القسم</label>
+              <label for="item-dept">القسم الرئيسي</label>
               <select id="item-dept" onchange="onItemDeptChange(this.value)"></select>
             </div>
             <div class="form-group">
               <label for="item-subdept">القسم الفرعي</label>
-              <select id="item-subdept" onchange="selectedItemSubDept = this.value"></select>
+              <select id="item-subdept" onchange="onItemSubDeptChange(this.value)"></select>
             </div>
           </div>
+
           <div class="form-row-2">
             <div class="form-group">
-              <label for="item-title">اسم النوع / الحجم / العرض</label>
-              <input type="text" id="item-title" placeholder="مثال: لبن بخيره نص لتر أو جبنة رومي" />
+              <label for="item-type">النوع (من القسم الفرعي أو اكتب نوعاً جديداً)</label>
+              <select id="item-type-select" onchange="document.getElementById('item-type').value = this.value || document.getElementById('item-type').value"></select>
+              <input type="text" id="item-type" style="margin-top:6px;" placeholder="مثال: كامل الدسم أو رومي بطارخ" />
+            </div>
+            <div class="form-group">
+              <label for="item-size">الحجم (من القسم الفرعي أو اكتب حجماً جديداً)</label>
+              <select id="item-size-select" onchange="document.getElementById('item-size').value = this.value || document.getElementById('item-size').value"></select>
+              <input type="text" id="item-size" style="margin-top:6px;" placeholder="مثال: 1 لتر أو نص كيلو" />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="item-title">اسم الصنف / العرض</label>
+              <input type="text" id="item-title" placeholder="مثال: لبن بخيره أو جبنة رومي" />
             </div>
             <div class="form-group">
               <label for="item-price">السعر (جنيه)</label>
               <input type="number" id="item-price" min="0" step="0.5" placeholder="35" />
             </div>
           </div>
+
           <div class="form-group">
             <label>
               <input type="checkbox" id="item-is-offer" style="width:auto; margin-left:6px;" />
@@ -429,6 +483,7 @@
     let activeAdminTab = "requests";
     let pickedUserId = "";
     let selectedSubParentDept = "سوبرمركت";
+    let editingSubDeptKey = "";
     let selectedItemDept = "سوبرمركت";
     let selectedItemSubDept = "";
     const draftImgs = { dept: "", sub: "", item: "", chal: "", gift: "" };
@@ -447,7 +502,6 @@
       subDepartments: {},
       products: {},
       cashPhones: [],
-      phonePool: [],
       orders: {},
       userOrderHistory: {},
       challengerHistory: {},
@@ -469,6 +523,15 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+    }
+
+    function parseListField(raw) {
+      return [...new Set(
+        String(raw || "")
+          .split(/[,،\n\r]+/)
+          .map((x) => x.trim())
+          .filter(Boolean)
+      )];
     }
 
     function isEgyptMobile(p) {
@@ -558,7 +621,7 @@
       reader.readAsDataURL(file);
     }
 
-    function burnPriceOnImage(rawUrl, title, price, cb) {
+    function burnPriceOnImage(rawUrl, title, price, extraTag, cb) {
       const img = new Image();
       img.onload = function () {
         const canvas = document.createElement("canvas");
@@ -569,23 +632,24 @@
         ctx.imageSmoothingQuality = "high";
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        const bh = Math.max(76, Math.round(canvas.height * 0.14));
+        const bh = Math.max(82, Math.round(canvas.height * 0.15));
         ctx.fillStyle = "rgba(15, 23, 42, 0.88)";
         ctx.fillRect(0, canvas.height - bh, canvas.width, bh);
 
-        const priceFont = Math.max(28, Math.round(bh * 0.46));
+        const priceFont = Math.max(28, Math.round(bh * 0.44));
         ctx.font = `bold ${priceFont}px Tahoma, Arial, sans-serif`;
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#fde047";
-        ctx.fillText(`${Number(price) || 0} جنيه`, canvas.width - 22, canvas.height - bh * 0.5);
+        ctx.fillText(`${Number(price) || 0} جنيه`, canvas.width - 22, canvas.height - bh * 0.52);
 
-        if (title) {
-          const tFont = Math.max(20, Math.round(bh * 0.32));
+        const labelText = [title, extraTag].filter(Boolean).join(" • ");
+        if (labelText) {
+          const tFont = Math.max(19, Math.round(bh * 0.3));
           ctx.font = `bold ${tFont}px Tahoma, Arial, sans-serif`;
           ctx.textAlign = "left";
           ctx.fillStyle = "#ffffff";
-          ctx.fillText(String(title), 22, canvas.height - bh * 0.5);
+          ctx.fillText(labelText, 22, canvas.height - bh * 0.52);
         }
 
         cb(canvas.toDataURL("image/jpeg", 0.94));
@@ -692,12 +756,16 @@
       return Object.entries(merged).map(([k, v]) => ({
         key: k,
         name: typeof v === "object" && v ? (v.name || k) : k,
-        image: typeof v === "object" && v ? (v.image || "") : ""
+        image: typeof v === "object" && v ? (v.image || "") : "",
+        types: Array.isArray(v?.types) ? v.types : [],
+        sizes: Array.isArray(v?.sizes) ? v.sizes : []
       }));
     }
 
     window.onSubParentDeptChange = function (val) {
       selectedSubParentDept = val || "سوبرمركت";
+      editingSubDeptKey = "";
+      document.getElementById("subdept-types-sizes-editor").style.display = "none";
       window.renderSubDeptsAdmin();
     };
 
@@ -705,6 +773,30 @@
       selectedItemDept = val || "سوبرمركت";
       selectedItemSubDept = "";
       window.syncItemSubDeptSelect();
+    };
+
+    window.onItemSubDeptChange = function (val) {
+      selectedItemSubDept = val || "";
+      window.syncItemTypesAndSizesSelects();
+    };
+
+    window.syncItemTypesAndSizesSelects = function () {
+      const dept = document.getElementById("item-dept")?.value || selectedItemDept;
+      const subName = document.getElementById("item-subdept")?.value || selectedItemSubDept;
+      const subObj = getSubDepts(dept).find((s) => s.name === subName);
+      const types = subObj?.types || [];
+      const sizes = subObj?.sizes || [];
+
+      const tSel = document.getElementById("item-type-select");
+      const sSel = document.getElementById("item-size-select");
+      if (tSel) {
+        tSel.innerHTML = `<option value="">-- اختر نوعاً من القسم الفرعي --</option>` +
+          types.map((t) => `<option value="${esc(t)}">${esc(t)}</option>`).join("");
+      }
+      if (sSel) {
+        sSel.innerHTML = `<option value="">-- اختر حجماً من القسم الفرعي --</option>` +
+          sizes.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
+      }
     };
 
     window.saveNewDepartment = async function () {
@@ -726,27 +818,67 @@
     window.saveSubDepartment = async function () {
       const parentDept = document.getElementById("sub-parent-dept").value || selectedSubParentDept;
       const subName = document.getElementById("sub-dept-title").value.trim();
+      const types = parseListField(document.getElementById("sub-dept-types").value);
+      const sizes = parseListField(document.getElementById("sub-dept-sizes").value);
+
       if (!parentDept || !subName) return notifyAdmin("اختر القسم الرئيسي واكتب اسم القسم الفرعي.", "error");
+
       const payload = {
         name: subName,
         parentDept,
+        types,
+        sizes,
         image: draftImgs.sub || "",
         createdAt: Date.now()
       };
       await set(ref(db, `subDepartments/${sKey(parentDept)}/${sKey(subName)}`), payload);
       await set(ref(db, `subDepartments/${parentDept}/${sKey(subName)}`), payload);
+
       selectedSubParentDept = parentDept;
       selectedItemDept = parentDept;
       selectedItemSubDept = subName;
+
       document.getElementById("sub-dept-title").value = "";
+      document.getElementById("sub-dept-types").value = "";
+      document.getElementById("sub-dept-sizes").value = "";
       draftImgs.sub = "";
       document.getElementById("prev-sub").style.display = "none";
-      notifyAdmin(`تم حفظ القسم الفرعي (${subName}) تحت (${parentDept}).`, "success");
+      notifyAdmin(`تم حفظ القسم الفرعي (${subName}) وأنواعه وأحجامه.`, "success");
+    };
+
+    window.openEditSubDeptOptions = function (parentDept, subKey) {
+      const sub = getSubDepts(parentDept).find((s) => s.key === subKey);
+      if (!sub) return;
+      selectedSubParentDept = parentDept;
+      editingSubDeptKey = subKey;
+      document.getElementById("subdept-types-sizes-editor").style.display = "block";
+      document.getElementById("editing-subdept-heading").textContent =
+        `تعديل أنواع وأحجام القسم الفرعي: ${sub.name} (${parentDept})`;
+      document.getElementById("edit-sub-types-in").value = (sub.types || []).join("، ");
+      document.getElementById("edit-sub-sizes-in").value = (sub.sizes || []).join("، ");
+    };
+
+    window.saveEditedSubDeptOptions = async function () {
+      if (!editingSubDeptKey) return;
+      const parentDept = selectedSubParentDept;
+      const sub = getSubDepts(parentDept).find((s) => s.key === editingSubDeptKey);
+      if (!sub) return;
+
+      const types = parseListField(document.getElementById("edit-sub-types-in").value);
+      const sizes = parseListField(document.getElementById("edit-sub-sizes-in").value);
+
+      await update(ref(db, `subDepartments/${sKey(parentDept)}/${editingSubDeptKey}`), { types, sizes });
+      await update(ref(db, `subDepartments/${parentDept}/${editingSubDeptKey}`), { types, sizes });
+      notifyAdmin(`تم تحديث الأنواع والأحجام للقسم الفرعي (${sub.name}).`, "success");
     };
 
     window.deleteSubDepartment = async function (parentDept, subKey, subName) {
       await remove(ref(db, `subDepartments/${sKey(parentDept)}/${subKey}`));
       await remove(ref(db, `subDepartments/${parentDept}/${subKey}`));
+      if (editingSubDeptKey === subKey) {
+        editingSubDeptKey = "";
+        document.getElementById("subdept-types-sizes-editor").style.display = "none";
+      }
       notifyAdmin(`تم حذف القسم الفرعي (${subName}).`, "info");
     };
 
@@ -763,22 +895,34 @@
       } else {
         selectedItemSubDept = sel.value || "";
       }
+      window.syncItemTypesAndSizesSelects();
     };
 
     window.saveCatalogItem = async function () {
       const dept = document.getElementById("item-dept").value;
       const subDept = document.getElementById("item-subdept").value;
+      const itemType = document.getElementById("item-type").value.trim() || document.getElementById("item-type-select").value.trim();
+      const itemSize = document.getElementById("item-size").value.trim() || document.getElementById("item-size-select").value.trim();
       const title = document.getElementById("item-title").value.trim();
       const price = Number(document.getElementById("item-price").value);
       const isOffer = Boolean(document.getElementById("item-is-offer").checked);
+
       if (!dept || !title || Number.isNaN(price) || price < 0) {
         return notifyAdmin("أدخل القسم والاسم والسعر بشكل صحيح.", "error");
       }
+
+      const subObj = getSubDepts(dept).find((s) => s.name === subDept);
+      const availableTypes = [...new Set([...(subObj?.types || []), itemType].filter(Boolean))];
+      const availableSizes = [...new Set([...(subObj?.sizes || []), itemSize].filter(Boolean))];
 
       const writeItem = async (finalImg) => {
         const pRef = push(ref(db, `products/${sKey(dept)}`));
         await set(pRef, {
           subDept,
+          itemType,
+          itemSize,
+          availableTypes,
+          availableSizes,
           title,
           price,
           isOffer,
@@ -787,14 +931,17 @@
         });
         document.getElementById("item-title").value = "";
         document.getElementById("item-price").value = "";
+        document.getElementById("item-type").value = "";
+        document.getElementById("item-size").value = "";
         document.getElementById("item-is-offer").checked = false;
         draftImgs.item = "";
         document.getElementById("prev-item").style.display = "none";
-        notifyAdmin("تمت الإضافة بنجاح.", "success");
+        notifyAdmin("تمت إضافة الصنف بالنوع والحجم بنجاح.", "success");
       };
 
+      const variantTag = [itemType, itemSize].filter(Boolean).join(" - ");
       if (draftImgs.item) {
-        burnPriceOnImage(draftImgs.item, title, price, writeItem);
+        burnPriceOnImage(draftImgs.item, title, price, variantTag, writeItem);
       } else {
         await writeItem("");
       }
@@ -963,6 +1110,29 @@
       `;
     };
 
+    window.renderSubDeptsAdmin = function () {
+      const parent = document.getElementById("sub-parent-dept")?.value || selectedSubParentDept;
+      const subs = getSubDepts(parent);
+      document.getElementById("admin-subdepts-grid").innerHTML = subs.length
+        ? subs.map((s) => `
+          <div class="box" style="margin-bottom:0;">
+            ${s.image ? `<img src="${s.image}" class="thumb" style="width:100%; height:110px;" alt="${esc(s.name)}" />` : ""}
+            <div style="font-weight:bold; font-size:15px; margin-top:6px;">${esc(s.name)}</div>
+            <div style="margin-top:4px;">
+              <strong>الأنواع:</strong> ${s.types.length ? s.types.map((t) => `<span class="chip">${esc(t)}</span>`).join("") : `<span style="font-size:12px; color:#64748b;">غير محدد</span>`}
+            </div>
+            <div style="margin-top:4px;">
+              <strong>الأحجام:</strong> ${s.sizes.length ? s.sizes.map((z) => `<span class="chip">${esc(z)}</span>`).join("") : `<span style="font-size:12px; color:#64748b;">غير محدد</span>`}
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+              <button type="button" class="btn-blue" onclick="openEditSubDeptOptions('${esc(parent)}', '${esc(s.key)}')">أنواع وأحجام</button>
+              <button type="button" class="btn-danger" onclick="deleteSubDepartment('${esc(parent)}', '${esc(s.key)}', '${esc(s.name)}')">حذف</button>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد أقسام فرعية لهذا القسم.</div>`;
+    };
+
     function renderAdminAll() {
       const cReqs = Object.entries(st.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
       const hReqs = Object.entries(st.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
@@ -1107,7 +1277,12 @@
           <div class="box" style="margin-bottom:0;">
             ${p.image ? `<img src="${p.image}" class="thumb" style="width:100%; height:130px;" alt="${esc(p.title)}" />` : ""}
             <div><strong>${esc(p.title)}</strong> • <strong>${Number(p.price) || 0} جنيه</strong></div>
-            <div style="font-size:12px; color:#64748b;">${esc(p.d)}${p.subDept ? " / " + esc(p.subDept) : ""}${p.isOffer ? " • عرض خاص" : ""}</div>
+            <div style="font-size:12px; color:#64748b;">
+              ${esc(p.d)}${p.subDept ? " / " + esc(p.subDept) : ""}
+              ${p.itemType ? " • نوع: " + esc(p.itemType) : ""}
+              ${p.itemSize ? " • حجم: " + esc(p.itemSize) : ""}
+              ${p.isOffer ? " • عرض خاص" : ""}
+            </div>
             <button type="button" class="btn-danger" style="margin-top:8px;" onclick="deleteCatalogItem('${esc(p.d)}', '${esc(p.id)}')">حذف</button>
           </div>
         `).join("")
@@ -1129,7 +1304,10 @@
 
       document.getElementById("admin-active-orders-list").innerHTML = activeOrd.length
         ? activeOrd.map(([id, o]) => {
-            const itemsTxt = (o.items || []).map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ");
+            const itemsTxt = (o.items || []).map((i) => {
+              const meta = [i.itemType, i.itemSize].filter(Boolean).join(" - ");
+              return `${esc(i.title)}${meta ? ` (${esc(meta)})` : ""} (${Number(i.price) || 0} جنيه)`;
+            }).join(" ، ");
             return `
               <div class="box">
                 <strong>طلب #${esc(id.slice(-6))}</strong> • <strong>${esc(o.buyerName || "")}</strong> • <strong>${Number(o.totalAmount) || 0} جنيه</strong><br/>
@@ -1153,20 +1331,6 @@
         `).join("")
         : `<div class="box">لا توجد طلبات منتهية بعد.</div>`;
     }
-
-    window.renderSubDeptsAdmin = function () {
-      const parent = document.getElementById("sub-parent-dept")?.value || selectedSubParentDept;
-      const subs = getSubDepts(parent);
-      document.getElementById("admin-subdepts-grid").innerHTML = subs.length
-        ? subs.map((s) => `
-          <div class="box" style="margin-bottom:0;">
-            ${s.image ? `<img src="${s.image}" class="thumb" style="width:100%; height:110px;" alt="${esc(s.name)}" />` : ""}
-            <div style="font-weight:bold; margin-top:6px;">${esc(s.name)}</div>
-            <button type="button" class="btn-danger" style="margin-top:8px;" onclick="deleteSubDepartment('${esc(parent)}', '${esc(s.key)}', '${esc(s.name)}')">حذف</button>
-          </div>
-        `).join("")
-        : `<div class="box">لا توجد أقسام فرعية لهذا القسم.</div>`;
-    };
 
     onValue(ref(db, "users"), (s) => { st.users = s.val() || {}; scheduleRender(); });
     onValue(ref(db, "banned"), (s) => { st.banned = s.val() || {}; scheduleRender(); });
