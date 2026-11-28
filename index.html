@@ -411,6 +411,7 @@
             <h3 style="margin:0; color:#3b0764;" id="active-dept-title"></h3>
             <button type="button" class="btn-soft" onclick="closeSelectedDept()">عودة لكل الأقسام</button>
           </div>
+          <h4>الأقسام الفرعية</h4>
           <div id="sub-departments-grid" class="grid-3" style="margin-bottom:16px;"></div>
           <h4>الأنواع والمنتجات والعروض (اضغط ضغطة 3 ثوانٍ على أي صورة لتحديدها أو إلغاء التحديد)</h4>
           <div id="dept-items-grid" class="grid-3"></div>
@@ -964,8 +965,10 @@
     }
 
     function getSubDepartmentsList(deptName) {
-      const mapObj = dbState.subDepartments?.[deptName] || dbState.subDepartments?.[sKey(deptName)] || {};
-      return Object.values(mapObj)
+      const mapA = dbState.subDepartments?.[deptName] || {};
+      const mapB = dbState.subDepartments?.[sKey(deptName)] || {};
+      const merged = Object.assign({}, mapB, mapA);
+      return Object.values(merged)
         .map((v) => (typeof v === "object" && v ? { name: v.name || "", image: v.image || "" } : null))
         .filter((x) => x && x.name);
     }
@@ -985,7 +988,7 @@
     };
 
     window.selectSubDepartment = function (subName) {
-      activeSubDeptName = activeSubDeptName === subName ? "" : subName;
+      activeSubDeptName = subName || "";
       renderDepartmentDetails();
     };
 
@@ -1031,7 +1034,11 @@
       if (!activeDeptName) return;
       const subs = getSubDepartmentsList(activeDeptName);
       document.getElementById("sub-departments-grid").innerHTML = subs.length
-        ? subs.map((s) => `
+        ? `
+          <div class="box ${!activeSubDeptName ? "selected-item" : ""}" style="cursor:pointer;" onclick="selectSubDepartment('')">
+            <div style="font-weight:bold; font-size:16px;">الكل (${esc(activeDeptName)})</div>
+          </div>
+        ` + subs.map((s) => `
           <div class="box ${activeSubDeptName === s.name ? "selected-item" : ""}" style="cursor:pointer;" onclick="selectSubDepartment('${esc(s.name)}')">
             ${s.image ? `<img src="${s.image}" class="card-img" alt="${esc(s.name)}" />` : ""}
             <div style="font-weight:bold; font-size:16px; margin-top:6px;">${esc(s.name)}</div>
