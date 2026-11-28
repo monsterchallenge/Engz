@@ -53,7 +53,7 @@
     .notice.error { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
     .notice.success { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
 
-    .tabs { display: flex; gap: 8px; flex-wrap:wrap; margin-bottom: 16px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
     button {
       font-family: inherit;
       cursor: pointer;
@@ -233,19 +233,19 @@
         </div>
 
         <div class="box">
-          <h3 style="margin-top:0; color:#3b0764;">إضافة قسم فرعي تابع لقسم كبير (مثال: ألبان، أجبان، مكرونات، مجمدات، أيس كريم)</h3>
+          <h3 style="margin-top:0; color:#3b0764;">إضافة / إدارة الأقسام الفرعية في كل قسم</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="sub-parent-dept">القسم الكبير</label>
+              <label for="sub-parent-dept">اختر القسم الرئيسي</label>
               <select id="sub-parent-dept" onchange="renderSubDeptsAdmin()"></select>
             </div>
             <div class="form-group">
-              <label for="sub-dept-title">اسم القسم الفرعي</label>
-              <input type="text" id="sub-dept-title" placeholder="مثال: أجبان أو ألبان" />
+              <label for="sub-dept-title">اسم القسم الفرعي الجديد</label>
+              <input type="text" id="sub-dept-title" placeholder="مثال: أجبان، ألبان، مكرونات، مجمدات..." />
             </div>
           </div>
           <div class="form-group">
-            <label>صورة القسم الفرعي (كاميرا / استوديو)</label>
+            <label>صورة القسم الفرعي (اختياري — كاميرا / استوديو)</label>
             <input type="file" id="sub-cam" accept="image/*" capture="environment" style="display:none;" onchange="pickImg(this, 'sub')" />
             <input type="file" id="sub-gal" accept="image/*" style="display:none;" onchange="pickImg(this, 'sub')" />
             <div style="display:flex; gap:8px;">
@@ -683,8 +683,10 @@
     }
 
     function getSubDepts(parentDept) {
-      const m = st.subDepartments?.[parentDept] || st.subDepartments?.[sKey(parentDept)] || {};
-      return Object.entries(m).map(([k, v]) => ({
+      const mapA = st.subDepartments?.[parentDept] || {};
+      const mapB = st.subDepartments?.[sKey(parentDept)] || {};
+      const merged = Object.assign({}, mapB, mapA);
+      return Object.entries(merged).map(([k, v]) => ({
         key: k,
         name: typeof v === "object" && v ? (v.name || k) : k,
         image: typeof v === "object" && v ? (v.image || "") : ""
@@ -708,15 +710,22 @@
     window.saveSubDepartment = async function () {
       const parentDept = document.getElementById("sub-parent-dept").value;
       const subName = document.getElementById("sub-dept-title").value.trim();
-      if (!parentDept || !subName) return notifyAdmin("اختر القسم الكبير واكتب اسم القسم الفرعي.", "error");
+      if (!parentDept || !subName) return notifyAdmin("اختر القسم الرئيسي واكتب اسم القسم الفرعي.", "error");
       await set(ref(db, `subDepartments/${sKey(parentDept)}/${sKey(subName)}`), {
         name: subName,
-        image: draftImgs.sub || ""
+        parentDept,
+        image: draftImgs.sub || "",
+        createdAt: Date.now()
       });
       document.getElementById("sub-dept-title").value = "";
       draftImgs.sub = "";
       document.getElementById("prev-sub").style.display = "none";
       notifyAdmin(`تم حفظ القسم الفرعي (${subName}) تحت (${parentDept}).`, "success");
+    };
+
+    window.deleteSubDepartment = async function (parentDept, subKey, subName) {
+      await remove(ref(db, `subDepartments/${sKey(parentDept)}/${subKey}`));
+      notifyAdmin(`تم حذف القسم الفرعي (${subName}).`, "info");
     };
 
     window.syncItemSubDeptSelect = function () {
@@ -1124,6 +1133,7 @@
           <div class="box" style="margin-bottom:0;">
             ${s.image ? `<img src="${s.image}" class="thumb" style="width:100%; height:110px;" alt="${esc(s.name)}" />` : ""}
             <div style="font-weight:bold; margin-top:6px;">${esc(s.name)}</div>
+            <button type="button" class="btn-danger" style="margin-top:8px;" onclick="deleteSubDepartment('${esc(parent)}', '${esc(s.key)}', '${esc(s.name)}')">حذف</button>
           </div>
         `).join("")
         : `<div class="box">لا توجد أقسام فرعية لهذا القسم.</div>`;
