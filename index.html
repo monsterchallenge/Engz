@@ -413,7 +413,7 @@
           </div>
           <h4>الأقسام الفرعية</h4>
           <div id="sub-departments-grid" class="grid-3" style="margin-bottom:16px;"></div>
-          <h4>الأنواع والمنتجات والعروض (اضغط ضغطة 3 ثوانٍ على أي صورة لتحديدها أو إلغاء التحديد)</h4>
+          <h4>الأنواع والمنتجات والعروض (اضغط «تحديد» أو «إلغاء التحديد» أو اضغط 3 ثوانٍ على الصورة)</h4>
           <div id="dept-items-grid" class="grid-3"></div>
         </div>
       </div>
@@ -973,6 +973,14 @@
         .filter((x) => x && x.name);
     }
 
+    function getDeptProductsMap(deptName) {
+      return Object.assign(
+        {},
+        dbState.products?.[sKey(deptName)] || {},
+        dbState.products?.[deptName] || {}
+      );
+    }
+
     window.openDepartmentView = function (deptName) {
       activeDeptName = deptName;
       activeSubDeptName = "";
@@ -996,8 +1004,9 @@
       return cart.some((x) => x.dept === dept && x.id === itemId);
     }
 
-    window.toggleSelectItemByLongPress = function (dept, itemId) {
-      const prod = dbState.products?.[dept]?.[itemId] || dbState.products?.[sKey(dept)]?.[itemId];
+    window.toggleSelectItem = function (dept, itemId) {
+      const rawMap = getDeptProductsMap(dept);
+      const prod = rawMap?.[itemId];
       if (!prod) return;
       const idx = cart.findIndex((x) => x.dept === dept && x.id === itemId);
       if (idx >= 0) {
@@ -1017,12 +1026,16 @@
       }
       saveCart();
       renderDepartmentDetails();
+      const cartSub = document.getElementById("client-sub-cart");
+      if (cartSub && cartSub.style.display !== "none") {
+        window.openCartView();
+      }
     };
 
     window.startLongPress3s = function (dept, itemId) {
       clearTimeout(longPressTimers[`${dept}_${itemId}`]);
       longPressTimers[`${dept}_${itemId}`] = setTimeout(() => {
-        window.toggleSelectItemByLongPress(dept, itemId);
+        window.toggleSelectItem(dept, itemId);
       }, 3000);
     };
 
@@ -1046,7 +1059,7 @@
         `).join("")
         : `<div class="box">لا توجد أقسام فرعية مضافة لهذا القسم حالياً.</div>`;
 
-      const rawItems = dbState.products?.[activeDeptName] || dbState.products?.[sKey(activeDeptName)] || {};
+      const rawItems = getDeptProductsMap(activeDeptName);
       const items = Object.entries(rawItems)
         .map(([id, it]) => ({ id, ...it }))
         .filter((it) => !activeSubDeptName || it.subDept === activeSubDeptName);
@@ -1063,7 +1076,11 @@
                 <div style="font-weight:bold; font-size:15px; margin-top:6px;">${esc(it.title)}</div>
                 ${it.subDept ? `<div style="font-size:12px; color:#64748b;">${esc(it.subDept)}</div>` : ""}
                 <div class="price-badge">${Number(it.price) || 0} جنيه</div>
-                ${sel ? `<div style="margin-top:6px; color:#059669; font-weight:bold;">✓ محدد</div>` : ""}
+                <div style="margin-top:8px;">
+                  <button type="button" class="${sel ? "btn-danger" : "btn-success"}" onclick="toggleSelectItem('${esc(activeDeptName)}', '${esc(it.id)}')">
+                    ${sel ? "إلغاء التحديد" : "تحديد"}
+                  </button>
+                </div>
               </div>
             `;
           }).join("")
@@ -1079,7 +1096,7 @@
               <strong>${esc(x.title)}</strong> (${esc(x.dept)}${x.subDept ? " / " + esc(x.subDept) : ""}) •
               <strong>${Number(x.price) || 0} جنيه</strong>
             </div>
-            <button type="button" class="btn-danger" onclick="removeCartItem(${idx})">حذف</button>
+            <button type="button" class="btn-danger" onclick="removeCartItem(${idx})">إلغاء التحديد</button>
           </div>
         `).join("")
         : `<div class="box">عربة التسوق فارغة.</div>`;
@@ -1090,6 +1107,7 @@
       cart.splice(idx, 1);
       saveCart();
       window.openCartView();
+      renderDepartmentDetails();
     };
 
     window.openCheckoutConfirmPage = function () {
