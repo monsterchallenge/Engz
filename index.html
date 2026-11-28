@@ -3,1565 +3,405 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>انجز - للخصومات والمهام والمكافآت</title>
+  <title>انجز - تطبيق المستخدم (عميل / تحدّي)</title>
   <style>
-    :root {
-      --accent-pink: #ec4899;
-      --accent-amber: #f59e0b;
-      --accent-teal: #06b6d4;
-      --surface: #ffffff;
-      --surface-soft: #f8fafc;
-      --text-dark: #0f172a;
-      --text-muted: #475569;
-      --border: #e2e8f0;
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 0;
-      min-height: 100vh;
+      padding: 16px 14px 64px;
       font-family: Tahoma, Arial, sans-serif;
-      background: linear-gradient(135deg, #090d16 0%, #1a103c 45%, #082f49 100%);
-      color: var(--text-dark);
+      background: linear-gradient(135deg, #090d16 0%, #1e1b4b 52%, #082f49 100%);
+      color: #0f172a;
       line-height: 1.65;
+      min-height: 100vh;
     }
-
-    @keyframes btnPulsePop {
-      0% { transform: scale(1); }
-      45% { transform: scale(0.92) translateY(2px); }
-      100% { transform: scale(1) translateY(0); }
-    }
-
-    @keyframes bannerSlideIn {
-      from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-
-    #splash-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 24px;
-      color: #ffffff;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(236, 72, 153, 0.35), transparent 45%),
-        radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.35), transparent 45%),
-        radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.32), transparent 50%),
-        linear-gradient(145deg, #0b1021 0%, #24124d 50%, #0b2d48 100%);
-    }
-
-    .splash-card {
-      width: 100%;
-      max-width: 520px;
-      background: rgba(15, 23, 42, 0.72);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 28px;
-      padding: 32px 24px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
-    }
-
-    .splash-badge {
-      display: inline-block;
-      padding: 6px 16px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: bold;
-      background: linear-gradient(90deg, var(--accent-pink), var(--accent-amber));
-      color: #ffffff;
-      margin-bottom: 16px;
-    }
-
-    .splash-title {
-      margin: 0 0 22px;
-      font-size: 24px;
-      font-weight: bold;
-      line-height: 1.5;
-      background: linear-gradient(90deg, #fde047, #f472b6, #67e8f9);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .countdown-circle {
-      width: 112px;
-      height: 112px;
-      margin: 0 auto 20px;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(6, 182, 212, 0.25));
-      border: 3px solid #38bdf8;
-      box-shadow: 0 0 28px rgba(56, 189, 248, 0.4);
-    }
-
-    .countdown-num {
-      font-size: 38px;
-      font-weight: bold;
-      color: #ffffff;
-      line-height: 1.1;
-    }
-
-    .countdown-unit {
-      font-size: 12px;
-      color: #cbd5e1;
-    }
-
-    .progress-outer {
-      width: 100%;
-      height: 18px;
-      background: rgba(255, 255, 255, 0.14);
-      border-radius: 999px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .progress-inner {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent-amber), var(--accent-pink), var(--accent-teal));
-      transition: width 0.25s linear;
-    }
-
-    .progress-meta {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #e2e8f0;
-    }
-
-    #main-app {
-      display: block;
-      max-width: 1060px;
+    .wrap {
+      max-width: 1040px;
       margin: 0 auto;
-      padding: 16px 14px 56px;
     }
-
-    .top-header {
-      background: linear-gradient(120deg, #ff2e93 0%, #7c3aed 50%, #06b6d4 100%);
+    .top-bar {
+      background: linear-gradient(120deg, #0f172a 0%, #2563eb 55%, #7c3aed 100%);
       color: #ffffff;
       border-radius: 22px;
       padding: 18px 20px;
       margin-bottom: 14px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
     }
-
-    .brand-name {
+    .top-bar h1 {
       margin: 0;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .user-pill {
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .cart-fab {
-      display: none;
-      position: relative;
-      background: linear-gradient(135deg, #f59e0b, #ea580c);
-      color: #ffffff;
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 14px;
-      padding: 9px 15px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(234, 88, 12, 0.4);
-      transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.14s ease, filter 0.14s ease;
-    }
-
-    .cart-fab:active {
-      transform: scale(0.92) translateY(2px);
-      filter: brightness(0.95);
-    }
-
-    .cart-count {
-      background: #0f172a;
+      font-size: 22px;
       color: #fde047;
-      padding: 2px 8px;
-      border-radius: 999px;
-      margin-right: 6px;
+    }
+    .user-pill {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 14px;
+      padding: 8px 12px;
       font-size: 13px;
-    }
-
-    .screen {
-      display: none;
-      background: var(--surface);
-      border-radius: 22px;
-      padding: 22px 18px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .screen-top-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 12px;
+      flex-wrap: wrap;
     }
-
-    .screen-title {
-      margin: 0 0 8px;
-      font-size: 21px;
-      font-weight: bold;
-      color: #1e1b4b;
+    .panel {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 20px 18px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+      animation: popIn 0.22s ease-out;
     }
-
-    .screen-sub {
-      margin: 0 0 16px;
-      color: var(--text-muted);
+    .notice {
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 14px;
       font-size: 14px;
+      font-weight: bold;
+      display: none;
+      background: #eff6ff;
+      color: #1e3a8a;
+      border: 1px solid #bfdbfe;
+      animation: popIn 0.2s ease-out;
     }
+    .notice.error { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+    .notice.success { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
 
-    .two-big-btns {
+    .role-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 14px;
       margin: 16px 0;
     }
-
-    @media (min-width: 600px) {
-      .two-big-btns {
-        grid-template-columns: 1fr 1fr;
-      }
+    @media (min-width: 640px) {
+      .role-grid { grid-template-columns: 1fr 1fr; }
     }
-
-    .big-choice-btn {
-      padding: 22px 18px;
-      border: 3px solid transparent;
+    .role-card {
+      border: 2px solid #cbd5e1;
       border-radius: 18px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #ffffff;
+      padding: 20px;
+      background: #f8fafc;
+      text-align: center;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
-      transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.14s ease, filter 0.14s ease;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
-
-    .big-choice-btn.selected-path {
-      border-color: #0f172a;
-      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.65);
+    .role-card:hover {
       transform: translateY(-2px);
+      border-color: #2563eb;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.14);
     }
-
-    .big-choice-btn:active {
-      transform: scale(0.94) translateY(3px);
-      filter: brightness(0.94);
+    .role-card.active {
+      border-color: #7c3aed;
+      background: linear-gradient(135deg, #eff6ff, #f5f3ff);
     }
+    .role-icon { font-size: 36px; margin-bottom: 6px; }
+    .role-title { font-size: 19px; font-weight: bold; color: #0f172a; }
+    .role-desc { font-size: 13px; color: #475569; margin-top: 4px; }
 
-    .btn-client { background: linear-gradient(135deg, #ec4899, #8b5cf6); }
-    .btn-challenge { background: linear-gradient(135deg, #06b6d4, #10b981); }
-    .btn-amber { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #ffffff; }
-    .btn-dark { background: #1e293b; color: #ffffff; }
-    .btn-soft { background: #e2e8f0; color: #0f172a; }
-    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; }
-    .btn-danger { background: linear-gradient(135deg, #ef4444, #be123c); color: #ffffff; }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 640px) {
+      .stats-row { grid-template-columns: repeat(4, 1fr); }
+    }
+    .stat-box {
+      background: #0f172a;
+      color: #fff;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-box .v { font-size: 18px; font-weight: bold; color: #fde047; }
+    .stat-box .l { font-size: 12px; color: #cbd5e1; }
 
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
     button {
       font-family: inherit;
       cursor: pointer;
       border: none;
       border-radius: 12px;
-      padding: 11px 16px;
-      font-size: 14px;
-      font-weight: bold;
-      touch-action: manipulation;
-      transition: transform 0.13s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
-    }
-
-    button:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.16);
-      filter: brightness(1.03);
-    }
-
-    button:active:not(:disabled) {
-      transform: scale(0.92) translateY(2px);
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
-      filter: brightness(0.93);
-    }
-
-    button.btn-motion-active {
-      animation: btnPulsePop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    button:disabled {
-      opacity: 0.58;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: #1e293b;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 12px;
-      font-size: 15px;
-      font-family: inherit;
-      background: #ffffff;
-      color: #0f172a;
-    }
-
-    .dept-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    @media (min-width: 640px) {
-      .dept-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    .dept-card {
-      border-radius: 18px;
-      color: #ffffff;
-      text-align: center;
-      font-weight: bold;
-      font-size: 16px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
-      cursor: pointer;
-      overflow: hidden;
-      background: linear-gradient(135deg, #7c3aed, #ec4899);
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      transition: transform 0.14s ease, box-shadow 0.14s ease;
-    }
-
-    .dept-card:active {
-      transform: scale(0.95);
-    }
-
-    .dept-card-img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-      display: block;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-    }
-
-    .dept-card-label {
-      padding: 12px 10px;
-    }
-
-    .dept-card:nth-child(5n+1) { background: linear-gradient(135deg, #ec4899, #f43f5e); }
-    .dept-card:nth-child(5n+2) { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
-    .dept-card:nth-child(5n+3) { background: linear-gradient(135deg, #06b6d4, #0284c7); }
-    .dept-card:nth-child(5n+4) { background: linear-gradient(135deg, #10b981, #0d9488); }
-    .dept-card:nth-child(5n+5) { background: linear-gradient(135deg, #f59e0b, #ea580c); }
-
-    /* شريط البحث وزر اطلب عرض أعلى صفحة القسم */
-    .dept-search-offer-bar {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: center;
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 16px;
-      padding: 10px 12px;
-      margin-bottom: 12px;
-    }
-
-    @media (max-width: 560px) {
-      .dept-search-offer-bar {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .dept-search-input {
       padding: 10px 14px;
-      border-radius: 12px;
-      border: 1.5px solid #94a3b8;
-      font-size: 14px;
-      background: #ffffff;
-    }
-
-    .request-offer-btn {
-      background: linear-gradient(135deg, #f59e0b, #ea580c);
-      color: #ffffff;
-      padding: 11px 18px;
-      border-radius: 12px;
       font-size: 14px;
       font-weight: bold;
-      white-space: nowrap;
-      box-shadow: 0 6px 16px rgba(234, 88, 12, 0.3);
+      transition: transform 0.12s ease, filter 0.15s ease;
     }
+    button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.03); }
+    button:active:not(:disabled) { transform: scale(0.95); filter: brightness(0.94); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
 
-    /* الأقسام الفرعية داخل القسم الرئيسي */
-    .subdept-strip {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-      cursor: grab;
-      scrollbar-width: thin;
-    }
+    .tab-btn { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; }
+    .tab-btn.active { background: linear-gradient(90deg, #2563eb, #7c3aed); color: #fff; border-color: transparent; }
 
-    .subdept-strip:active {
-      cursor: grabbing;
-    }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    .btn-amber { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #be123c); color: #fff; }
+    .btn-dark { background: #1e293b; color: #fff; }
+    .btn-soft { background: #e2e8f0; color: #0f172a; }
 
-    .subdept-card {
-      min-width: 155px;
-      flex: 0 0 auto;
-      border-radius: 16px;
+    .box {
       background: #f8fafc;
-      border: 2px solid #cbd5e1;
-      overflow: hidden;
-      cursor: pointer;
-      text-align: center;
-      transition: transform 0.14s ease, border-color 0.14s ease;
-    }
-
-    .subdept-card.active {
-      border-color: #7c3aed;
-      background: #f5f3ff;
-      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
-    }
-
-    .subdept-card img {
-      width: 100%;
-      height: 92px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .subdept-card-title {
-      padding: 8px 10px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #0f172a;
-    }
-
-    /* أداة السحب والحركة السريعة بين الأنواع */
-    .drag-scroller-box {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 14px;
-      padding: 10px 12px;
-      margin-bottom: 12px;
-    }
-
-    .drag-scroller-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      font-weight: bold;
-      color: #1e3a8a;
-      margin-bottom: 6px;
-    }
-
-    .drag-slider-track {
-      width: 100%;
-      accent-color: #7c3aed;
-      cursor: pointer;
-    }
-
-    .types-bar {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-      cursor: grab;
-    }
-
-    .types-bar:active {
-      cursor: grabbing;
-    }
-
-    .type-chip {
-      flex: 0 0 auto;
-      background: #f1f5f9;
-      color: #0f172a;
-      border: 1px solid #cbd5e1;
-      border-radius: 999px;
-      padding: 7px 14px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.13s ease, background 0.15s ease;
-    }
-
-    .type-chip:active {
-      transform: scale(0.93);
-    }
-
-    .type-chip.active {
-      background: linear-gradient(90deg, #ec4899, #7c3aed);
-      color: #ffffff;
-      border-color: transparent;
-    }
-
-    /* عرض 3 صور بالعرض + إمكانية السحب الأفقي */
-    .items-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-      margin-top: 14px;
-    }
-
-    @media (min-width: 580px) {
-      .items-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (min-width: 880px) {
-      .items-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    .items-grid.horizontal-slide-mode {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      gap: 14px;
-      padding-bottom: 10px;
-      cursor: grab;
-    }
-
-    .items-grid.horizontal-slide-mode:active {
-      cursor: grabbing;
-    }
-
-    .items-grid.horizontal-slide-mode .product-card {
-      flex: 0 0 calc(33.333% - 10px);
-      min-width: 245px;
-      scroll-snap-align: start;
-    }
-
-    @media (max-width: 640px) {
-      .items-grid.horizontal-slide-mode .product-card {
-        flex: 0 0 82%;
-        min-width: 230px;
-      }
-    }
-
-    .product-card {
-      border: 2px solid #e2e8f0;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #ffffff;
-      position: relative;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      transition: border-color 0.2s ease, transform 0.15s ease;
-    }
-
-    .product-card.selected {
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.28);
-    }
-
-    .product-card.holding-3s {
-      border-color: #f59e0b;
-      transform: scale(0.98);
-    }
-
-    .product-img-wrap {
-      position: relative;
-      height: 225px;
-      background: #0f172a;
-      overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      cursor: zoom-in;
-    }
-
-    .product-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      pointer-events: none;
-    }
-
-    .price-overlay {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background: linear-gradient(90deg, #0f172a, #be185d);
-      color: #fde047;
-      font-size: 18px;
-      font-weight: bold;
-      padding: 5px 12px;
-      border-radius: 12px;
-      border: 2px solid rgba(253, 224, 71, 0.8);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-      pointer-events: none;
-    }
-
-    .offer-ribbon {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: linear-gradient(90deg, #f59e0b, #ef4444);
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: bold;
-      padding: 4px 10px;
-      border-radius: 999px;
-      pointer-events: none;
-    }
-
-    .select-indicator {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(15, 23, 42, 0.85);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: bold;
-      padding: 4px 9px;
-      border-radius: 999px;
-      pointer-events: none;
-    }
-
-    .product-card.selected .select-indicator {
-      background: #10b981;
-      color: #ffffff;
-    }
-
-    .product-body {
-      padding: 12px 14px;
-    }
-
-    .product-title {
-      font-size: 15px;
-      font-weight: bold;
-      margin: 0 0 4px;
-      color: #0f172a;
-    }
-
-    .product-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin: 0;
-    }
-
-    .hold-hint {
-      font-size: 11px;
-      color: #7c3aed;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    .offers-drawer-box {
-      background: linear-gradient(135deg, #fffbeb, #fef3c7);
-      border: 2px solid #f59e0b;
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .box-card {
-      background: var(--surface-soft);
-      border: 1.5px solid var(--border);
+      border: 1.5px solid #e2e8f0;
       border-radius: 16px;
       padding: 14px;
       margin-bottom: 12px;
     }
+    .box.done { background: #f0fdf4; border-color: #86efac; }
+    .box.active-order { background: #eff6ff; border-color: #93c5fd; }
 
-    .box-card.completed-card {
-      background: #f0fdf4;
-      border-color: #86efac;
-    }
-
-    .box-card.history-card {
-      background: #eff6ff;
-      border-color: #93c5fd;
-    }
-
-    .status-banner {
-      padding: 12px 14px;
-      border-radius: 12px;
-      margin-bottom: 14px;
-      font-size: 14px;
-      font-weight: bold;
-      background: #eff6ff;
-      color: #1e3a8a;
-      border: 1px solid #bfdbfe;
-      animation: bannerSlideIn 0.24s ease-out;
-    }
-
-    .status-banner.error {
-      background: #fef2f2;
-      color: #991b1b;
-      border-color: #fecaca;
-    }
-
-    .status-banner.success {
-      background: #ecfdf5;
-      color: #065f46;
-      border-color: #a7f3d0;
-    }
-
-    .admin-approval-alert {
-      background: linear-gradient(120deg, #059669 0%, #10b981 55%, #0d9488 100%);
-      color: #ffffff;
-      border: 2px solid #a7f3d0;
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      box-shadow: 0 10px 24px rgba(5, 150, 105, 0.35);
-      animation: bannerSlideIn 0.28s ease-out;
-      display: none;
-    }
-
-    .delivery-status-alert {
-      background: linear-gradient(120deg, #0284c7 0%, #2563eb 55%, #4f46e5 100%);
-      color: #ffffff;
-      border: 2px solid #bae6fd;
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
-      animation: bannerSlideIn 0.28s ease-out;
-      display: none;
-    }
-
-    .receipt-box {
-      background: linear-gradient(135deg, #f0fdf4, #eff6ff);
-      border: 2px dashed #10b981;
-      border-radius: 16px;
-      padding: 16px;
-      margin-top: 14px;
-    }
-
-    .sub-tabs {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-
-    .sub-tab-btn {
-      background: #f1f5f9;
-      color: #0f172a;
-      border: 1px solid #cbd5e1;
-    }
-
-    .sub-tab-btn.active {
-      background: linear-gradient(90deg, #7c3aed, #ec4899);
-      color: #ffffff;
-      border-color: transparent;
-    }
-
-    .thumb-preview {
-      max-width: 260px;
-      max-height: 220px;
-      border-radius: 12px;
-      margin-top: 8px;
-      display: none;
-      border: 2px solid #cbd5e1;
-      object-fit: contain;
-      background: #0f172a;
-    }
-
-    .preview-actions-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-
-    .zoom-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: rgba(9, 13, 22, 0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .zoom-modal-card {
-      width: 100%;
-      max-width: 720px;
-      background: #0f172a;
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 20px;
-      padding: 16px;
-      text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
-    }
-
-    .zoom-modal-img {
-      max-width: 100%;
-      max-height: 68vh;
-      border-radius: 14px;
-      object-fit: contain;
-      background: #020617;
-      display: block;
-      margin: 0 auto 12px;
-    }
-
-    .exit-confirm-box {
-      border: 2px solid #f59e0b;
-      background: #fffbeb;
-      border-radius: 18px;
-      padding: 18px;
-      margin-top: 16px;
-      text-align: center;
-    }
-
-    .payer-source-row {
+    .grid-3 {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 10px;
+      gap: 12px;
+    }
+    @media (min-width: 680px) {
+      .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    }
+    .card-img {
+      width: 100%;
+      height: 155px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 8px;
+      background: #0f172a;
+    }
+    .price-tag { color: #be185d; font-weight: bold; font-size: 15px; }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
       margin-bottom: 12px;
     }
-
-    @media (min-width: 600px) {
-      .payer-source-row {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .source-choice-btn {
-      padding: 13px 14px;
-      border-radius: 14px;
-      border: 2px solid #cbd5e1;
-      background: #f8fafc;
-      color: #0f172a;
+    .chip {
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 13px;
       font-weight: bold;
-      text-align: center;
+      background: #e2e8f0;
+      color: #0f172a;
+      cursor: pointer;
+      border: none;
     }
+    .chip.active { background: #0f172a; color: #fde047; }
 
-    .source-choice-btn.active {
-      border-color: #059669;
-      background: #ecfdf5;
-      color: #065f46;
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 640px) {
+      .form-row-2 { grid-template-columns: 1fr 1fr; }
+    }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; color: #1e293b; }
+    input, select {
+      width: 100%;
+      padding: 11px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      background: #fff;
+      color: #0f172a;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .badge.confirmed { background: #dbeafe; color: #1e40af; }
+    .badge.done { background: #dcfce7; color: #166534; }
+    .thumb-sm {
+      max-width: 220px;
+      max-height: 180px;
+      border-radius: 10px;
+      margin-top: 8px;
+      border: 1px solid #cbd5e1;
+      object-fit: contain;
+      background: #0f172a;
     }
   </style>
 </head>
 <body>
-  <div id="splash-screen">
-    <div class="splash-card">
-      <div class="splash-badge">تطبيق انجز • ENGZ</div>
-      <h1 class="splash-title">مرحبا بك فى تطبيق انجز للخصومات والمهام والمكافآت</h1>
-      <div class="countdown-circle">
-        <div class="countdown-num" id="splash-seconds">30</div>
-        <div class="countdown-unit">ثانية</div>
-      </div>
-      <div class="progress-outer">
-        <div class="progress-inner" id="splash-progress-bar"></div>
-      </div>
-      <div class="progress-meta">
-        <span>جاري تجهيز التطبيق...</span>
-        <span id="splash-percent">0%</span>
-      </div>
-    </div>
-  </div>
-
-  <div id="main-app">
-    <div class="top-header">
+  <div class="wrap">
+    <div class="top-bar">
       <div>
-        <h1 class="brand-name">انجز • ENGZ</h1>
-        <div id="active-user-summary" style="font-size:13px; opacity:0.95;">مسار العميل</div>
-        <div id="user-points-counter" style="display:none; font-size:13px; margin-top:3px; color:#fde047; font-weight:bold;">
-          عداد النقاط (point): <span id="user-points-value">0</span>
+        <h1>انجز • ENGZ</h1>
+        <div style="font-size:13px; opacity:0.9;">اختر وضعك: عميل للطلبات والعروض، أو متسابق لإنجاز التحديات</div>
+      </div>
+      <div class="user-pill" id="header-user-info">
+        <span>غير مسجل</span>
+      </div>
+    </div>
+
+    <div id="app-notice" class="notice"></div>
+
+    <!-- 1. شاشة البداية: اختيار عميل أو تحدّي + تسجيل/دخول -->
+    <div id="entry-screen" class="panel">
+      <h2 style="margin-top:0;">ابدأ الآن — اختر نوع حسابك</h2>
+      <p style="color:#475569; font-size:14px; margin-top:0;">
+        اختر <strong>عميل</strong> لطلب المنتجات والعروض، أو اختر <strong>تحدّي (متسابق)</strong> لاستلام المهام وإتمامها.
+      </p>
+
+      <div class="role-grid">
+        <div class="role-card active" id="role-card-client" onclick="selectEntryRole('client')">
+          <div class="role-icon">🛒</div>
+          <div class="role-title">عميل</div>
+          <div class="role-desc">تصفح الأقسام والمنتجات والعروض وإرسال طلبك مع إيصال الدفع</div>
         </div>
-      </div>
-      <div class="header-actions">
-        <div class="user-pill">رصيدي: <span id="user-wallet-display">0</span> جنيه</div>
-      </div>
-    </div>
-
-    <div id="admin-approval-banner" class="admin-approval-alert"></div>
-    <div id="delivery-status-banner" class="delivery-status-alert"></div>
-    <div id="global-notice" class="status-banner" style="display:none;"></div>
-
-    <div id="personal-referral-wallet-bar" class="box-card" style="display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div>
-          <div style="font-weight:bold; color:#1e1b4b;">رابطك المخصص لإرسال التطبيق:</div>
-          <div id="my-referral-link-text" style="font-size:12px; color:#0284c7; word-break:break-all; margin-top:4px;"></div>
-          <div id="my-referral-stats-text" style="font-size:12px; color:#475569; margin-top:4px;"></div>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button type="button" class="btn-dark" onclick="copyMyReferralLink()">نسخ رابطي</button>
-          <button type="button" id="convert-points-btn" class="btn-success" style="display:none;" onclick="convertClientPointsToMoney()">
-            تحويل النقاط إلى رصيد
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- الخطوة 1: صفحة البداية (عميل أم تحدى + تأكيد) -->
-    <div id="screen-choice" class="screen active">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">صفحة البداية: عميل أم تحدى</h2>
-      <p class="screen-sub">اختر <strong>عميل</strong> أو <strong>تحدى</strong> ثم اضغط <strong>تأكيد</strong>.</p>
-      <div class="two-big-btns">
-        <button type="button" id="choice-btn-client" class="big-choice-btn btn-client selected-path" onclick="selectHomePath('client')">عميل</button>
-        <button type="button" id="choice-btn-challenge" class="big-choice-btn btn-challenge" onclick="selectHomePath('challenger')">تحدى</button>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
-        <button type="button" id="btn-confirm-home-path" class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmHomePathSelection()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-
-      <div id="exit-prompt-box" class="exit-confirm-box" style="display:none;">
-        <p style="font-size:18px; font-weight:bold; color:#78350f; margin:0 0 14px;">هل تريد الخروج من التطبيق</p>
-        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-          <button type="button" class="btn-danger" style="padding:12px 24px; font-size:15px;" onclick="handleExitYes()">نعم</button>
-          <button type="button" class="btn-success" style="padding:12px 24px; font-size:15px;" onclick="handleExitNo()">لا</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- الخطوة 2 (مسار العميل): صفحة التسجيل والمشاركة (تسجيل / مشترك + تأكيد) -->
-    <div id="screen-client-entry" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">صفحة التسجيل والمشاركة (عميل)</h2>
-      <p class="screen-sub">اختر <strong>تسجيل</strong> أو <strong>مشترك</strong> ثم اضغط <strong>تأكيد</strong> للانتقال إلى صفحة إدخال البيانات.</p>
-      <div class="two-big-btns">
-        <button type="button" id="client-mode-reg-btn" class="big-choice-btn btn-client selected-path" onclick="chooseEntryMode('client', 'register')">تسجيل</button>
-        <button type="button" id="client-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('client', 'subscriber')">مشترك</button>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" id="btn-confirm-client-entry" class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('client')">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- الخطوة 3 (مسار العميل - تسجيل) -->
-    <div id="screen-client-register" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">تسجيل عميل جديد</h2>
-      <p class="screen-sub">أدخل الاسم ورقم التلفون (11 رقماً مصرياً) ثم اضغط <strong>تأكيد</strong>.</p>
-      <div class="form-group">
-        <label for="reg-client-name">الاسم</label>
-        <input type="text" id="reg-client-name" placeholder="مثال: أحمد محمود" />
-      </div>
-      <div class="form-group">
-        <label for="reg-client-phone">رقم التلفون (مصر - 11 رقم)</label>
-        <input type="tel" id="reg-client-phone" placeholder="مثال: 01012345678" maxlength="11" />
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" id="btn-submit-client-reg" class="btn-success" onclick="submitClientRegistration()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- الخطوة 3 (مسار العميل - مشترك) -->
-    <div id="screen-client-subscriber" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">دخول المشتركين (عميل)</h2>
-      <p class="screen-sub">أدخل الاسم ورقم التلفون الأساسي (ورقم إضافي اختياري) ثم اضغط <strong>تأكيد</strong>.</p>
-      <div class="form-group">
-        <label for="sub-client-name">الاسم</label>
-        <input type="text" id="sub-client-name" placeholder="اكتب اسمك..." />
-      </div>
-      <div class="form-group">
-        <label for="sub-client-phone1">رقم التلفون الأساسي (مصر - 11 رقم)</label>
-        <input type="tel" id="sub-client-phone1" placeholder="01xxxxxxxxx" maxlength="11" />
-      </div>
-      <div class="form-group">
-        <label for="sub-client-phone2">رقم تلفون إضافي مرتبط بنفس الحساب (اختياري - مصر)</label>
-        <input type="tel" id="sub-client-phone2" placeholder="01xxxxxxxxx" maxlength="11" />
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="btn-success" onclick="loginClientSubscriber()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- الخطوة 2 (مسار التحدى) -->
-    <div id="screen-challenger-entry" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">صفحة التسجيل والمشاركة (تحدى)</h2>
-      <p class="screen-sub">اختر <strong>تسجيل</strong> أو <strong>مشترك</strong> ثم اضغط <strong>تأكيد</strong> للانتقال إلى صفحة إدخال البيانات.</p>
-      <div class="two-big-btns">
-        <button type="button" id="chal-mode-reg-btn" class="big-choice-btn btn-challenge selected-path" onclick="chooseEntryMode('challenger', 'register')">تسجيل</button>
-        <button type="button" id="chal-mode-sub-btn" class="big-choice-btn btn-amber" onclick="chooseEntryMode('challenger', 'subscriber')">مشترك</button>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" id="btn-confirm-chal-entry" class="btn-success" style="padding:13px 24px; font-size:16px;" onclick="confirmEntryModeSelection('challenger')">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- الخطوة 3 (مسار التحدى - تسجيل) -->
-    <div id="screen-challenger-register" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">تسجيل متسابق جديد</h2>
-      <p class="screen-sub">أدخل الاسم ورقم التلفون (11 رقماً مصرياً) ثم اضغط <strong>تأكيد</strong>.</p>
-      <div class="form-group">
-        <label for="reg-chal-name">الاسم</label>
-        <input type="text" id="reg-chal-name" placeholder="مثال: كريم حسن" />
-      </div>
-      <div class="form-group">
-        <label for="reg-chal-phone">رقم التلفون (مصر - 11 رقم)</label>
-        <input type="tel" id="reg-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="btn-success" onclick="submitChallengerRegistration()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- الخطوة 3 (مسار التحدى - مشترك) -->
-    <div id="screen-challenger-subscriber" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">دخول متسابق مشترك</h2>
-      <p class="screen-sub">أدخل الاسم ورقم التلفون ثم اضغط <strong>تأكيد</strong>.</p>
-      <div class="form-group">
-        <label for="sub-chal-name">الاسم</label>
-        <input type="text" id="sub-chal-name" placeholder="اكتب اسمك..." />
-      </div>
-      <div class="form-group">
-        <label for="sub-chal-phone">رقم التلفون (مصر - 11 رقم)</label>
-        <input type="tel" id="sub-chal-phone" placeholder="01xxxxxxxxx" maxlength="11" />
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="btn-success" onclick="loginChallengerSubscriber()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- صفحة العميل الخاصة: الطلبات والأقسام -->
-    <div id="screen-orders-home" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-        <button type="button" class="cart-fab" id="cart-open-btn" onclick="openCartScreen()">
-          عربة التسوق <span class="cart-count" id="cart-count-badge">0</span>
-        </button>
-      </div>
-      <h2 class="screen-title">صفحة العميل الخاصة • الطلبات والأقسام</h2>
-      <p class="screen-sub">الرقم الظاهر على عربة التسوق يمثل <strong>عدد العمليات النشطة قبل تأكيد التوصيل</strong>. اضغط على أي قسم لفتح أقسامه الفرعية وأنواعه وعروضه.</p>
-      <div id="departments-container" class="dept-grid"></div>
-
-      <div id="client-orders-tracker-section" style="margin-top:22px;">
-        <h3 style="margin:0 0 10px; color:#1e1b4b;">الطلبات النشطة للعميل</h3>
-        <div id="client-active-orders-list"></div>
-
-        <h3 style="margin:18px 0 10px; color:#166534;">الطلبات المنتهية</h3>
-        <div id="client-completed-orders-list"></div>
-
-        <h3 style="margin:18px 0 10px; color:#1e40af;">سجل طلبات العميل (بالتاريخ والوقت)</h3>
-        <div id="client-order-history-list"></div>
-
-        <div id="client-admin-inbox-section" style="margin-top:18px;"></div>
-      </div>
-
-      <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" class="btn-amber" onclick="openCartScreen()">عربة التسوق (<span class="cart-count-inline">0</span>)</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- صفحة القسم والفرعيات والأنواع والعروض -->
-    <div id="screen-department-view" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackInsideDepartment()">عودة</button>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button type="button" class="cart-fab" onclick="openCartScreen()">عربة التسوق (<span class="cart-count-inline">0</span>)</button>
-          <button type="button" class="btn-soft" onclick="goScreen('screen-orders-home')">صفحة العميل</button>
+        <div class="role-card" id="role-card-challenger" onclick="selectEntryRole('challenger')">
+          <div class="role-icon">⚡</div>
+          <div class="role-title">تحدّي (متسابق)</div>
+          <div class="role-desc">استعراض المهام والتحديات المتاحة وإنجازها ومتابعة الرصيد والسجل</div>
         </div>
       </div>
 
-      <h2 class="screen-title" id="current-dept-title" style="margin:0 0 10px;">القسم</h2>
-
-      <!-- شريط البحث السريع وزر اطلب عرض -->
-      <div class="dept-search-offer-bar">
-        <input
-          type="search"
-          id="dept-search-input"
-          class="dept-search-input"
-          placeholder="ابحث سريعاً عن منتج أو نوع أو حجم (مثال: جبنة براميلي، جبنة رومي، لبن)..."
-          oninput="onDepartmentSearchInput(this.value)"
-        />
-        <button type="button" class="request-offer-btn" onclick="requestDepartmentOffers()">
-          🎁 اطلب عرض
-        </button>
-      </div>
-
-      <!-- قائمة العروض المحددة من الأدمن لهذا القسم عند الضغط على اطلب عرض -->
-      <div id="dept-offers-panel" class="offers-drawer-box" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-          <h3 style="margin:0; color:#92400e;">العروض المحددة من الأدمن لهذا القسم</h3>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button type="button" class="btn-success" onclick="openCartScreen()">تأكيد العروض في العربة</button>
-            <button type="button" class="btn-soft" onclick="closeDepartmentOffersPanel()">إخفاء العروض</button>
+      <div class="box">
+        <h3 style="margin-top:0;" id="auth-form-title">بيانات الدخول / طلب تسجيل كـ (عميل)</h3>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="auth-name">الاسم الكامل</label>
+            <input type="text" id="auth-name" placeholder="اكتب اسمك..." />
+          </div>
+          <div class="form-group">
+            <label for="auth-phone">رقم التلفون (11 رقماً)</label>
+            <input type="tel" id="auth-phone" placeholder="01xxxxxxxxx" maxlength="11" />
           </div>
         </div>
-        <div id="dept-offers-grid" class="items-grid"></div>
-      </div>
-
-      <!-- الأقسام الفرعية التابعة للقسم (مثال: ألبان، أجبان، مكرونات، مجمدات، أيس كريم) -->
-      <div style="font-size:13px; font-weight:bold; color:#1e1b4b; margin-bottom:6px;">
-        الأقسام الفرعية (اسحب يميناً/يساراً أو اختر قسماً فرعياً):
-      </div>
-      <div id="dept-subdepts-strip" class="subdept-strip"></div>
-
-      <!-- شريط الأنواع والأحجام -->
-      <div id="dept-types-bar" class="types-bar"></div>
-
-      <!-- أداة السحب والحركة بين الأنواع + زر تبديل العرض -->
-      <div class="drag-scroller-box">
-        <div class="drag-scroller-header">
-          <span>أداة السحب للحركة بين الأنواع (3 صور بالعرض)</span>
-          <button type="button" id="toggle-slide-mode-btn" class="btn-dark" style="padding:5px 11px; font-size:12px;" onclick="toggleHorizontalSlideMode()">
-            وضع السحب الأفقي: مفعّل
-          </button>
+        <div class="form-group" style="max-width:340px;">
+          <label for="auth-invite">كود أو اسم دعوة (اختياري)</label>
+          <input type="text" id="auth-invite" placeholder="اختياري..." />
         </div>
-        <input type="range" id="items-drag-slider" class="drag-slider-track" min="0" max="100" value="0" oninput="onSliderMoveItems(this.value)" />
-      </div>
-
-      <p class="screen-sub">ضغطة واحدة على الصورة لتكبيرها • ضغط مطول لمدة <strong>3 ثوانٍ</strong> على الصنف لتحديده أو إلغاء تحديده وتعديل اختياراتك بحرية.</p>
-      <div id="dept-items-container" class="items-grid horizontal-slide-mode"></div>
-    </div>
-
-    <!-- عربة التسوق -->
-    <div id="screen-cart" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">عربة التسوق</h2>
-      <p class="screen-sub">الأصناف والعروض والخدمات المحددة من مختلف الأقسام — يمكنك إزالة أو تعديل اختياراتك في أي وقت.</p>
-      <div id="cart-items-list"></div>
-      <div id="cart-total-box" class="box-card" style="font-size:18px; font-weight:bold; color:#0f172a;">
-        الإجمالي: 0 جنيه
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" id="btn-cart-confirm" class="btn-success" onclick="goToCheckoutConfirmation()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn-success" onclick="submitUserAuth()">دخول / إرسال طلب التسجيل</button>
+          <button type="button" class="btn-soft" onclick="quickGuestEnter()">دخول سريع للتصفح</button>
+        </div>
       </div>
     </div>
 
-    <!-- تأكيد الشراء -->
-    <div id="screen-confirm-purchase" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">تأكيد الشراء</h2>
-      <p class="screen-sub">راجع الأصناف وأسعارها بوضوح قبل الانتقال إلى صفحة الدفع.</p>
-      <div id="confirm-cards-grid" class="items-grid"></div>
-      <div id="confirm-total-line" class="box-card" style="margin-top:14px; font-size:18px; font-weight:bold;"></div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" id="btn-confirm-purchase-step" class="btn-success" onclick="openPaymentMethodsScreen()">تأكيد</button>
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-    </div>
-
-    <!-- صفحة الدفع -->
-    <div id="screen-payment" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">صفحة الدفع من رقمك</h2>
-      <p class="screen-sub">اختر رقم الاستقبال المحدد من الأدمن، وحدد هل ستدفع من نفس الرقم أو من رقم آخر، ثم صوّر أو اختر إيصال الدفع وأرسله للأدمن.</p>
-      <div id="payment-amount-banner" class="status-banner"></div>
-
-      <div class="form-group">
-        <label>1. اختر رقم الكاش المحدد من الأدمن</label>
-        <div id="admin-cash-phones-list"></div>
-      </div>
-
-      <div class="box-card">
-        <label>2. هل ستدفع من نفس الرقم أم من رقم آخر؟</label>
-        <div class="payer-source-row">
-          <button type="button" id="payer-same-btn" class="source-choice-btn active" onclick="selectPaymentSource('same')">
-            الدفع من نفس الرقم
-          </button>
-          <button type="button" id="payer-other-btn" class="source-choice-btn" onclick="selectPaymentSource('other')">
-            الدفع من رقم آخر
-          </button>
+    <!-- 2. واجهة التطبيق بعد اختيار الدور -->
+    <div id="main-app" class="panel" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn-soft" onclick="switchRoleQuick('client')" id="quick-btn-client">🛒 وضع العميل</button>
+          <button type="button" class="btn-soft" onclick="switchRoleQuick('challenger')" id="quick-btn-challenger">⚡ وضع التحدّي</button>
         </div>
-        <div id="payer-same-info" style="font-size:13px; color:#065f46; font-weight:bold;">
-          رقم الدفع المستخدم: <span id="same-payer-phone-display">رقم حسابك المسجل</span>
-        </div>
-        <div id="payer-other-box" style="display:none; margin-top:10px;">
-          <label for="other-payer-phone-input">اختر أو اكتب رقم الدفع الآخر (11 رقماً مصرياً)</label>
-          <input type="tel" id="other-payer-phone-input" placeholder="مثال: 01012345678" maxlength="11" />
-        </div>
+        <button type="button" class="btn-dark" onclick="logoutUser()">تغيير الحساب / خروج</button>
       </div>
 
-      <div class="box-card">
-        <label>3. تصوير أو سحب صورة إيصال الدفع وإرسالها للأدمن</label>
-        <p style="font-size:13px; color:#475569; margin:0 0 10px;">
-          يمكنك فتح الكاميرا لتصوير الإيصال مباشرة أو اختيار صورة من الاستوديو، ثم الضغط على <strong>إرسال الإيصال إلى الأدمن</strong>.
-        </p>
+      <div id="stats-row" class="stats-row"></div>
 
-        <input type="file" id="receipt-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePaymentReceiptFile(this)" />
-        <input type="file" id="receipt-gallery-input" accept="image/*" style="display:none;" onchange="handlePaymentReceiptFile(this)" />
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button type="button" class="btn-dark" onclick="document.getElementById('receipt-camera-input').click()">
-            📷 كاميرا (تصوير الإيصال)
-          </button>
-          <button type="button" class="btn-amber" onclick="document.getElementById('receipt-gallery-input').click()">
-            🖼️ استوديو (اختيار صورة)
-          </button>
-          <button type="button" id="btn-send-receipt-admin" class="btn-success" onclick="sendPaymentReceiptToAdmin()">
-            📤 إرسال الإيصال إلى الأدمن
-          </button>
-        </div>
-
-        <div class="preview-actions-row">
-          <img id="payment-receipt-preview" class="thumb-preview" alt="معاينة إيصال الدفع" />
-          <button type="button" id="delete-payment-receipt-btn" class="btn-danger" style="display:none;" onclick="clearPaymentReceiptImage()">
-            🗑️ حذف الصورة
-          </button>
-        </div>
-        <div id="receipt-send-status" style="font-size:13px; font-weight:bold; color:#059669; margin-top:8px;"></div>
+      <!-- تبويبات العميل -->
+      <div id="client-tabs" class="tabs">
+        <button type="button" class="tab-btn active" id="ctab-shop" onclick="switchClientTab('shop')">الأقسام والمنتجات</button>
+        <button type="button" class="tab-btn" id="ctab-offers" onclick="switchClientTab('offers')">العروض الخاصة</button>
+        <button type="button" class="tab-btn" id="ctab-cart" onclick="switchClientTab('cart')">السلة والدفع <span id="cart-count-badge">(0)</span></button>
+        <button type="button" class="tab-btn" id="ctab-orders" onclick="switchClientTab('orders')">طلباتي وسجلي</button>
+        <button type="button" class="tab-btn" id="ctab-inbox" onclick="switchClientTab('inbox')">الهدايا والرسائل</button>
       </div>
 
-      <div id="confirm-purchase-prompt-box" class="box-card">
-        <p style="font-size:17px; font-weight:bold; color:#1e1b4b; margin-top:0;">هل تريد تأكيد طلب الشراء</p>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button type="button" id="btn-confirm-purchase-yes" class="btn-success" onclick="confirmPurchaseYes()">نعم</button>
-          <button type="button" id="btn-confirm-purchase-no" class="btn-danger" onclick="confirmPurchaseNo()">لا</button>
+      <!-- تبويبات المتسابق (تحدّي) -->
+      <div id="challenger-tabs" class="tabs" style="display:none;">
+        <button type="button" class="tab-btn active" id="htab-tasks" onclick="switchChallengerTab('tasks')">المهام والتحديات</button>
+        <button type="button" class="tab-btn" id="htab-history" onclick="switchChallengerTab('history')">سجلي المكتمل</button>
+        <button type="button" class="tab-btn" id="htab-inbox" onclick="switchChallengerTab('inbox')">الهدايا والرسائل</button>
+      </div>
+
+      <!-- أقسام العميل -->
+      <div id="csec-shop">
+        <div class="form-group">
+          <input type="text" id="prod-search-input" placeholder="ابحث عن صنف أو نوع أو قسم..." oninput="renderClientShop()" />
+        </div>
+        <div id="dept-chips" class="chips"></div>
+        <div id="subdept-chips" class="chips"></div>
+        <div id="client-products-grid" class="grid-3"></div>
+      </div>
+
+      <div id="csec-offers" style="display:none;">
+        <h3 style="margin-top:0;">العروض الخاصة المتاحة</h3>
+        <div id="client-offers-grid" class="grid-3"></div>
+      </div>
+
+      <div id="csec-cart" style="display:none;">
+        <h3 style="margin-top:0;">سلة المشتريات وإتمام الطلب</h3>
+        <div id="cart-items-box"></div>
+
+        <div class="box" id="checkout-box">
+          <h4 style="margin-top:0;">بيانات الدفع وإرفاق الإيصال</h4>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="payer-phone-input">رقم التلفون المحوّل منه (11 رقماً)</label>
+              <input type="tel" id="payer-phone-input" placeholder="01xxxxxxxxx" maxlength="11" />
+            </div>
+            <div class="form-group">
+              <label for="cash-receiver-select">رقم الكاش للاستقبال</label>
+              <select id="cash-receiver-select"></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>صورة إيصال الدفع (كاميرا / استوديو)</label>
+            <input type="file" id="receipt-cam-input" accept="image/*" capture="environment" style="display:none;" onchange="handleReceiptFile(this)" />
+            <input type="file" id="receipt-gal-input" accept="image/*" style="display:none;" onchange="handleReceiptFile(this)" />
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="btn-dark" onclick="document.getElementById('receipt-cam-input').click()">📷 كاميرا</button>
+              <button type="button" class="btn-amber" onclick="document.getElementById('receipt-gal-input').click()">🖼️ استوديو</button>
+            </div>
+            <img id="receipt-preview" class="thumb-sm" style="display:none;" alt="معاينة الإيصال" />
+          </div>
+          <button type="button" class="btn-success" onclick="submitOrder()">تأكيد وإرسال الطلب</button>
         </div>
       </div>
 
-      <div id="payment-result-box"></div>
-    </div>
-
-    <!-- صفحة التحديات وسجل المتسابق -->
-    <div id="screen-challenges-hub" class="screen">
-      <div class="screen-top-bar">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
-      </div>
-      <h2 class="screen-title">صفحة التحديات وسجل المتسابق</h2>
-      <p class="screen-sub">يمكنك اختيار مهمة واحدة نشطة في كل مرة، والضغط على <strong>تم التوصيل</strong> لنقلها إلى سجل المهام المكتملة.</p>
-
-      <div class="sub-tabs">
-        <button type="button" class="sub-tab-btn" id="stab-available" onclick="switchChallengerSubTab('available')">قائمة التحديات</button>
-        <button type="button" class="sub-tab-btn active" id="stab-active" onclick="switchChallengerSubTab('active')">المهام النشطة</button>
-        <button type="button" class="sub-tab-btn" id="stab-completed" onclick="switchChallengerSubTab('completed')">سجل المتسابق (المهام المكتملة)</button>
-        <button type="button" class="sub-tab-btn" id="stab-rewards" onclick="switchChallengerSubTab('rewards')">الهدايا والوصولات</button>
+      <div id="csec-orders" style="display:none;">
+        <h3 style="margin-top:0;">الطلبات الحالية</h3>
+        <div id="client-active-orders"></div>
+        <h3>سجل الطلبات المنتهية</h3>
+        <div id="client-completed-orders"></div>
       </div>
 
-      <div id="chal-panel-available" style="display:none;"><div id="available-challenges-list"></div></div>
-      <div id="chal-panel-active"><div id="active-challenger-order-box"></div></div>
-      <div id="chal-panel-completed" style="display:none;"><div id="completed-challenger-orders-box"></div></div>
-      <div id="chal-panel-rewards" style="display:none;"><div id="user-gifts-and-receipts-box"></div></div>
+      <div id="csec-inbox" style="display:none;">
+        <h3 style="margin-top:0;">الهدايا والرسائل من الأدمن</h3>
+        <div id="client-inbox-list"></div>
+      </div>
 
-      <div style="margin-top:16px;">
-        <button type="button" class="btn-soft" onclick="goBackOneStep()">عودة</button>
+      <!-- أقسام المتسابق (تحدّي) -->
+      <div id="hsec-tasks" style="display:none;">
+        <h3 style="margin-top:0;">المهام والتحديات المتاحة</h3>
+        <div id="challenger-tasks-list"></div>
+      </div>
+
+      <div id="hsec-history" style="display:none;">
+        <h3 style="margin-top:0;">سجل المهام والتحديات المكتملة</h3>
+        <div id="challenger-history-list"></div>
+      </div>
+
+      <div id="hsec-inbox" style="display:none;">
+        <h3 style="margin-top:0;">الهدايا والرسائل من الأدمن</h3>
+        <div id="challenger-inbox-list"></div>
       </div>
     </div>
   </div>
-
-  <div id="image-zoom-modal" class="zoom-modal-backdrop" onclick="closeImageZoomModal()">
-    <div class="zoom-modal-card" onclick="event.stopPropagation()">
-      <h3 id="zoom-modal-title" style="margin:0 0 10px;">معاينة الصورة</h3>
-      <img id="zoom-modal-img" class="zoom-modal-img" alt="صورة مكبرة" />
-      <div id="zoom-modal-meta" style="font-size:14px; color:#fde047; font-weight:bold; margin-bottom:12px;"></div>
-      <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-        <button type="button" id="zoom-modal-toggle-cart-btn" class="btn-success" style="display:none;" onclick="toggleCartFromZoomModal()">تحديد / إلغاء في العربة</button>
-        <button type="button" class="btn-soft" onclick="closeImageZoomModal()">إغلاق</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    window.__engzHistory = ["screen-choice"];
-    window.__engzActiveScreen = "screen-choice";
-    window.__engzDeptHistory = ["الكل"];
-    window.__engzHomePath = "client";
-    window.__engzClientMode = "register";
-    window.__engzChalMode = "register";
-    window.__engzSplashTimer = null;
-    window.__engzSplashRunning = false;
-    window.__engzNoticeTimer = null;
-
-    document.addEventListener("click", function (ev) {
-      var btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
-      if (!btn) return;
-      btn.classList.remove("btn-motion-active");
-      void btn.offsetWidth;
-      btn.classList.add("btn-motion-active");
-      setTimeout(function () {
-        btn.classList.remove("btn-motion-active");
-      }, 260);
-    }, true);
-
-    window.engzNotify = function (msg, type, durationMs) {
-      if (durationMs === undefined) durationMs = 8000;
-      var el = document.getElementById("global-notice");
-      if (!el) return;
-      if (window.__engzNoticeTimer) clearTimeout(window.__engzNoticeTimer);
-      el.style.display = "block";
-      el.className = "status-banner" + (type === "error" ? " error" : type === "success" ? " success" : "");
-      el.textContent = msg;
-      if (durationMs > 0) {
-        window.__engzNoticeTimer = setTimeout(function () {
-          el.style.display = "none";
-          el.textContent = "";
-        }, durationMs);
-      }
-    };
-
-    window.engzActivateScreen = function (screenId) {
-      window.__engzActiveScreen = screenId;
-      var screens = document.querySelectorAll(".screen");
-      for (var i = 0; i < screens.length; i++) {
-        screens[i].classList.remove("active");
-        screens[i].style.display = "none";
-      }
-      var target = document.getElementById(screenId);
-      if (target) {
-        target.classList.add("active");
-        target.style.display = "block";
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-      if (typeof window.__engzOnScreenChange === "function") {
-        window.__engzOnScreenChange(screenId);
-      }
-    };
-
-    window.goScreen = function (screenId, recordHistory) {
-      if (recordHistory === undefined) recordHistory = true;
-      var hist = window.__engzHistory;
-      var last = hist[hist.length - 1];
-      if (recordHistory && screenId !== last) {
-        hist.push(screenId);
-      }
-      window.engzActivateScreen(screenId);
-    };
-
-    window.goBackOneStep = function () {
-      var hist = window.__engzHistory;
-      if (hist.length > 1) {
-        hist.pop();
-        window.engzActivateScreen(hist[hist.length - 1]);
-      } else {
-        window.engzActivateScreen("screen-choice");
-        var exitBox = document.getElementById("exit-prompt-box");
-        if (exitBox) {
-          exitBox.style.display = exitBox.style.display === "block" ? "none" : "block";
-        }
-      }
-    };
-
-    window.selectHomePath = function (pathRole) {
-      window.__engzHomePath = pathRole === "challenger" ? "challenger" : "client";
-      var cBtn = document.getElementById("choice-btn-client");
-      var hBtn = document.getElementById("choice-btn-challenge");
-      if (cBtn) cBtn.classList.toggle("selected-path", window.__engzHomePath === "client");
-      if (hBtn) hBtn.classList.toggle("selected-path", window.__engzHomePath === "challenger");
-      var exitBox = document.getElementById("exit-prompt-box");
-      if (exitBox) exitBox.style.display = "none";
-      var summary = document.getElementById("active-user-summary");
-      if (summary && !window.__engzHasUser) {
-        summary.textContent = window.__engzHomePath === "challenger" ? "مسار التحدي" : "مسار العميل";
-      }
-    };
-
-    window.confirmHomePathSelection = function () {
-      var exitBox = document.getElementById("exit-prompt-box");
-      if (exitBox) exitBox.style.display = "none";
-      if (window.__engzHomePath === "challenger") {
-        window.goScreen("screen-challenger-entry");
-      } else {
-        window.goScreen("screen-client-entry");
-      }
-    };
-
-    window.chooseEntryMode = function (role, mode) {
-      if (role === "challenger") {
-        window.__engzChalMode = mode === "subscriber" ? "subscriber" : "register";
-        document.getElementById("chal-mode-reg-btn").classList.toggle("selected-path", window.__engzChalMode === "register");
-        document.getElementById("chal-mode-sub-btn").classList.toggle("selected-path", window.__engzChalMode === "subscriber");
-      } else {
-        window.__engzClientMode = mode === "subscriber" ? "subscriber" : "register";
-        document.getElementById("client-mode-reg-btn").classList.toggle("selected-path", window.__engzClientMode === "register");
-        document.getElementById("client-mode-sub-btn").classList.toggle("selected-path", window.__engzClientMode === "subscriber");
-      }
-    };
-
-    window.confirmEntryModeSelection = function (role) {
-      if (role === "challenger") {
-        var targetChal = window.__engzChalMode === "subscriber" ? "screen-challenger-subscriber" : "screen-challenger-register";
-        window.goScreen(targetChal);
-      } else {
-        var targetClient = window.__engzClientMode === "subscriber" ? "screen-client-subscriber" : "screen-client-register";
-        window.goScreen(targetClient);
-      }
-    };
-
-    window.startFull30SecSplash = function (onDone) {
-      if (window.__engzSplashTimer) {
-        clearInterval(window.__engzSplashTimer);
-      }
-      window.__engzSplashRunning = true;
-      var splash = document.getElementById("splash-screen");
-      var app = document.getElementById("main-app");
-      var secEl = document.getElementById("splash-seconds");
-      var barEl = document.getElementById("splash-progress-bar");
-      var pctEl = document.getElementById("splash-percent");
-      var total = 30;
-      var rem = 30;
-      secEl.textContent = "30";
-      barEl.style.width = "0%";
-      pctEl.textContent = "0%";
-      splash.style.display = "flex";
-      app.style.display = "none";
-
-      window.__engzSplashTimer = setInterval(function () {
-        rem -= 1;
-        var clamped = Math.max(0, rem);
-        var pct = Math.round(((total - clamped) / total) * 100);
-        secEl.textContent = String(clamped);
-        barEl.style.width = pct + "%";
-        pctEl.textContent = pct + "%";
-        if (clamped <= 0) {
-          clearInterval(window.__engzSplashTimer);
-          window.__engzSplashTimer = null;
-          window.__engzSplashRunning = false;
-          splash.style.display = "none";
-          app.style.display = "block";
-          if (typeof onDone === "function") onDone();
-        }
-      }, 1000);
-    };
-
-    window.handleExitYes = function () {
-      try { localStorage.removeItem("engz_exited_flag_v1"); } catch (e) {}
-      try {
-        if (window.AndroidInterface && typeof window.AndroidInterface.exitApp === "function") {
-          window.AndroidInterface.exitApp();
-        }
-      } catch (e) {}
-      try {
-        if (window.Android && typeof window.Android.closeApp === "function") {
-          window.Android.closeApp();
-        }
-      } catch (e) {}
-      try {
-        window.open("", "_self");
-        window.close();
-      } catch (e) {}
-      document.getElementById("main-app").innerHTML =
-        '<div class="screen active" style="display:block; text-align:center; padding:36px 20px;">' +
-        '<h2 class="screen-title" style="color:#be123c;">تم الخروج من التطبيق</h2>' +
-        '<p class="screen-sub">للدخول مرة أخرى وبدء شريط التحميل 30 ثانية كاملة، أعد فتح التطبيق أو اضغط إعادة الفتح.</p>' +
-        '<button type="button" class="btn-success" onclick="window.location.reload()">إعادة فتح التطبيق (30 ثانية)</button>' +
-        "</div>";
-    };
-
-    window.handleExitNo = function () {
-      var exitBox = document.getElementById("exit-prompt-box");
-      if (exitBox) exitBox.style.display = "none";
-      window.startFull30SecSplash(function () {
-        window.__engzHistory = ["screen-choice"];
-        window.engzActivateScreen("screen-choice");
-      });
-    };
-
-    window.startFull30SecSplash(function () {
-      window.__engzHistory = ["screen-choice"];
-      window.engzActivateScreen("screen-choice");
-    });
-
-    window.addEventListener("popstate", function () {
-      if (!window.__engzSplashRunning) {
-        window.goBackOneStep();
-      }
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-      var b1 = document.getElementById("btn-confirm-client-entry");
-      if (b1) b1.addEventListener("click", function () { window.confirmEntryModeSelection("client"); });
-
-      var b2 = document.getElementById("btn-confirm-chal-entry");
-      if (b2) b2.addEventListener("click", function () { window.confirmEntryModeSelection("challenger"); });
-
-      var b3 = document.getElementById("btn-confirm-home-path");
-      if (b3) b3.addEventListener("click", function () { window.confirmHomePathSelection(); });
-    });
-  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -1572,26 +412,8 @@
       push,
       onValue,
       update,
-      remove,
       runTransaction
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const POINT_VALUE_EGP = 33.333333333333;
-    const CART_STORAGE_KEY = "engz_persistent_cart_v1";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
-      authDomain: "engz-2567e.firebaseapp.com",
-      databaseURL: "https://engz-2567e-default-rtdb.firebaseio.com",
-      projectId: "engz-2567e",
-      storageBucket: "engz-2567e.firebasestorage.app",
-      messagingSenderId: "933265018725",
-      appId: "1:933265018725:web:279ba4bfb56489b895db8c",
-      measurementId: "G-RB49T4CWT3"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
 
     const DEFAULT_DEPARTMENTS = [
       "سوبرمركت",
@@ -1607,101 +429,63 @@
       "سوبرمركت": ["ألبان", "أجبان", "مكرونات", "مجمدات", "أيس كريم"]
     };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const incomingRefCode = (urlParams.get("ref") || "").trim();
-    const impersonateUidParam = (urlParams.get("asUser") || "").trim();
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
+      authDomain: "engz-2567e.firebaseapp.com",
+      databaseURL: "https://engz-2567e-default-rtdb.firebaseio.com",
+      projectId: "engz-2567e",
+      storageBucket: "engz-2567e.firebasestorage.app",
+      messagingSenderId: "933265018725",
+      appId: "1:933265018725:web:279ba4bfb56489b895db8c",
+      measurementId: "G-RB49T4CWT3"
+    };
 
-    function loadSavedCart() {
-      try {
-        const raw = localStorage.getItem(CART_STORAGE_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let selectedEntryRole = "client";
+    let currentUser = JSON.parse(localStorage.getItem("engz_current_user_v1") || "null");
+    let clientTab = "shop";
+    let challengerTab = "tasks";
+    let activeDept = "الكل";
+    let activeSubDept = "الكل";
+    let cart = JSON.parse(localStorage.getItem("engz_cart_v1") || "[]");
+    let receiptImageData = "";
+    let noticeTimer = null;
+    let renderTimer = null;
+
+    const store = {
+      users: {},
+      banned: {},
+      departments: [],
+      departmentsMeta: {},
+      subDepartments: {},
+      products: {},
+      cashPhones: [],
+      orders: {},
+      userOrderHistory: {},
+      userOrderHistoryByName: {},
+      challengerHistory: {},
+      challengersStats: {},
+      challenges: {},
+      gifts: {},
+      userMessages: {}
+    };
+
+    function sanitizeKey(k) {
+      return String(k || "").trim().replace(/[.#$[\]/]/g, "_") || "item";
     }
 
-    function saveCartToStorage(cartArr) {
-      try {
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartArr || []));
-      } catch {}
+    function esc(v) {
+      return String(v ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
-    let autoRedirectedAfterApproval = false;
-    let appliedImpersonation = false;
-    const productsCatalog = {};
-    let currentZoomUid = null;
-    const seenConfirmedOrderIds = new Set();
-    const clientOrderProofs = {};
-    let execBannerTimer = null;
-    let delivBannerTimer = null;
-
-    const locks = {
-      cartStep: false,
-      confirmStep: false,
-      sendReceipt: false,
-      confirmPurchase: false
-    };
-
-    const state = {
-      currentRole: null,
-      currentUser: null,
-      selectedDept: null,
-      selectedSubDept: "الكل",
-      selectedTypeFilter: "الكل",
-      searchQuery: "",
-      horizontalSlideMode: true,
-      offersDrawerOpen: false,
-      cart: loadSavedCart(),
-      selectedCashPhone: null,
-      paymentSourceType: "same",
-      uploadedImages: { deliveryProof: "", paymentReceipt: "" },
-      trackedApplicant: null,
-      db: {
-        users: {},
-        banned: {},
-        clientRegRequests: {},
-        challengerRegRequests: {},
-        departmentsMeta: {},
-        departments: [],
-        subDepartments: {},
-        products: {},
-        cashPhones: [],
-        orders: {},
-        userOrderHistory: {},
-        userOrderHistoryByName: {},
-        challengerHistory: {},
-        userMessages: {},
-        challenges: {},
-        gifts: {},
-        receipts: {},
-        referrals: {},
-        appSettings: { requireDeliveryPhoto: false }
-      }
-    };
-
-    updateCartBadges();
-
-    window.__engzOnScreenChange = function (screenId) {
-      updateCartBadges();
-      if (screenId === "screen-orders-home") {
-        renderDepartments();
-        renderClientOrdersTracker();
-      }
-      if (screenId === "screen-challenges-hub") renderChallengesHub();
-      if (screenId === "screen-payment") {
-        locks.sendReceipt = false;
-        locks.confirmPurchase = false;
-        const bSend = document.getElementById("btn-send-receipt-admin");
-        const bYes = document.getElementById("btn-confirm-purchase-yes");
-        if (bSend) bSend.disabled = false;
-        if (bYes) bYes.disabled = false;
-        renderPaymentScreen();
-      }
-    };
-
-    function notify(msg, type = "info", durationMs = 8000) {
-      window.engzNotify(msg, type, durationMs);
+    function isValidPhone(p) {
+      return /^01[0125][0-9]{8}$/.test(String(p || "").trim());
     }
 
     function isOrderCompleted(o) {
@@ -1716,1405 +500,630 @@
       );
     }
 
-    function formatDuration(sec) {
-      const s = Math.max(0, Number(sec) || 0);
-      const mins = Math.floor(s / 60);
-      const rem = s % 60;
-      return mins > 0 ? `${mins} دقيقة و ${rem} ثانية` : `${rem} ثانية`;
+    function notify(msg, type = "info", duration = 7000) {
+      const el = document.getElementById("app-notice");
+      if (!el) return;
+      if (noticeTimer) clearTimeout(noticeTimer);
+      el.style.display = "block";
+      el.className = "notice" + (type === "error" ? " error" : type === "success" ? " success" : "");
+      el.textContent = msg;
+      if (duration > 0) {
+        noticeTimer = setTimeout(() => {
+          el.style.display = "none";
+        }, duration);
+      }
     }
 
-    function getClientActiveUndeliveredOrdersCount() {
-      if (!state.currentUser || state.currentRole === "challenger") return 0;
-
-      const uid = state.currentUser.id || "";
-      const phone = (state.currentUser.phone || "").trim();
-      const name = (state.currentUser.name || "").trim().toLowerCase();
-
-      return Object.values(state.db.orders || {}).filter((o) => {
-        if (!o || isOrderCompleted(o)) return false;
-
-        return (
-          (uid && o.buyerId === uid) ||
-          (phone && (o.buyerPhone === phone || o.payerPhone === phone)) ||
-          (name && (o.buyerName || "").trim().toLowerCase() === name)
-        );
-      }).length;
-    }
-
-    function updateCartBadges() {
-      const isClientPage =
-        window.__engzActiveScreen === "screen-orders-home" ||
-        window.__engzActiveScreen === "screen-department-view";
-      const showCartBtn = Boolean(state.currentUser) && state.currentRole !== "challenger" && isClientPage;
-
-      document.querySelectorAll(".cart-fab").forEach((btn) => {
-        btn.style.display = showCartBtn ? "inline-block" : "none";
+    function scheduleRender() {
+      if (renderTimer) return;
+      renderTimer = requestAnimationFrame(() => {
+        renderTimer = null;
+        renderApp();
       });
+    }
 
-      const activeCount = showCartBtn ? getClientActiveUndeliveredOrdersCount() : 0;
-      const countText = String(activeCount);
-
+    function saveCart() {
+      localStorage.setItem("engz_cart_v1", JSON.stringify(cart));
       const badge = document.getElementById("cart-count-badge");
-      if (badge) badge.textContent = countText;
-
-      document.querySelectorAll(".cart-count-inline").forEach((el) => {
-        el.textContent = countText;
-      });
+      if (badge) badge.textContent = `(${cart.length})`;
     }
 
-    function showTemporaryArrivalAlert(orderId, durationMs = 8000) {
-      const execBanner = document.getElementById("admin-approval-banner");
-      const delivBanner = document.getElementById("delivery-status-banner");
-      if (execBannerTimer) clearTimeout(execBannerTimer);
-      if (delivBannerTimer) clearTimeout(delivBannerTimer);
-      const suffix = orderId ? ` • رقم الطلب #${String(orderId).slice(-6)}` : "";
-
-      if (execBanner) {
-        execBanner.textContent = `تم التوصيل${suffix}`;
-        execBanner.style.display = "block";
-        execBannerTimer = setTimeout(() => {
-          execBanner.style.display = "none";
-          execBanner.textContent = "";
-        }, durationMs);
-      }
-      if (delivBanner) {
-        delivBanner.textContent = `تم نقل العملية إلى السجل بنجاح${suffix}`;
-        delivBanner.style.display = "block";
-        delivBannerTimer = setTimeout(() => {
-          delivBanner.style.display = "none";
-          delivBanner.textContent = "";
-        }, durationMs);
-      }
-
-      notify(`تم التوصيل${suffix}`, "success", durationMs);
-    }
-
-    function showExecutionAndDeliveryAlerts(orderId) {
-      const execBanner = document.getElementById("admin-approval-banner");
-      const delivBanner = document.getElementById("delivery-status-banner");
-      if (execBannerTimer) clearTimeout(execBannerTimer);
-      if (delivBannerTimer) clearTimeout(delivBannerTimer);
-      const suffix = orderId ? ` • رقم الطلب #${String(orderId).slice(-6)}` : "";
-
-      if (execBanner) {
-        execBanner.textContent = `جارى تنفيذ طلبك${suffix}`;
-        execBanner.style.display = "block";
-        execBannerTimer = setTimeout(() => {
-          execBanner.style.display = "none";
-        }, 8000);
-      }
-      if (delivBanner) {
-        delivBanner.textContent = `جارى التوصيل${suffix}`;
-        delivBanner.style.display = "block";
-        delivBannerTimer = setTimeout(() => {
-          delivBanner.style.display = "none";
-        }, 8000);
-      }
-
-      notify("جارى تنفيذ طلبك", "success", 8000);
-      setTimeout(() => {
-        notify("جارى التوصيل", "success", 8000);
-      }, 450);
-    }
-
-    function monitorConfirmedOrdersForUser() {
-      const ordersObj = state.db.orders || {};
-      const currentName = (state.currentUser?.name || "").trim().toLowerCase();
-      const currentPhone = (state.currentUser?.phone || "").trim();
-      const currentUid = state.currentUser?.id || "";
-
-      for (const [orderId, ord] of Object.entries(ordersObj)) {
-        if (!ord || isOrderCompleted(ord)) continue;
-        const isConfirmed =
-          ord.paymentStatus === "confirmed" ||
-          ord.paymentConfirmed === true ||
-          ord.deliveryStatus === "out_for_delivery";
-        if (!isConfirmed) continue;
-
-        const matchesUser =
-          (currentUid && ord.buyerId === currentUid) ||
-          (currentPhone && (ord.buyerPhone === currentPhone || ord.payerPhone === currentPhone)) ||
-          (currentName && (ord.buyerName || "").trim().toLowerCase() === currentName) ||
-          !currentUid;
-
-        if (matchesUser && !seenConfirmedOrderIds.has(orderId)) {
-          seenConfirmedOrderIds.add(orderId);
-          showExecutionAndDeliveryAlerts(orderId);
-        }
-      }
-    }
-
-    function isValidEgyptianPhone(phone) {
-      return /^01[0125][0-9]{8}$/.test(String(phone || "").trim());
-    }
-
-    function esc(v) {
-      return String(v ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    function tryApplyAdminUserAccess() {
-      if (appliedImpersonation) return;
-      let targetUid = impersonateUidParam;
-      let fallbackObj = null;
-      if (!targetUid) {
-        try {
-          const raw = localStorage.getItem("engz_admin_impersonate_v1");
-          if (raw) {
-            fallbackObj = JSON.parse(raw);
-            targetUid = fallbackObj?.id || "";
-          }
-        } catch {}
-      }
-      if (targetUid && state.db.users[targetUid]) {
-        appliedImpersonation = true;
-        const u = state.db.users[targetUid];
-        state.currentUser = { id: targetUid, ...u };
-        state.currentRole = u.role || "client";
-        syncUserHeader();
-        if (window.__engzSplashTimer) {
-          clearInterval(window.__engzSplashTimer);
-          window.__engzSplashTimer = null;
-          window.__engzSplashRunning = false;
-        }
-        document.getElementById("splash-screen").style.display = "none";
-        document.getElementById("main-app").style.display = "block";
-        notify(`تم الدخول إلى حساب: ${u.name}`, "success");
-        window.goScreen(u.role === "challenger" ? "screen-challenges-hub" : "screen-orders-home");
-      } else if (fallbackObj && fallbackObj.id) {
-        appliedImpersonation = true;
-        state.currentUser = fallbackObj;
-        state.currentRole = fallbackObj.role || "client";
-        syncUserHeader();
-      }
-    }
-
-    function isPhoneBoundToAnotherUser(phone, excludeUserId = null) {
-      const p = String(phone || "").trim();
-      if (!p) return false;
-      const inUsers = Object.entries(state.db.users || {}).some(
-        ([uid, u]) => uid !== excludeUserId && (u.phone === p || u.phone2 === p)
-      );
-      if (inUsers) return true;
-      const inClientReqs = Object.values(state.db.clientRegRequests || {}).some(
-        (r) => r.status === "pending" && r.phone === p
-      );
-      if (inClientReqs) return true;
-      return Object.values(state.db.challengerRegRequests || {}).some(
-        (r) => r.status === "pending" && r.phone === p
-      );
-    }
-
-    function buildPersonalReferralUrl(userId) {
-      const base = window.location.origin + window.location.pathname;
-      return `${base}?ref=${encodeURIComponent(userId)}`;
-    }
-
-    window.copyMyReferralLink = function () {
-      if (!state.currentUser || !state.currentUser.id) return;
-      const link = buildPersonalReferralUrl(state.currentUser.id);
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(link).catch(() => {});
-      }
-      notify(`تم نسخ رابطك المخصص: ${link}`, "success");
-    };
-
-    function renderReferralAndWalletBar() {
-      const bar = document.getElementById("personal-referral-wallet-bar");
-      const pointsCounterBox = document.getElementById("user-points-counter");
-      const pointsValEl = document.getElementById("user-points-value");
-      const convertBtn = document.getElementById("convert-points-btn");
-
-      if (!state.currentUser || !state.currentUser.id) {
-        bar.style.display = "none";
-        pointsCounterBox.style.display = "none";
-        convertBtn.style.display = "none";
-        return;
-      }
-
-      const latest = state.db.users[state.currentUser.id] || state.currentUser;
-      state.currentUser = { ...state.currentUser, ...latest };
-      const pts = Number(state.currentUser.points) || 0;
-
-      pointsCounterBox.style.display = "block";
-      pointsValEl.textContent = String(pts);
-      convertBtn.style.display = state.currentUser.role === "client" && pts > 0 ? "inline-block" : "none";
-
-      bar.style.display = "block";
-      document.getElementById("my-referral-link-text").textContent = buildPersonalReferralUrl(state.currentUser.id);
-
-      const refMap = state.db.referrals[state.currentUser.id] || {};
-      const invitedEntries = Object.values(refMap);
-      const sentCount = invitedEntries.length;
-      const completedCount = invitedEntries.filter((x) => x.completedFirstAction === true).length;
-      document.getElementById("my-referral-stats-text").textContent =
-        `عدد الأشخاص المرسل لهم الرابط: ${sentCount} • عدد من أتموا أول طلب شراء أو مهمة ناجحة: ${completedCount}`;
-    }
-
-    window.convertClientPointsToMoney = async function () {
-      if (!state.currentUser || state.currentUser.role !== "client") return;
-      const uid = state.currentUser.id;
-      const currentPts = Number(state.db.users[uid]?.points) || 0;
-      if (currentPts <= 0) {
-        return notify("لا توجد نقاط متاحة للتحويل.", "error");
-      }
-      const addedMoney = Number((currentPts * POINT_VALUE_EGP).toFixed(2));
-      await update(ref(db, `users/${uid}`), {
-        points: 0,
-        wallet: Number(((Number(state.db.users[uid]?.wallet) || 0) + addedMoney).toFixed(2))
-      });
-      notify(`تم تحويل ${currentPts} point إلى رصيدك (${addedMoney} جنيه) بنجاح.`, "success");
-    };
-
-    async function recordReferralJoin(referrerId, invitedUserId, invitedName) {
-      if (!referrerId || !invitedUserId || referrerId === invitedUserId) return;
-      if (!state.db.users[referrerId]) return;
-      const entryRef = ref(db, `referrals/${referrerId}/${invitedUserId}`);
-      await runTransaction(entryRef, (existing) => {
-        if (existing) return existing;
-        return {
-          invitedUserId,
-          invitedName,
-          joinedAt: Date.now(),
-          completedFirstAction: false
-        };
-      });
-    }
-
-    async function markReferrerFirstActionSuccess(invitedUserId) {
-      if (!invitedUserId) return;
-      const allReferrals = state.db.referrals || {};
-      for (const [referrerId, invitedMap] of Object.entries(allReferrals)) {
-        const rec = invitedMap && invitedMap[invitedUserId];
-        if (rec && rec.completedFirstAction !== true) {
-          await update(ref(db, `referrals/${referrerId}/${invitedUserId}`), {
-            completedFirstAction: true,
-            completedAt: Date.now()
-          });
-          await runTransaction(ref(db, `users/${referrerId}/points`), (curPts) => (Number(curPts) || 0) + 1);
-        }
-      }
-    }
-
-    async function finalizeApprovedUserAndRedirect(userRecord, preferredId = null) {
-      if (!userRecord || autoRedirectedAfterApproval) return;
-      autoRedirectedAfterApproval = true;
-
-      let uid = preferredId;
-      if (!uid) {
-        const existing = Object.entries(state.db.users || {}).find(
-          ([, u]) =>
-            (u.name || "").trim().toLowerCase() === (userRecord.name || "").trim().toLowerCase() ||
-            (userRecord.phone && u.phone === userRecord.phone)
-        );
-        if (existing) {
-          uid = existing[0];
-          userRecord = { ...existing[1], ...userRecord };
-        }
-      }
-
-      if (!uid) {
-        const newRef = push(ref(db, "users"));
-        uid = newRef.key;
-        const payload = {
-          name: userRecord.name,
-          phone: userRecord.phone,
-          role: userRecord.role,
-          status: "approved",
-          wallet: Number(userRecord.wallet) || 0,
-          points: Number(userRecord.points) || 0,
-          invitedBy: userRecord.invitedBy || incomingRefCode || "",
-          createdAt: Date.now()
-        };
-        await set(newRef, payload);
-        userRecord = payload;
-      }
-
-      const role = userRecord.role || (state.trackedApplicant && state.trackedApplicant.kind) || "client";
-      state.currentUser = { id: uid, ...userRecord, role, status: "approved" };
-      state.currentRole = role;
-      window.__engzHasUser = true;
-
-      if (incomingRefCode || userRecord.invitedBy) {
-        await recordReferralJoin(incomingRefCode || userRecord.invitedBy, uid, userRecord.name);
-      }
-
-      syncUserHeader();
-      state.trackedApplicant = null;
-      notify("تمت الموافقه على طلبك انت الان مشترك", "success");
-
-      if (role === "challenger") {
-        window.goScreen("screen-challenges-hub");
+    function saveSession(userObj) {
+      currentUser = userObj;
+      if (userObj) {
+        localStorage.setItem("engz_current_user_v1", JSON.stringify(userObj));
       } else {
-        window.goScreen("screen-orders-home");
+        localStorage.removeItem("engz_current_user_v1");
       }
+      syncScreens();
     }
 
-    function checkRegistrationStatusBanner() {
-      if (!state.trackedApplicant) return;
-      const { name, phone, kind } = state.trackedApplicant;
-      const cleanName = (name || "").trim().toLowerCase();
-
-      const pendingMap = kind === "challenger" ? state.db.challengerRegRequests : state.db.clientRegRequests;
-      const isStillPending = Object.values(pendingMap || {}).some(
-        (r) =>
-          r.status === "pending" &&
-          ((cleanName && (r.name || "").trim().toLowerCase() === cleanName) || (phone && r.phone === phone))
-      );
-
-      const approvedEntry = Object.entries(state.db.users || {}).find(
-        ([, u]) =>
-          u.status === "approved" &&
-          (!kind || u.role === kind) &&
-          ((cleanName && (u.name || "").trim().toLowerCase() === cleanName) || (phone && u.phone === phone))
-      );
-
-      if (approvedEntry && !isStillPending) {
-        finalizeApprovedUserAndRedirect({ id: approvedEntry[0], ...approvedEntry[1] }, approvedEntry[0]);
-        return;
-      }
-
-      const rejectedEntry = Object.values(state.db.users || {}).find(
-        (u) =>
-          u.status === "rejected" &&
-          (!kind || u.role === kind) &&
-          ((cleanName && (u.name || "").trim().toLowerCase() === cleanName) || (phone && u.phone === phone))
-      );
-
-      if (rejectedEntry && !isStillPending) {
-        state.trackedApplicant = null;
-        notify("تم رفض طلبك", "error");
-        return;
-      }
-
-      notify("جاري طلب التسجيل", "info");
-    }
-
-    window.goBackInsideDepartment = function () {
-      if (window.__engzDeptHistory.length > 1) {
-        window.__engzDeptHistory.pop();
-        state.selectedTypeFilter = window.__engzDeptHistory[window.__engzDeptHistory.length - 1];
-        if (state.selectedDept) {
-          renderDepartmentView(state.selectedDept);
-          return;
-        }
-      }
-      window.goBackOneStep();
+    window.selectEntryRole = function (role) {
+      selectedEntryRole = role === "challenger" ? "challenger" : "client";
+      document.getElementById("role-card-client").classList.toggle("active", selectedEntryRole === "client");
+      document.getElementById("role-card-challenger").classList.toggle("active", selectedEntryRole === "challenger");
+      document.getElementById("auth-form-title").textContent =
+        selectedEntryRole === "challenger"
+          ? "بيانات الدخول / طلب تسجيل كـ (تحدّي / متسابق)"
+          : "بيانات الدخول / طلب تسجيل كـ (عميل)";
     };
-
-    function syncUserHeader() {
-      const summary = document.getElementById("active-user-summary");
-      const walletEl = document.getElementById("user-wallet-display");
-      if (!state.currentUser) {
-        window.__engzHasUser = false;
-        summary.textContent = window.__engzHomePath === "challenger" ? "مسار التحدي" : "مسار العميل";
-        walletEl.textContent = "0";
-        renderReferralAndWalletBar();
-        updateCartBadges();
-        return;
-      }
-      window.__engzHasUser = true;
-      const latest = state.db.users[state.currentUser.id] || state.currentUser;
-      state.currentUser = { ...state.currentUser, ...latest };
-      const roleLabel = state.currentUser.role === "challenger" ? "متسابق مشترك" : "عميل";
-      summary.textContent = `${state.currentUser.name} (${roleLabel}) • ${state.currentUser.phone}`;
-      walletEl.textContent = String(Number(state.currentUser.wallet || 0));
-      renderReferralAndWalletBar();
-      updateCartBadges();
-    }
-
-    function isNameTaken(name) {
-      const clean = name.trim().toLowerCase();
-      const inUsers = Object.values(state.db.users).some((u) => (u.name || "").trim().toLowerCase() === clean);
-      const inClientReq = Object.values(state.db.clientRegRequests).some((r) => r.status === "pending" && (r.name || "").trim().toLowerCase() === clean);
-      const inChalReq = Object.values(state.db.challengerRegRequests).some((r) => r.status === "pending" && (r.name || "").trim().toLowerCase() === clean);
-      return inUsers || inClientReq || inChalReq;
-    }
 
     function isBanned(name, phone) {
-      return Object.values(state.db.banned).some(
-        (b) => (b.phone && phone && b.phone === phone) || (b.name && name && b.name.trim().toLowerCase() === name.trim().toLowerCase())
-      );
+      const n = (name || "").trim().toLowerCase();
+      const p = (phone || "").trim();
+      return Object.values(store.banned || {}).some((b) => {
+        const bn = (b.name || "").trim().toLowerCase();
+        const bp = (b.phone || "").trim();
+        return (n && bn && n === bn) || (p && bp && p === bp);
+      });
     }
 
-    window.submitClientRegistration = async function () {
-      const name = document.getElementById("reg-client-name").value.trim();
-      const phone = document.getElementById("reg-client-phone").value.trim();
+    window.submitUserAuth = async function () {
+      const name = document.getElementById("auth-name").value.trim();
+      const phone = document.getElementById("auth-phone").value.trim();
+      const invitedBy = document.getElementById("auth-invite").value.trim();
 
-      if (!name) return notify("من فضلك أدخل الاسم.", "error");
-      if (!isValidEgyptianPhone(phone)) return notify("رقم التلفون يجب أن يكون رقماً مصرياً صحيحاً مكوناً من 11 رقماً.", "error");
-      if (isBanned(name, phone)) return notify("عذراً، هذه البيانات محظورة من الدخول.", "error");
-      if (isNameTaken(name)) return notify("هذا الاسم مستخدم بالفعل، اختر اسماً فريداً غير مكرر.", "error");
-      if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم تلفون يجب أن يكون لمستخدم وحيد.", "error");
+      if (!name) return notify("اكتب اسمك أولاً.", "error");
+      if (!isValidPhone(phone)) return notify("أدخل رقم تلفون مصرياً صحيحاً من 11 رقماً.", "error");
+      if (isBanned(name, phone)) return notify("عذراً، هذا الحساب أو الرقم محظور.", "error");
 
-      autoRedirectedAfterApproval = false;
-      state.trackedApplicant = { name, phone, kind: "client" };
-
-      await push(ref(db, "clientRegRequests"), {
-        name,
-        phone,
-        role: "client",
-        status: "pending",
-        invitedBy: incomingRefCode || "",
-        createdAt: Date.now()
-      });
-
-      document.getElementById("reg-client-name").value = "";
-      document.getElementById("reg-client-phone").value = "";
-      notify("جاري طلب التسجيل", "info");
-    };
-
-    window.loginClientSubscriber = async function () {
-      const name = document.getElementById("sub-client-name").value.trim();
-      const phone1 = document.getElementById("sub-client-phone1").value.trim();
-      const phone2 = document.getElementById("sub-client-phone2").value.trim();
-
-      if (!name || !isValidEgyptianPhone(phone1)) {
-        return notify("أدخل الاسم ورقم التلفون المصري الصحيح (11 رقماً).", "error");
-      }
-      if (phone2 && !isValidEgyptianPhone(phone2)) {
-        return notify("الرقم الإضافي الثاني غير صالح للعمل في مصر.", "error");
-      }
-      if (isBanned(name, phone1) || (phone2 && isBanned(name, phone2))) {
-        return notify("عذراً، هذا الحساب محظور ولا يمكنه الدخول.", "error");
-      }
-
-      const pendingClient = Object.values(state.db.clientRegRequests || {}).find(
-        (r) => (r.name || "").trim().toLowerCase() === name.toLowerCase() && r.status === "pending"
-      );
-      if (pendingClient) {
-        autoRedirectedAfterApproval = false;
-        state.trackedApplicant = { name, phone: phone1, kind: "client" };
-        return notify("جاري طلب التسجيل", "info");
-      }
-
-      const existingEntry = Object.entries(state.db.users).find(
-        ([, u]) => (u.name || "").trim().toLowerCase() === name.toLowerCase()
+      const existing = Object.entries(store.users || {}).find(
+        ([, u]) => (u.phone && u.phone === phone) || ((u.name || "").trim().toLowerCase() === name.toLowerCase())
       );
 
-      if (existingEntry) {
-        const [uid, uData] = existingEntry;
-        if (uData.status === "rejected") {
-          return notify("تم رفض طلبك", "error");
-        }
-        const ownsPhone1 = uData.phone === phone1 || uData.phone2 === phone1;
-        if (!ownsPhone1 && isPhoneBoundToAnotherUser(phone1, uid)) {
-          return notify("رقم التلفون الأساسي مرتبط بمستخدم وحيد آخر.", "error");
-        }
-        if (phone2 && isPhoneBoundToAnotherUser(phone2, uid)) {
-          return notify("الرقم الإضافي مرتبط بمستخدم وحيد آخر.", "error");
-        }
-
-        await update(ref(db, `users/${uid}`), {
-          phone: phone1,
-          phone2: phone2 || uData.phone2 || "",
-          lastLogin: Date.now()
-        });
-        state.currentUser = { id: uid, ...uData, phone: phone1, phone2: phone2 || uData.phone2 || "" };
-        state.currentRole = "client";
-        if (incomingRefCode || uData.invitedBy) {
-          await recordReferralJoin(incomingRefCode || uData.invitedBy, uid, name);
-        }
-        syncUserHeader();
-        notify("تمت الموافقه على طلبك انت الان مشترك", "success");
-        window.goScreen("screen-orders-home");
+      if (existing) {
+        const [uid, u] = existing;
+        const updatedUser = {
+          id: uid,
+          ...u,
+          name: u.name || name,
+          phone: u.phone || phone,
+          role: selectedEntryRole
+        };
+        await update(ref(db, `users/${uid}`), { role: selectedEntryRole });
+        saveSession(updatedUser);
+        notify(`مرحباً بك يا ${updatedUser.name}!`, "success");
         return;
       }
 
-      if (isPhoneBoundToAnotherUser(phone1) || (phone2 && isPhoneBoundToAnotherUser(phone2))) {
-        return notify("هذا الرقم مرتبط بمستخدم وحيد آخر ولا يمكن استخدامه لحساب جديد.", "error");
-      }
-
-      const newRef = push(ref(db, "users"));
-      const newUser = {
-        name,
-        phone: phone1,
-        phone2: phone2 || "",
-        role: "client",
-        status: "approved",
-        wallet: 0,
-        points: 0,
-        invitedBy: incomingRefCode || "",
-        createdAt: Date.now()
-      };
-      await set(newRef, newUser);
-      state.currentUser = { id: newRef.key, ...newUser };
-      state.currentRole = "client";
-      if (incomingRefCode) {
-        await recordReferralJoin(incomingRefCode, newRef.key, name);
-      }
-      syncUserHeader();
-      notify("تمت الموافقه على طلبك انت الان مشترك", "success");
-      window.goScreen("screen-orders-home");
-    };
-
-    window.submitChallengerRegistration = async function () {
-      const name = document.getElementById("reg-chal-name").value.trim();
-      const phone = document.getElementById("reg-chal-phone").value.trim();
-
-      if (!name || !isValidEgyptianPhone(phone)) {
-        return notify("أدخل الاسم ورقم التلفون المصري الصحيح (11 رقماً).", "error");
-      }
-      if (isBanned(name, phone)) return notify("عذراً، هذه البيانات محظورة.", "error");
-      if (isNameTaken(name)) return notify("هذا الاسم مسجل بالفعل، اختر اسماً فريداً.", "error");
-      if (isPhoneBoundToAnotherUser(phone)) return notify("هذا الرقم مرتبط بمستخدم آخر بالفعل، كل رقم تلفون يجب أن يكون لمستخدم وحيد.", "error");
-
-      autoRedirectedAfterApproval = false;
-      state.trackedApplicant = { name, phone, kind: "challenger" };
-
-      await push(ref(db, "challengerRegRequests"), {
+      const reqPath = selectedEntryRole === "challenger" ? "challengerRegRequests" : "clientRegRequests";
+      await push(ref(db, reqPath), {
         name,
         phone,
-        role: "challenger",
+        invitedBy,
         status: "pending",
-        invitedBy: incomingRefCode || "",
         createdAt: Date.now()
       });
 
-      document.getElementById("reg-chal-name").value = "";
-      document.getElementById("reg-chal-phone").value = "";
-      notify("جاري طلب التسجيل", "info");
+      const uRef = push(ref(db, "users"));
+      const newUser = {
+        name,
+        phone,
+        role: selectedEntryRole,
+        status: "pending",
+        wallet: 0,
+        points: 0,
+        invitedBy,
+        createdAt: Date.now()
+      };
+      await set(uRef, newUser);
+      saveSession({ id: uRef.key, ...newUser });
+      notify("تم إرسال طلب تسجيلك للأدمن ويمكنك التصفح الآن.", "success");
     };
 
-    window.loginChallengerSubscriber = async function () {
-      const name = document.getElementById("sub-chal-name").value.trim();
-      const phone = document.getElementById("sub-chal-phone").value.trim();
-
-      if (!name || !isValidEgyptianPhone(phone)) {
-        return notify("أدخل الاسم ورقم التلفون المصري الصحيح.", "error");
-      }
-      if (isBanned(name, phone)) {
-        return notify("عذراً، هذا الحساب محظور ولا يمكنه الدخول.", "error");
-      }
-
-      const pendingChal = Object.values(state.db.challengerRegRequests || {}).find(
-        (r) => (r.name || "").trim().toLowerCase() === name.toLowerCase() && r.status === "pending"
-      );
-      if (pendingChal) {
-        autoRedirectedAfterApproval = false;
-        state.trackedApplicant = { name, phone, kind: "challenger" };
-        return notify("جاري طلب التسجيل", "info");
-      }
-
-      const found = Object.entries(state.db.users).find(
-        ([, u]) => (u.name || "").trim().toLowerCase() === name.toLowerCase()
-      );
-
-      if (!found) {
-        return notify("لم يتم العثور على حساب متسابق بهذا الاسم. يمكنك إرسال طلب تسجيل أولاً.", "error");
-      }
-
-      const [uid, uData] = found;
-      if (uData.status === "rejected") return notify("تم رفض طلبك", "error");
-      if (uData.status === "waiting") return notify("طلبك حالياً في قائمة الانتظار لدى الإدارة.", "info");
-      if (uData.role !== "challenger") return notify("هذا الحساب مسجل كعميل وليس متسابقاً.", "error");
-      if (uData.phone && uData.phone !== phone) return notify("رقم التلفون لا يطابق رقم المستخدم الوحيد المسجل لهذا الحساب.", "error");
-
-      state.currentUser = { id: uid, ...uData, phone };
-      state.currentRole = "challenger";
-      if (incomingRefCode || uData.invitedBy) {
-        await recordReferralJoin(incomingRefCode || uData.invitedBy, uid, name);
-      }
-      syncUserHeader();
-      notify("تمت الموافقه على طلبك انت الان مشترك", "success");
-      window.goScreen("screen-challenges-hub");
+    window.quickGuestEnter = function () {
+      saveSession({
+        id: `guest_${selectedEntryRole}`,
+        name: selectedEntryRole === "challenger" ? "متسابق زائر" : "عميل زائر",
+        phone: "",
+        role: selectedEntryRole,
+        status: "guest",
+        wallet: 0,
+        points: 0
+      });
+      notify(selectedEntryRole === "challenger" ? "تم الدخول في وضع التحدّي." : "تم الدخول في وضع العميل.", "info");
     };
 
-    function getAllDepartments() {
-      const extra = Array.isArray(state.db.departments) ? state.db.departments : [];
+    window.logoutUser = function () {
+      saveSession(null);
+      notify("تم تسجيل الخروج. اختر دورك من البداية.", "info");
+    };
+
+    window.switchRoleQuick = async function (role) {
+      if (!currentUser) return;
+      const nextRole = role === "challenger" ? "challenger" : "client";
+      currentUser.role = nextRole;
+      if (currentUser.id && !String(currentUser.id).startsWith("guest_") && store.users[currentUser.id]) {
+        await update(ref(db, `users/${currentUser.id}`), { role: nextRole });
+      }
+      saveSession(currentUser);
+      notify(nextRole === "challenger" ? "تم التبديل إلى وضع التحدّي." : "تم التبديل إلى وضع العميل.", "success");
+    };
+
+    window.switchClientTab = function (tab) {
+      clientTab = tab;
+      ["shop", "offers", "cart", "orders", "inbox"].forEach((t) => {
+        document.getElementById(`ctab-${t}`)?.classList.toggle("active", t === tab);
+        const sec = document.getElementById(`csec-${t}`);
+        if (sec) sec.style.display = t === tab ? "block" : "none";
+      });
+      renderApp();
+    };
+
+    window.switchChallengerTab = function (tab) {
+      challengerTab = tab;
+      ["tasks", "history", "inbox"].forEach((t) => {
+        document.getElementById(`htab-${t}`)?.classList.toggle("active", t === tab);
+        const sec = document.getElementById(`hsec-${t}`);
+        if (sec) sec.style.display = t === tab ? "block" : "none";
+      });
+      renderApp();
+    };
+
+    function allDepts() {
+      const extra = Array.isArray(store.departments) ? store.departments : [];
       return [...new Set([...DEFAULT_DEPARTMENTS, ...extra])];
     }
 
-    function getSubDepartmentsForDept(deptName) {
-      const defaults = DEFAULT_SUBDEPTS[deptName] || [];
-      const fromDb = state.db.subDepartments?.[deptName] || {};
-      const extra = Object.keys(fromDb);
-      return [...new Set([...defaults, ...extra])];
+    function getSubDepts(parentDept) {
+      const defaults = DEFAULT_SUBDEPTS[parentDept] || [];
+      const dbMap = store.subDepartments?.[parentDept] || store.subDepartments?.[sanitizeKey(parentDept)] || {};
+      const names = Object.values(dbMap)
+        .map((v) => (typeof v === "object" && v && v.name ? v.name : ""))
+        .filter(Boolean);
+      return [...new Set([...defaults, ...Object.keys(dbMap), ...names])];
     }
 
-    function renderDepartments() {
-      const container = document.getElementById("departments-container");
-      const depts = getAllDepartments();
-      container.innerHTML = depts
-        .map((d) => {
-          const meta = state.db.departmentsMeta[d] || {};
-          const imgHtml = meta.image
-            ? `<img src="${meta.image}" alt="${esc(d)}" class="dept-card-img" draggable="false" oncontextmenu="return false;" />`
-            : "";
-          return `
-            <div class="dept-card" onclick="openDepartment('${esc(d)}')" oncontextmenu="return false;">
-              ${imgHtml}
-              <div class="dept-card-label">${esc(d)}</div>
-            </div>
-          `;
-        })
-        .join("");
-    }
-
-    window.triggerClientOrderPhoto = function (orderId, mode) {
-      const id = mode === "camera" ? `client-cam-${orderId}` : `client-gal-${orderId}`;
-      const el = document.getElementById(id);
-      if (el) el.click();
-    };
-
-    window.handleClientOrderPhotoFile = function (inputEl, orderId) {
-      const file = inputEl.files && inputEl.files[0];
-      if (!file) return;
-      encodeHighQualityImage(file, (dataUrl) => {
-        clientOrderProofs[orderId] = dataUrl;
-        renderClientOrdersTracker();
-        notify("تم إرفاق صورة تأكيد التوصيل.", "success");
-      });
-    };
-
-    window.clearClientOrderPhoto = function (orderId) {
-      clientOrderProofs[orderId] = "";
-      const c = document.getElementById(`client-cam-${orderId}`);
-      const g = document.getElementById(`client-gal-${orderId}`);
-      if (c) c.value = "";
-      if (g) g.value = "";
-      renderClientOrdersTracker();
-      notify("تم حذف الصورة.", "info");
-    };
-
-    async function archiveOrderToUserHistory(orderId, ord, customDateMs = Date.now()) {
-      if (!ord) return;
-      const startTs = Number(ord.deliveryStartAt || ord.acceptedAt || ord.createdAt) || customDateMs;
-      const durationSec = Math.max(1, Math.round((customDateMs - startTs) / 1000));
-      const historyPayload = {
-        orderId,
-        buyerId: ord.buyerId || state.currentUser?.id || "",
-        buyerName: ord.buyerName || state.currentUser?.name || "مستخدم",
-        buyerPhone: ord.buyerPhone || ord.payerPhone || state.currentUser?.phone || "",
-        assignedChallengerId: ord.assignedChallengerId || "",
-        assignedChallengerName: ord.assignedChallengerName || "",
-        items: ord.items || [],
-        challengeTitle: ord.challengeTitle || "",
-        totalAmount: Number(ord.totalAmount) || 0,
-        status: "تم التوصيل",
-        createdAt: ord.createdAt || customDateMs,
-        deliveredAt: customDateMs,
-        completedAt: customDateMs,
-        deliveryDurationSec: durationSec,
-        archivedAt: customDateMs,
-        dateTimeText: new Date(customDateMs).toLocaleString("ar-EG")
-      };
-
-      const targetUid = ord.buyerId || state.currentUser?.id || "";
-      if (targetUid) {
-        await set(ref(db, `userOrderHistory/${targetUid}/${orderId}`), historyPayload);
-      }
-      const cleanName = (ord.buyerName || state.currentUser?.name || "").trim().toLowerCase().replace(/[.#$[\]]/g, "_");
-      if (cleanName) {
-        await set(ref(db, `userOrderHistoryByName/${cleanName}/${orderId}`), historyPayload);
-      }
-      if (ord.assignedChallengerId) {
-        await set(ref(db, `challengerHistory/${ord.assignedChallengerId}/${orderId}`), historyPayload);
-      }
-    }
-
-    window.markOrderArrivedClient = async function (orderId) {
-      const ord = state.db.orders[orderId];
-      if (!ord) return notify("الطلب غير موجود.", "error");
-
-      const photoData = clientOrderProofs[orderId] || ord.deliveryImage || ord.receiptImage || "";
-      if (state.db.appSettings?.requireDeliveryPhoto && !photoData) {
-        return notify("تصوير أو اختيار صورة (كاميرا / استوديو) مطلوب قبل الضغط على تم التوصيل.", "error");
-      }
-
-      const now = Date.now();
-      const startTs = Number(ord.deliveryStartAt || ord.acceptedAt || ord.createdAt) || now;
-      const elapsedSec = Math.max(1, Math.round((now - startTs) / 1000));
-
-      await update(ref(db, `orders/${orderId}`), {
-        stage: "completed",
-        orderCompleted: true,
-        deliveryStatus: "completed",
-        status: "تم التوصيل",
-        userAlertMessage: "تم التوصيل",
-        deliveryImage: photoData,
-        deliveredAt: now,
-        deliveredAtFormatted: new Date(now).toLocaleString("ar-EG"),
-        deliveryDurationSec: elapsedSec,
-        completedAt: now,
-        completedAtFormatted: new Date(now).toLocaleString("ar-EG"),
-        completedBy: "client"
-      });
-
-      await archiveOrderToUserHistory(orderId, { ...ord, completedAt: now }, now);
-
-      if (ord.challengeId) {
-        await update(ref(db, `challenges/${ord.challengeId}`), {
-          completed: true,
-          status: "مكتملة",
-          deliveredAt: now,
-          completedAt: now
-        });
-      }
-
-      delete clientOrderProofs[orderId];
-      updateCartBadges();
-      showTemporaryArrivalAlert(orderId, 8000);
-      renderClientOrdersTracker();
-    };
-
-    window.deleteCompletedOrderClient = async function (orderId) {
-      const ok = confirm("هل تريد حذف هذا الطلب من قائمة الطلبات المنتهية؟ (سيبقى في سجل طلباتك بالتاريخ والوقت)");
-      if (!ok) return;
-      const ord = state.db.orders[orderId];
-      if (ord) {
-        await archiveOrderToUserHistory(orderId, ord, Date.now());
-      }
-      await remove(ref(db, `orders/${orderId}`));
-      updateCartBadges();
-      notify("تم حذف الطلب من قائمة المنتهية وبقي في سجل طلباتك.", "success", 8000);
-      renderClientOrdersTracker();
-    };
-
-    function renderClientOrdersTracker() {
-      const activeBox = document.getElementById("client-active-orders-list");
-      const completedBox = document.getElementById("client-completed-orders-list");
-      const historyBox = document.getElementById("client-order-history-list");
-      const inboxBox = document.getElementById("client-admin-inbox-section");
-      if (!activeBox || !completedBox || !historyBox) return;
-
-      const uid = state.currentUser?.id || "";
-      const phone = state.currentUser?.phone || "";
-      const name = (state.currentUser?.name || "").trim().toLowerCase();
-      const safeNameKey = name.replace(/[.#$[\]]/g, "_");
-
-      const myOrders = Object.entries(state.db.orders || {})
-        .filter(([, o]) => {
-          if (!o) return false;
-          if (!uid && !phone && !name) return true;
-          return (
-            (uid && o.buyerId === uid) ||
-            (phone && (o.buyerPhone === phone || o.payerPhone === phone)) ||
-            (name && (o.buyerName || "").trim().toLowerCase() === name)
-          );
-        })
-        .sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0));
-
-      const activeList = myOrders.filter(([, o]) => !isOrderCompleted(o));
-      const completedList = myOrders.filter(([, o]) => isOrderCompleted(o));
-
-      activeBox.innerHTML = activeList.length
-        ? activeList.map(([id, o]) => {
-            const proof = clientOrderProofs[id] || o.deliveryImage || "";
-            const itemsText = Array.isArray(o.items) && o.items.length
-              ? o.items.map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ")
-              : esc(o.challengeTitle || "طلب");
-
-            return `
-              <div class="box-card">
-                <div><strong>طلب #${esc(id.slice(-6))}</strong> • الحالة: <strong style="color:#0284c7;">${esc(o.status || "قيد التنفيذ")}</strong></div>
-                <div style="font-size:13px; color:#334155; margin-top:4px;">الأصناف: ${itemsText} • الإجمالي: <strong>${Number(o.totalAmount) || 0} جنيه</strong></div>
-
-                <input type="file" id="client-cam-${esc(id)}" accept="image/*" capture="environment" style="display:none;" onchange="handleClientOrderPhotoFile(this, '${esc(id)}')" />
-                <input type="file" id="client-gal-${esc(id)}" accept="image/*" style="display:none;" onchange="handleClientOrderPhotoFile(this, '${esc(id)}')" />
-
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; align-items:center;">
-                  <button type="button" class="btn-dark" onclick="triggerClientOrderPhoto('${esc(id)}', 'camera')">📷 كاميرا</button>
-                  <button type="button" class="btn-amber" onclick="triggerClientOrderPhoto('${esc(id)}', 'gallery')">🖼️ استوديو</button>
-                  ${proof ? `<button type="button" class="btn-danger" onclick="clearClientOrderPhoto('${esc(id)}')">🗑️ حذف الصورة</button>` : ""}
-                </div>
-                ${proof ? `<img src="${proof}" class="thumb-preview" style="display:block;" alt="صورة التوصيل" />` : ""}
-
-                <div style="margin-top:10px;">
-                  <button type="button" class="btn-success" onclick="markOrderArrivedClient('${esc(id)}')">تم التوصيل</button>
-                </div>
-              </div>
-            `;
-          }).join("")
-        : `<div class="box-card">لا توجد طلبات نشطة حالياً.</div>`;
-
-      completedBox.innerHTML = completedList.length
-        ? completedList.map(([id, o]) => {
-            const itemsText = Array.isArray(o.items) && o.items.length
-              ? o.items.map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ")
-              : esc(o.challengeTitle || "طلب");
-
-            return `
-              <div class="box-card completed-card" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
-                <div>
-                  <strong>طلب #${esc(id.slice(-6))}</strong> • <strong style="color:#166534;">تم التوصيل ✓</strong><br/>
-                  <span style="font-size:13px; color:#334155;">${itemsText} • الإجمالي: <strong>${Number(o.totalAmount) || 0} جنيه</strong></span>
-                </div>
-                <button type="button" class="btn-danger" onclick="deleteCompletedOrderClient('${esc(id)}')">حذف الطلب</button>
-              </div>
-            `;
-          }).join("")
-        : `<div class="box-card">لا توجد طلبات منتهية بعد.</div>`;
-
-      const historyMap = {};
-      if (uid && state.db.userOrderHistory && state.db.userOrderHistory[uid]) {
-        Object.assign(historyMap, state.db.userOrderHistory[uid]);
-      }
-      if (safeNameKey && state.db.userOrderHistoryByName && state.db.userOrderHistoryByName[safeNameKey]) {
-        Object.assign(historyMap, state.db.userOrderHistoryByName[safeNameKey]);
-      }
-      for (const [id, o] of completedList) {
-        if (!historyMap[id]) {
-          const ts = o.completedAt || o.deliveredAt || o.createdAt || Date.now();
-          historyMap[id] = {
-            orderId: id,
-            items: o.items || [],
-            challengeTitle: o.challengeTitle || "",
-            totalAmount: Number(o.totalAmount) || 0,
-            status: "تم التوصيل",
-            deliveryDurationSec: o.deliveryDurationSec || 0,
-            dateTimeText: new Date(ts).toLocaleString("ar-EG"),
-            archivedAt: ts
-          };
+    function getAllProducts() {
+      const list = [];
+      for (const [dept, items] of Object.entries(store.products || {})) {
+        for (const [id, it] of Object.entries(items || {})) {
+          list.push({ id, dept, ...it });
         }
       }
-
-      const historyEntries = Object.entries(historyMap).sort(
-        (a, b) => (b[1]?.archivedAt || b[1]?.completedAt || 0) - (a[1]?.archivedAt || a[1]?.completedAt || 0)
-      );
-
-      historyBox.innerHTML = historyEntries.length
-        ? historyEntries.map(([id, h]) => {
-            const itemsText = Array.isArray(h.items) && h.items.length
-              ? h.items.map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ")
-              : esc(h.challengeTitle || "طلب");
-            const dtText = h.dateTimeText || new Date(h.archivedAt || h.completedAt || Date.now()).toLocaleString("ar-EG");
-            const durText = h.deliveryDurationSec ? ` • وقت التوصيل: ${formatDuration(h.deliveryDurationSec)}` : "";
-
-            return `
-              <div class="box-card history-card">
-                <div><strong>طلب #${esc(String(h.orderId || id).slice(-6))}</strong> • <strong style="color:#1e40af;">${esc(h.status || "تم التوصيل")}</strong></div>
-                <div style="font-size:13px; color:#334155; margin-top:4px;">الأصناف: ${itemsText} • الإجمالي: <strong>${Number(h.totalAmount) || 0} جنيه</strong></div>
-                <div style="font-size:12px; color:#1d4ed8; font-weight:bold; margin-top:4px;">التاريخ والوقت: ${esc(dtText)}${durText}</div>
-              </div>
-            `;
-          }).join("")
-        : `<div class="box-card">لا يوجد سجل طلبات منتهية بعد.</div>`;
-
-      if (inboxBox && uid) {
-        const msgs = Object.values(state.db.userMessages?.[uid] || {}).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        inboxBox.innerHTML = msgs.length
-          ? `
-            <h3 style="margin:18px 0 10px; color:#0f766e;">الرسائل والصور والنقاط المرسلة من الأدمن</h3>
-            ${msgs.map((m) => `
-              <div class="box-card">
-                <div style="font-weight:bold;">${esc(m.text || m.caption || "")}</div>
-                <div style="font-size:12px; color:#64748b;">${esc(m.dateTimeText || "")}</div>
-                ${m.image ? `<img src="${m.image}" class="thumb-preview" style="display:block; cursor:zoom-in;" onclick="openImageZoomModal('${esc(m.caption || "صورة من الأدمن")}', '${m.image}', '')" alt="صورة من الأدمن" />` : ""}
-              </div>
-            `).join("")}
-          `
-          : "";
-      }
+      return list;
     }
 
-    window.openImageZoomModal = function (title, imgSrc, priceText, uid = null) {
-      if (!imgSrc) return;
-      currentZoomUid = uid;
-      document.getElementById("zoom-modal-title").textContent = title || "معاينة الصورة";
-      document.getElementById("zoom-modal-img").src = imgSrc;
-      document.getElementById("zoom-modal-meta").textContent = priceText ? `السعر: ${priceText}` : "";
-
-      const toggleBtn = document.getElementById("zoom-modal-toggle-cart-btn");
-      if (uid && productsCatalog[uid]) {
-        const isSel = state.cart.some((c) => c.uid === uid);
-        toggleBtn.style.display = "inline-block";
-        toggleBtn.textContent = isSel ? "إلغاء التحديد من العربة" : "تحديد في العربة";
-      } else {
-        toggleBtn.style.display = "none";
-      }
-
-      document.getElementById("image-zoom-modal").style.display = "flex";
+    window.selectDeptFilter = function (dept) {
+      activeDept = dept;
+      activeSubDept = "الكل";
+      renderClientShop();
     };
 
-    window.closeImageZoomModal = function () {
-      document.getElementById("image-zoom-modal").style.display = "none";
-      currentZoomUid = null;
+    window.selectSubDeptFilter = function (sub) {
+      activeSubDept = sub;
+      renderClientShop();
     };
 
-    window.toggleCartFromZoomModal = function () {
-      if (!currentZoomUid || !productsCatalog[currentZoomUid]) return;
-      toggleCartSelection(productsCatalog[currentZoomUid]);
-      const isSel = state.cart.some((c) => c.uid === currentZoomUid);
-      document.getElementById("zoom-modal-toggle-cart-btn").textContent = isSel ? "إلغاء التحديد من العربة" : "تحديد في العربة";
-    };
-
-    const holdTimers = {};
-    const holdStartCoords = {};
-
-    window.onProductPointerDown = function (ev, uid) {
-      if (ev.button !== undefined && ev.button !== 0 && ev.pointerType === "mouse") return;
-      clearTimeout(holdTimers[uid]);
-      holdStartCoords[uid] = { x: ev.clientX, y: ev.clientY, triggered: false };
-
-      const cardEl = document.getElementById("prod-card-" + uid);
-      if (cardEl) cardEl.classList.add("holding-3s");
-
-      holdTimers[uid] = setTimeout(() => {
-        if (holdStartCoords[uid]) holdStartCoords[uid].triggered = true;
-        if (cardEl) cardEl.classList.remove("holding-3s");
-        const itemPayload = productsCatalog[uid];
-        if (itemPayload) toggleCartSelection(itemPayload);
-      }, 3000);
-    };
-
-    window.onProductPointerMove = function (ev, uid) {
-      const start = holdStartCoords[uid];
-      if (!start || start.triggered) return;
-      const dx = Math.abs((ev.clientX || 0) - start.x);
-      const dy = Math.abs((ev.clientY || 0) - start.y);
-      if (dx > 12 || dy > 12) {
-        cancelProductHold(uid);
-      }
-    };
-
-    window.cancelProductHold = function (uid) {
-      clearTimeout(holdTimers[uid]);
-      const cardEl = document.getElementById("prod-card-" + uid);
-      if (cardEl) cardEl.classList.remove("holding-3s");
-    };
-
-    window.onProductImageSingleClick = function (ev, uid) {
-      ev.stopPropagation();
-      const rec = holdStartCoords[uid];
-      if (rec && rec.triggered) {
-        rec.triggered = false;
-        return;
-      }
-      const item = productsCatalog[uid];
-      if (!item || !item.image) return;
-      window.openImageZoomModal(item.title, item.image, `${item.price} جنيه`, uid);
-    };
-
-    function toggleCartSelection(itemPayload) {
-      const idx = state.cart.findIndex((c) => c.uid === itemPayload.uid);
-      if (idx >= 0) {
-        state.cart.splice(idx, 1);
-        notify(`تم إلغاء تحديد: ${itemPayload.title}`, "info");
-      } else {
-        state.cart.push(itemPayload);
-        notify(`تمت إضافة (${itemPayload.title}) إلى عربة التسوق`, "success");
-      }
-      saveCartToStorage(state.cart);
-      if (state.selectedDept) renderDepartmentView(state.selectedDept);
-      if (state.offersDrawerOpen && state.selectedDept) renderDepartmentOffersDrawer(state.selectedDept);
-    }
-
-    window.openDepartment = function (deptName) {
-      state.selectedDept = deptName;
-      state.selectedSubDept = "الكل";
-      state.selectedTypeFilter = "الكل";
-      state.searchQuery = "";
-      state.offersDrawerOpen = false;
-      const sInp = document.getElementById("dept-search-input");
-      if (sInp) sInp.value = "";
-      const offPanel = document.getElementById("dept-offers-panel");
-      if (offPanel) offPanel.style.display = "none";
-
-      window.__engzDeptHistory.length = 0;
-      window.__engzDeptHistory.push("الكل");
-      document.getElementById("current-dept-title").textContent = deptName;
-      renderDepartmentView(deptName);
-      window.goScreen("screen-department-view");
-    };
-
-    window.selectSubDepartment = function (subDeptName) {
-      state.selectedSubDept = subDeptName;
-      state.selectedTypeFilter = "الكل";
-      if (state.selectedDept) renderDepartmentView(state.selectedDept);
-    };
-
-    window.selectDepartmentTypeFilter = function (typeName) {
-      state.selectedTypeFilter = typeName;
-      if (window.__engzDeptHistory[window.__engzDeptHistory.length - 1] !== typeName) {
-        window.__engzDeptHistory.push(typeName);
-      }
-      if (state.selectedDept) renderDepartmentView(state.selectedDept);
-    };
-
-    window.onDepartmentSearchInput = function (val) {
-      state.searchQuery = String(val || "").trim().toLowerCase();
-      if (state.selectedDept) renderDepartmentView(state.selectedDept);
-    };
-
-    window.toggleHorizontalSlideMode = function () {
-      state.horizontalSlideMode = !state.horizontalSlideMode;
-      const btn = document.getElementById("toggle-slide-mode-btn");
-      if (btn) {
-        btn.textContent = state.horizontalSlideMode ? "وضع السحب الأفقي: مفعّل" : "وضع الشبكة (3 صور بالعرض)";
-      }
-      if (state.selectedDept) renderDepartmentView(state.selectedDept);
-    };
-
-    window.onSliderMoveItems = function (pctVal) {
-      const container = document.getElementById("dept-items-container");
-      if (!container) return;
-      const pct = Math.max(0, Math.min(100, Number(pctVal) || 0)) / 100;
-      if (!state.horizontalSlideMode) {
-        state.horizontalSlideMode = true;
-        const btn = document.getElementById("toggle-slide-mode-btn");
-        if (btn) btn.textContent = "وضع السحب الأفقي: مفعّل";
-        container.classList.add("horizontal-slide-mode");
-      }
-      const maxScroll = Math.max(0, container.scrollWidth - container.clientWidth);
-      container.scrollLeft = maxScroll * pct;
-    };
-
-    window.requestDepartmentOffers = function () {
-      if (!state.selectedDept) return;
-      notify("جاري تنفيذ طلبك", "info", 2200);
-      setTimeout(() => {
-        state.offersDrawerOpen = true;
-        const panel = document.getElementById("dept-offers-panel");
-        if (panel) panel.style.display = "block";
-        renderDepartmentOffersDrawer(state.selectedDept);
-        notify("تم عرض العروض المحددة من الأدمن لهذا القسم — اختر عرضاً أو أكثر.", "success");
-      }, 650);
-    };
-
-    window.closeDepartmentOffersPanel = function () {
-      state.offersDrawerOpen = false;
-      const panel = document.getElementById("dept-offers-panel");
-      if (panel) panel.style.display = "none";
-    };
-
-    function getDepartmentOffersList(deptName) {
-      const deptObj = state.db.products[deptName] || {};
-      return Object.entries(deptObj)
-        .filter(([, it]) => Boolean(it && it.isOffer))
-        .map(([id, item]) => ({ id, item }));
-    }
-
-    function renderDepartmentOffersDrawer(deptName) {
-      const grid = document.getElementById("dept-offers-grid");
-      if (!grid) return;
-      const offers = getDepartmentOffersList(deptName);
-      if (!offers.length) {
-        grid.innerHTML = `<div class="box-card">لم يحدد الأدمن عروضاً خاصة في هذا القسم بعد.</div>`;
-        return;
-      }
-
-      grid.innerHTML = offers
-        .map(({ id, item }) => {
-          const uid = `${deptName}__${id}`;
-          const priceNum = Math.max(0, Number(item.price) || 0);
-          productsCatalog[uid] = {
-            uid,
-            dept: deptName,
-            subDept: item.subDept || "",
-            title: item.title || item.type || "عرض خاص",
-            price: priceNum,
-            isOffer: true,
-            image: item.image || ""
-          };
-          const isSelected = state.cart.some((c) => c.uid === uid);
-
-          return `
-            <div id="offer-card-${esc(uid)}"
-                 class="product-card ${isSelected ? "selected" : ""}"
-                 oncontextmenu="return false;"
-                 onpointerdown="onProductPointerDown(event, '${esc(uid)}')"
-                 onpointermove="onProductPointerMove(event, '${esc(uid)}')"
-                 onpointerup="cancelProductHold('${esc(uid)}')"
-                 onpointercancel="cancelProductHold('${esc(uid)}')">
-              <div class="product-img-wrap"
-                   oncontextmenu="return false;"
-                   onclick="onProductImageSingleClick(event, '${esc(uid)}')">
-                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" draggable="false" oncontextmenu="return false;" />` : ""}
-                <div class="offer-ribbon">عرض خاص</div>
-                <div class="select-indicator">${isSelected ? "محدد ✓" : "ضغط 3 ثوانٍ"}</div>
-                <div class="price-overlay">${priceNum} جنيه</div>
-              </div>
-              <div class="product-body">
-                <h4 class="product-title">${esc(item.title || item.type)}</h4>
-                ${item.subDept ? `<div style="font-size:12px; color:#0284c7; font-weight:bold;">الفرع: ${esc(item.subDept)}</div>` : ""}
-                ${item.desc ? `<p class="product-desc">${esc(item.desc)}</p>` : ""}
-                <button type="button" class="${isSelected ? "btn-soft" : "btn-success"}" style="margin-top:8px; width:100%;" onclick="toggleCartFromOfferButton('${esc(uid)}')">
-                  ${isSelected ? "إلغاء تحديد العرض ✓" : "اختيار هذا العرض"}
-                </button>
-              </div>
-            </div>
-          `;
-        })
-        .join("");
-    }
-
-    window.toggleCartFromOfferButton = function (uid) {
-      if (productsCatalog[uid]) {
-        toggleCartSelection(productsCatalog[uid]);
-      }
-    };
-
-    function renderDepartmentView(deptName) {
-      const subStrip = document.getElementById("dept-subdepts-strip");
-      const typesBar = document.getElementById("dept-types-bar");
-      const container = document.getElementById("dept-items-container");
-
-      container.classList.toggle("horizontal-slide-mode", Boolean(state.horizontalSlideMode));
-
-      const subDeptsList = ["الكل", ...getSubDepartmentsForDept(deptName)];
-      const subMetaMap = state.db.subDepartments?.[deptName] || {};
-
-      subStrip.innerHTML = subDeptsList
-        .map((sd) => {
-          const sMeta = subMetaMap[sd] || {};
-          const imgHtml = sMeta.image
-            ? `<img src="${sMeta.image}" alt="${esc(sd)}" draggable="false" oncontextmenu="return false;" />`
-            : "";
-          const isAct = state.selectedSubDept === sd;
-          return `
-            <div class="subdept-card ${isAct ? "active" : ""}" onclick="selectSubDepartment('${esc(sd)}')">
-              ${imgHtml}
-              <div class="subdept-card-title">${esc(sd)}</div>
-            </div>
-          `;
-        })
-        .join("");
-
-      const deptObj = state.db.products[deptName] || {};
-      const allEntries = Object.entries(deptObj);
-
-      const subFilteredEntries =
-        state.selectedSubDept === "الكل"
-          ? allEntries
-          : allEntries.filter(([, it]) => ((it.subDept || "").trim()) === state.selectedSubDept);
-
-      const distinctTypes = [
-        "الكل",
-        ...new Set(subFilteredEntries.map(([, it]) => (it.type || it.title || "صنف").trim()).filter(Boolean))
-      ];
-      typesBar.innerHTML = distinctTypes
-        .map(
-          (tp) =>
-            `<button type="button" class="type-chip ${state.selectedTypeFilter === tp ? "active" : ""}" onclick="selectDepartmentTypeFilter('${esc(tp)}')">${esc(tp)}</button>`
-        )
-        .join("");
-
-      const q = (state.searchQuery || "").trim().toLowerCase();
-      const filteredEntries = subFilteredEntries.filter(([, it]) => {
-        const matchesType =
-          state.selectedTypeFilter === "الكل" ||
-          ((it.type || it.title || "صنف").trim()) === state.selectedTypeFilter;
-        if (!matchesType) return false;
-        if (!q) return true;
-        const hay = `${it.title || ""} ${it.type || ""} ${it.subDept || ""} ${it.desc || ""} ${it.price || ""}`.toLowerCase();
-        return hay.includes(q);
+    window.addToCart = function (dept, prodId) {
+      const prod = store.products?.[dept]?.[prodId] || store.products?.[sanitizeKey(dept)]?.[prodId];
+      if (!prod) return notify("الصنف غير متاح.", "error");
+      cart.push({
+        id: prodId,
+        dept,
+        title: prod.title || "صنف",
+        price: Number(prod.price) || 0,
+        image: prod.image || ""
       });
-
-      if (!filteredEntries.length) {
-        container.innerHTML = `<div class="box-card">لا توجد أنواع أو سلع أو عروض مطابقة في قسم (${esc(deptName)}) حالياً.</div>`;
-        return;
-      }
-
-      container.innerHTML = filteredEntries
-        .map(([id, item]) => {
-          const uid = `${deptName}__${id}`;
-          const priceNum = Math.max(0, Number(item.price) || 0);
-          productsCatalog[uid] = {
-            uid,
-            dept: deptName,
-            subDept: item.subDept || "",
-            title: item.title || item.type || "صنف",
-            price: priceNum,
-            isOffer: Boolean(item.isOffer),
-            image: item.image || ""
-          };
-          const isSelected = state.cart.some((c) => c.uid === uid);
-
-          return `
-            <div id="prod-card-${esc(uid)}"
-                 class="product-card ${isSelected ? "selected" : ""}"
-                 oncontextmenu="return false;"
-                 onpointerdown="onProductPointerDown(event, '${esc(uid)}')"
-                 onpointermove="onProductPointerMove(event, '${esc(uid)}')"
-                 onpointerup="cancelProductHold('${esc(uid)}')"
-                 onpointercancel="cancelProductHold('${esc(uid)}')">
-              <div class="product-img-wrap"
-                   oncontextmenu="return false;"
-                   onclick="onProductImageSingleClick(event, '${esc(uid)}')">
-                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" draggable="false" oncontextmenu="return false;" />` : ""}
-                ${item.isOffer ? `<div class="offer-ribbon">عرض خاص</div>` : ""}
-                <div class="select-indicator">${isSelected ? "محدد ✓" : "ضغط 3 ثوانٍ"}</div>
-                <div class="price-overlay">${priceNum} جنيه</div>
-              </div>
-              <div class="product-body">
-                <h3 class="product-title">${esc(item.title || item.type)}</h3>
-                ${item.subDept ? `<div style="font-size:12px; color:#0284c7; font-weight:bold;">القسم الفرعي: ${esc(item.subDept)}</div>` : ""}
-                ${item.type ? `<div style="font-size:12px; color:#7c3aed; font-weight:bold;">النوع: ${esc(item.type)}</div>` : ""}
-                ${item.desc ? `<p class="product-desc">${esc(item.desc)}</p>` : ""}
-                <div class="hold-hint">ضغطة للتكبير • ضغط 3 ثوانٍ للعربة</div>
-              </div>
-            </div>
-          `;
-        })
-        .join("");
-
-      if (state.offersDrawerOpen) {
-        renderDepartmentOffersDrawer(deptName);
-      }
-    }
-
-    window.openCartScreen = function () {
-      locks.cartStep = false;
-      const bCart = document.getElementById("btn-cart-confirm");
-      if (bCart) bCart.disabled = false;
-
-      const listEl = document.getElementById("cart-items-list");
-      const totalBox = document.getElementById("cart-total-box");
-
-      if (!state.cart.length) {
-        listEl.innerHTML = `<div class="box-card">عربة التسوق فارغة حالياً. حدد أي صنف بضغط 3 ثوانٍ أو اختر عرضاً.</div>`;
-        totalBox.textContent = "الإجمالي: 0 جنيه";
-        window.goScreen("screen-cart");
-        return;
-      }
-
-      let total = 0;
-      listEl.innerHTML = state.cart
-        .map((item) => {
-          total += Math.max(0, Number(item.price) || 0);
-          return `
-            <div class="box-card" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-              <div>
-                <strong>${esc(item.title)}</strong> <span style="font-size:12px; color:#64748b;">(${esc(item.dept)}${item.subDept ? " • " + esc(item.subDept) : ""})</span><br/>
-                <span style="color:#be185d; font-weight:bold;">${Math.max(0, Number(item.price) || 0)} جنيه</span>
-              </div>
-              <button type="button" class="btn-soft" onclick="removeFromCart('${esc(item.uid)}')">إزالة</button>
-            </div>
-          `;
-        })
-        .join("");
-
-      totalBox.textContent = `الإجمالي: ${total} جنيه`;
-      window.goScreen("screen-cart");
+      saveCart();
+      notify(`تمت إضافة (${prod.title}) إلى السلة.`, "success");
     };
 
-    window.removeFromCart = function (uid) {
-      state.cart = state.cart.filter((i) => i.uid !== uid);
-      saveCartToStorage(state.cart);
-      window.openCartScreen();
+    window.removeFromCart = function (idx) {
+      cart.splice(idx, 1);
+      saveCart();
+      renderCart();
     };
 
-    window.goToCheckoutConfirmation = function () {
-      if (locks.cartStep) return;
-      if (!state.cart.length) {
-        return notify("اختر صنفاً واحداً على الأقل قبل التأكيد.", "error");
-      }
-      locks.cartStep = true;
-      const btn = document.getElementById("btn-cart-confirm");
-      if (btn) btn.disabled = true;
-
-      const grid = document.getElementById("confirm-cards-grid");
-      let total = 0;
-      grid.innerHTML = state.cart
-        .map((item) => {
-          const p = Math.max(0, Number(item.price) || 0);
-          total += p;
-          return `
-            <div class="product-card selected" oncontextmenu="return false;">
-              <div class="product-img-wrap"
-                   oncontextmenu="return false;"
-                   onclick="openImageZoomModal('${esc(item.title)}', '${item.image || ""}', '${p} جنيه')">
-                ${item.image ? `<img src="${item.image}" alt="${esc(item.title)}" draggable="false" oncontextmenu="return false;" />` : ""}
-                <div class="price-overlay">${p} جنيه</div>
-              </div>
-              <div class="product-body">
-                <h3 class="product-title">${esc(item.title)}</h3>
-                <p class="product-desc">${esc(item.dept)}${item.subDept ? " • " + esc(item.subDept) : ""}</p>
-              </div>
-            </div>
-          `;
-        })
-        .join("");
-
-      document.getElementById("confirm-total-line").textContent = `إجمالي المشتريات: ${total} جنيه`;
-      window.goScreen("screen-confirm-purchase");
-      setTimeout(() => {
-        locks.cartStep = false;
-        if (btn) btn.disabled = false;
-      }, 450);
-    };
-
-    function getCartTotal() {
-      return state.cart.reduce((sum, item) => sum + Math.max(0, Number(item.price) || 0), 0);
-    }
-
-    window.selectPaymentSource = function (mode) {
-      state.paymentSourceType = mode === "other" ? "other" : "same";
-      document.getElementById("payer-same-btn").classList.toggle("active", state.paymentSourceType === "same");
-      document.getElementById("payer-other-btn").classList.toggle("active", state.paymentSourceType === "other");
-      document.getElementById("payer-same-info").style.display = state.paymentSourceType === "same" ? "block" : "none";
-      document.getElementById("payer-other-box").style.display = state.paymentSourceType === "other" ? "block" : "none";
-    };
-
-    function getActivePayerPhone() {
-      if (state.paymentSourceType === "other") {
-        return (document.getElementById("other-payer-phone-input").value || "").trim();
-      }
-      return (state.currentUser && state.currentUser.phone) || "";
-    }
-
-    function encodeHighQualityImage(file, cb, maxDim = 1800, quality = 0.94) {
+    window.handleReceiptFile = function (inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
       const reader = new FileReader();
       reader.onload = function (ev) {
         const img = new Image();
         img.onload = function () {
-          let w = img.width;
-          let h = img.height;
+          const maxDim = 1400;
+          let w = img.width, h = img.height;
           if (w > maxDim || h > maxDim) {
-            if (w >= h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
+            if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
           }
           const canvas = document.createElement("canvas");
-          canvas.width = w;
-          canvas.height = h;
+          canvas.width = w; canvas.height = h;
           const ctx = canvas.getContext("2d");
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, w, h);
-          const isPng = file.type === "image/png";
-          let dataUrl = isPng ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", quality);
-          let q = quality;
-          while (!isPng && dataUrl.length > 2100000 && q > 0.72) {
-            q = Number((q - 0.05).toFixed(2));
-            dataUrl = canvas.toDataURL("image/jpeg", q);
-          }
-          cb(dataUrl);
+          receiptImageData = canvas.toDataURL("image/jpeg", 0.9);
+          const prev = document.getElementById("receipt-preview");
+          prev.src = receiptImageData;
+          prev.style.display = "block";
+          notify("تم إرفاق صورة الإيصال.", "success");
         };
         img.src = ev.target.result;
       };
       reader.readAsDataURL(file);
-    }
-
-    window.handlePaymentReceiptFile = function (inputEl) {
-      const file = inputEl.files && inputEl.files[0];
-      if (!file) return;
-      locks.sendReceipt = false;
-      const bSend = document.getElementById("btn-send-receipt-admin");
-      if (bSend) bSend.disabled = false;
-
-      encodeHighQualityImage(file, (highResDataUrl) => {
-        state.uploadedImages.paymentReceipt = highResDataUrl;
-        const prev = document.getElementById("payment-receipt-preview");
-        if (prev) {
-          prev.src = highResDataUrl;
-          prev.style.display = "block";
-        }
-        const delBtn = document.getElementById("delete-payment-receipt-btn");
-        if (delBtn) delBtn.style.display = "inline-block";
-        document.getElementById("receipt-send-status").textContent = "تم تجهيز صورة الإيصال — اضغط (إرسال الإيصال إلى الأدمن).";
-      });
     };
 
-    window.clearPaymentReceiptImage = function () {
-      state.uploadedImages.paymentReceipt = "";
-      locks.sendReceipt = false;
-      const bSend = document.getElementById("btn-send-receipt-admin");
+    window.submitOrder = async function () {
+      if (!cart.length) return notify("السلة فارغة أضف أصنافاً أولاً.", "error");
+      const payerPhone = document.getElementById("payer-phone-input").value.trim();
+      const receiverPhone = document.getElementById("cash-receiver-select").value || "";
+      if (!isValidPhone(payerPhone)) return notify("أدخل رقم التلفون المحوّل منه (11 رقماً).", "error");
+
+      const totalAmount = cart.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+      const uid = currentUser?.id || "";
+      const buyerName = currentUser?.name || "عميل";
+      const now = Date.now();
+
+      const orderRef = push(ref(db, "orders"));
+      await set(orderRef, {
+        buyerId: uid,
+        buyerName,
+        buyerPhone: currentUser?.phone || payerPhone,
+        payerPhone,
+        cashReceiverPhone: receiverPhone,
+        items: cart,
+        totalAmount,
+        receiptImage: receiptImageData || "",
+        status: "بانتظار تأكيد الدفع",
+        paymentStatus: "pending",
+        paymentConfirmed: false,
+        deliveryStatus: "pending",
+        createdAt: now
+      });
+
+      if (uid && !String(uid).startsWith("guest_")) {
+        await runTransaction(ref(db, `clientActivity/${sanitizeKey(uid)}`), (curr) => {
+          const prev = curr || { userId: uid, name: buyerName, phone: payerPhone, orderCount: 0, completedOrdersCount: 0, totalSpent: 0 };
+          return {
+            ...prev,
+            userId: uid,
+            name: buyerName,
+            phone: payerPhone,
+            orderCount: (Number(prev.orderCount) || 0) + 1,
+            totalSpent: Number(((Number(prev.totalSpent) || 0) + totalAmount).toFixed(2))
+          };
+        });
+      }
+
+      cart = [];
+      receiptImageData = "";
+      saveCart();
+      document.getElementById("payer-phone-input").value = "";
+      const prev = document.getElementById("receipt-preview");
+      if (prev) { prev.src = ""; prev.style.display = "none"; }
+
+      notify("تم إرسال طلبك بنجاح! يمكنك متابعته من تبويب (طلباتي وسجلي).", "success");
+      window.switchClientTab("orders");
+    };
+
+    window.completeChallengeByUser = async function (chalId) {
+      const chal = store.challenges?.[chalId];
+      if (!chal) return notify("التحدي غير موجود.", "error");
+      if (!currentUser || String(currentUser.id).startsWith("guest_")) {
+        return notify("سجّل باسمك ورقم تلفونك أولاً لاستلام وإتمام التحدي.", "error");
+      }
+
+      const now = Date.now();
+      const uid = currentUser.id;
+      const uname = currentUser.name || "متسابق";
+      const uphone = currentUser.phone || "";
+      const reward = Number(chal.reward) || 0;
+
+      await update(ref(db, `challenges/${chalId}`), {
+        completed: true,
+        status: "مكتملة",
+        acceptedById: uid,
+        acceptedByName: uname,
+        acceptedByPhone: uphone,
+        completedAt: now
+      });
+
+      await set(ref(db, `challengerHistory/${sanitizeKey(uid)}/${chalId}`), {
+        orderId: chalId,
+        challengeId: chalId,
+        challengeTitle: chal.title,
+        assignedChallengerId: uid,
+        assignedChallengerName: uname,
+        assignedChallengerPhone: uphone,
+        totalAmount: reward,
+        status: "مكتملة",
+        completedAt: now,
+        dateTimeText: new Date(now).toLocaleString("ar-EG")
+      });
+
+      await runTransaction(ref(db, `challengersStats/${sanitizeKey(uid)}`), (curr) => {
+        const prev = curr || { name: uname, phone: uphone, completedCount: 0, totalEarned: 0 };
+        return {
+          name: uname,
+          phone: uphone,
+          completedCount: (Number(prev.completedCount) || 0) + 1,
+          totalEarned: Number(((Number(prev.totalEarned) || 0) + reward).toFixed(2)),
+          lastDeliveredAt: now,
+          lastDeliveredText: new Date(now).toLocaleString("ar-EG")
+        };
+      });
+
+      if (reward > 0 && store.users[uid]) {
+        await runTransaction(ref(db, `users/${uid}/wallet`), (cur) => Number(((Number(cur) || 0) + reward).toFixed(2)));
+      }
+
+      notify(`أحسنت يا ${uname}! تم تسجيل إتمام التحدي (${chal.title}).`, "success");
+      window.switchChallengerTab("history");
+    };
+
+    function syncScreens() {
+      const entry = document.getElementById("entry-screen");
+      const main = document.getElementById("main-app");
+      const pill = document.getElementById("header-user-info");
+
+      if (!currentUser) {
+        entry.style.display = "block";
+        main.style.display = "none";
+        pill.innerHTML = `<span>اختر عميل أو تحدّي</span>`;
+        return;
+      }
+
+      entry.style.display = "none";
+      main.style.display = "block";
+
+      const liveUser = store.users?.[currentUser.id] || currentUser;
+      const roleLabel = liveUser.role === "challenger" ? "⚡ تحدّي (متسابق)" : "🛒 عميل";
+      pill.innerHTML = `<strong>${esc(liveUser.name)}</strong> • <span>${roleLabel}</span>`;
+
+      const isChal = liveUser.role === "challenger";
+      document.getElementById("quick-btn-client").className = !isChal ? "btn-primary" : "btn-soft";
+      document.getElementById("quick-btn-challenger").className = isChal ? "btn-amber" : "btn-soft";
+
+      document.getElementById("client-tabs").style.display = isChal ? "none" : "flex";
+      document.getElementById("challenger-tabs").style.display = isChal ? "flex" : "none";
+
+      ["shop", "offers", "cart", "orders", "inbox"].forEach((t) => {
+        const el = document.getElementById(`csec-${t}`);
+        if (el) el.style.display = !isChal && clientTab === t ? "block" : "none";
+      });
+      ["tasks", "history", "inbox"].forEach((t) => {
+        const el = document.getElementById(`hsec-${t}`);
+        if (el) el.style.display = isChal && challengerTab === t ? "block" : "none";
+      });
+
+      renderApp();
+    }
+
+    function renderClientShop() {
+      const depts = ["الكل", ...allDepts()];
+      document.getElementById("dept-chips").innerHTML = depts.map((d) => `
+        <button type="button" class="chip ${activeDept === d ? "active" : ""}" onclick="selectDeptFilter('${esc(d)}')">${esc(d)}</button>
+      `).join("");
+
+      const subBox = document.getElementById("subdept-chips");
+      if (activeDept !== "الكل") {
+        const subs = ["الكل", ...getSubDepts(activeDept)];
+        subBox.innerHTML = subs.map((s) => `
+          <button type="button" class="chip ${activeSubDept === s ? "active" : ""}" onclick="selectSubDeptFilter('${esc(s)}')">${esc(s)}</button>
+        `).join("");
+      } else {
+        subBox.innerHTML = "";
+      }
+
+      const q = (document.getElementById("prod-search-input")?.value || "").trim().toLowerCase();
+      const prods = getAllProducts().filter((p) => {
+        if (activeDept !== "الكل" && p.dept !== activeDept && sanitizeKey(p.dept) !== sanitizeKey(activeDept)) return false;
+        if (activeSubDept !== "الكل" && p.subDept !== activeSubDept) return false;
+        if (q) {
+          const hay = `${p.title || ""} ${p.type || ""} ${p.desc || ""} ${p.dept || ""} ${p.subDept || ""}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      document.getElementById("client-products-grid").innerHTML = prods.length
+        ? prods.map((p) => `
+          <div class="box" style="margin-bottom:0;">
+            ${p.image ? `<img src="${p.image}" class="card-img" alt="${esc(p.title)}" />` : ""}
+            <div style="font-weight:bold; font-size:15px;">${esc(p.title)}</div>
+            <div style="font-size:12px; color:#64748b;">${esc(p.dept)}${p.subDept ? " / " + esc(p.subDept) : ""}</div>
+            ${p.desc ? `<div style="font-size:13px; color:#334155; margin-top:4px;">${esc(p.desc)}</div>` : ""}
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+              <span class="price-tag">${Number(p.price) || 0} جنيه</span>
+              <button type="button" class="btn-success" onclick="addToCart('${esc(p.dept)}', '${esc(p.id)}')">إضافة للسلة</button>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد أصناف مطابقة حالياً.</div>`;
+
+      const offers = getAllProducts().filter((p) => Boolean(p.isOffer));
+      document.getElementById("client-offers-grid").innerHTML = offers.length
+        ? offers.map((p) => `
+          <div class="box" style="margin-bottom:0; border-color:#f59e0b;">
+            ${p.image ? `<img src="${p.image}" class="card-img" alt="${esc(p.title)}" />` : ""}
+            <span class="badge" style="margin-bottom:6px;">⭐ عرض خاص</span>
+            <div style="font-weight:bold; font-size:15px;">${esc(p.title)}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+              <span class="price-tag">${Number(p.price) || 0} جنيه</span>
+              <button type="button" class="btn-amber" onclick="addToCart('${esc(p.dept)}', '${esc(p.id)}')">اطلب العرض</button>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد عروض خاصة متاحة حالياً.</div>`;
+    }
+
+    function renderCart() {
+      saveCart();
+      const box = document.getElementById("cart-items-box");
+      if (!cart.length) {
+        box.innerHTML = `<div class="box">السلة فارغة حالياً.</div>`;
+      } else {
+        const total = cart.reduce((s, x) => s + (Number(x.price) || 0), 0);
+        box.innerHTML = `
+          ${cart.map((x, i) => `
+            <div class="box" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <div><strong>${esc(x.title)}</strong> • <span class="price-tag">${Number(x.price) || 0} جنيه</span></div>
+              <button type="button" class="btn-danger" onclick="removeFromCart(${i})">حذف</button>
+            </div>
+          `).join("")}
+          <div class="box" style="background:#eff6ff; border-color:#93c5fd;">
+            <strong>الإجمالي المطلوب: ${total} جنيه</strong>
+          </div>
+        `;
+      }
+
+      const sel = document.getElementById("cash-receiver-select");
+      const phones = Array.isArray(store.cashPhones) ? store.cashPhones.slice(0, 5) : [];
+      sel.innerHTML = phones.length
+        ? phones.map((p) => `<option value="${esc(p)}">${esc(p)}</option>`).join("")
+        : `<option value="">يتم التنسيق مع الأدمن</option>`;
+    }
+
+    function renderClientOrdersAndInbox() {
+      const uid = currentUser?.id || "";
+      const uname = (currentUser?.name || "").trim().toLowerCase();
+      const cleanName = sanitizeKey(uname);
+
+      const mine = Object.entries(store.orders || {}).filter(([, o]) =>
+        (uid && o.buyerId === uid) || (uname && (o.buyerName || "").trim().toLowerCase() === uname)
+      );
+
+      const activeOrders = mine.filter(([, o]) => !isOrderCompleted(o));
+      document.getElementById("client-active-orders").innerHTML = activeOrders.length
+        ? activeOrders.map(([id, o]) => {
+            const payOk = o.paymentStatus === "confirmed" || o.paymentConfirmed === true;
+            return `
+              <div class="box active-order">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <strong>طلب #${esc(id.slice(-6))}</strong>
+                  <span class="badge ${payOk ? "confirmed" : ""}">${esc(o.status || "بانتظار تأكيد الدفع")}</span>
+                </div>
+                <div style="font-size:13px; margin-top:6px;">
+                  الأصناف: ${(o.items || []).map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ")}<br/>
+                  الإجمالي: <strong>${Number(o.totalAmount) || 0} جنيه</strong>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : `<div class="box">لا توجد طلبات نشطة حالياً.</div>`;
+
+      const histMap = {};
+      if (uid && store.userOrderHistory?.[sanitizeKey(uid)]) Object.assign(histMap, store.userOrderHistory[sanitizeKey(uid)]);
+      if (cleanName && store.userOrderHistoryByName?.[cleanName]) Object.assign(histMap, store.userOrderHistoryByName[cleanName]);
+      for (const [id, o] of mine.filter(([, x]) => isOrderCompleted(x))) {
+        if (!histMap[id]) histMap[id] = o;
+      }
+
+      const histList = Object.values(histMap).sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+      document.getElementById("client-completed-orders").innerHTML = histList.length
+        ? histList.map((h) => `
+          <div class="box done">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+              <strong>طلب #${esc(String(h.orderId || "").slice(-6))}</strong>
+              <span class="badge done">تم التوصيل ✓</span>
+            </div>
+            <div style="font-size:13px; margin-top:6px;">
+              الإجمالي: <strong>${Number(h.totalAmount) || 0} جنيه</strong>
+              ${h.dateTimeText ? ` • ${esc(h.dateTimeText)}` : ""}
+            </div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد طلبات منتهية مسجلة في سجلك بعد.</div>`;
+
+      renderInbox("client-inbox-list");
+    }
+
+    function renderChallengerView() {
+      const uid = currentUser?.id || "";
+      const tasks = Object.entries(store.challenges || {}).filter(([, c]) => !c.completed);
+      document.getElementById("challenger-tasks-list").innerHTML = tasks.length
+        ? tasks.map(([id, c]) => `
+          <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <strong>${esc(c.title)}</strong> • <span class="price-tag">مكافأة: ${Number(c.reward) || 0} جنيه</span><br/>
+              <span style="font-size:13px; color:#334155;">${esc(c.details)}</span>
+            </div>
+            <button type="button" class="btn-success" onclick="completeChallengeByUser('${esc(id)}')">إتمام التحدي</button>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد مهام أو تحديات متاحة حالياً.</div>`;
+
+      const hMap = (uid && store.challengerHistory?.[sanitizeKey(uid)]) || {};
+      const hList = Object.values(hMap).sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+      document.getElementById("challenger-history-list").innerHTML = hList.length
+        ? hList.map((item) => `
+          <div class="box done">
+            <strong>${esc(item.challengeTitle || "تحدٍ")}</strong> • <span class="badge done">مكتملة ✓</span><br/>
+            <span style="font-size:13px;">المكافأة: <strong>${Number(item.totalAmount) || 0} جنيه</strong>${item.dateTimeText ? ` • ${esc(item.dateTimeText)}` : ""}</span>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد مهام مكتملة في سجلك بعد.</div>`;
+
+      renderInbox("challenger-inbox-list");
+    }
+
+    function renderInbox(targetId) {
+      const box = document.getElementById(targetId);
+      if (!box) return;
+      const uid = currentUser?.id || "";
+      const uname = (currentUser?.name || "").trim();
+
+      const gifts = Object.values(store.gifts || {}).filter((g) => {
+        const tgt = (g.targetName || "").trim();
+        return !tgt || tgt === uname;
+      });
+      const msgs = (uid && Object.values(store.userMessages?.[sanitizeKey(uid)] || {})) || [];
+
+      const items = [
+        ...gifts.map((g) => ({ title: `🎁 هدية: ${g.title}`, body: g.details, time: g.createdAt || 0, img: "" })),
+        ...msgs.map((m) => ({ title: m.type === "points" ? "⭐ نقاط من الأدمن" : "📩 رسالة من الأدمن", body: m.text || m.caption || "", time: m.createdAt || 0, img: m.image || "" }))
+      ].sort((a, b) => b.time - a.time);
+
+      box.innerHTML = items.length
+        ? items.map((it) => `
+          <div class="box">
+            <strong>${esc(it.title)}</strong>
+            <div style="font-size:13px; margin-top:4px;">${esc(it.body)}</div>
+            ${it.img ? `<img src="${it.img}" class="thumb-sm" alt="مرفق" />` : ""}
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد هدايا أو رسائل جديدة.</div>`;
+    }
+
+    function renderApp() {
+      if (!currentUser) return;
+      const uid = currentUser.id || "";
+      const liveUser = store.users?.[uid] || currentUser;
+      const cStat = (uid && store.challengersStats?.[sanitizeKey(uid)]) || {};
+
+      document.getElementById("stats-row").innerHTML = `
+        <div class="stat-box"><div class="v">${Number(liveUser.wallet) || 0} جنيه</div><div class="l">الرصيد</div></div>
+        <div class="stat-box"><div class="v">${Number(liveUser.points) || 0}</div><div class="l">النقاط</div></div>
+        <div class="stat-box"><div class="v">${Object.keys(store.challenges || {}).filter((k) => !store.challenges[k]?.completed).length}</div><div class="l">التحديات المتاحة</div></div>
+        <div class="stat-box"><div class="v">${Number(cStat.completedCount) || 0}</div><div class="l">المهام المنجزة</div></div>
+      `;
+
+      if (liveUser.role === "challenger") {
+        renderChallengerView();
+      } else {
+        renderClientShop();
+        renderCart();
+        renderClientOrdersAndInbox();
+      }
+    }
+
+    onValue(ref(db, "users"), (s) => { store.users = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "banned"), (s) => { store.banned = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "departments"), (s) => { store.departments = s.val() || []; scheduleRender(); });
+    onValue(ref(db, "departmentsMeta"), (s) => { store.departmentsMeta = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "subDepartments"), (s) => { store.subDepartments = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "products"), (s) => { store.products = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "cashPhones"), (s) => { store.cashPhones = s.val() || []; scheduleRender(); });
+    onValue(ref(db, "orders"), (s) => { store.orders = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "userOrderHistory"), (s) => { store.userOrderHistory = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "userOrderHistoryByName"), (s) => { store.userOrderHistoryByName = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "challengerHistory"), (s) => { store.challengerHistory = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "challengersStats"), (s) => { store.challengersStats = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "challenges"), (s) => { store.challenges = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "gifts"), (s) => { store.gifts = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "userMessages"), (s) => { store.userMessages = s.val() || {}; scheduleRender(); });
+
+    syncScreens();
+  </script>
+</body>
+</html>
