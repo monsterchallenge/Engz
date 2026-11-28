@@ -53,7 +53,7 @@
     .notice.error { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
     .notice.success { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
 
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tabs { display: flex; gap: 8px; flex-wrap:wrap; margin-bottom: 16px; }
     button {
       font-family: inherit;
       cursor: pointer;
@@ -379,7 +379,7 @@
           </div>
         </div>
 
-        <h3 style="color:#3b0764;">الطلبات النشطة (وتأكيد استلام الكاش / تأكيد التوصيل)</h3>
+        <h3 style="color:#3b0764;">الطلبات النشطة (تأكيد استلام الكاش / إنهاء عند التوصيل والاستلام)</h3>
         <div id="admin-active-orders-list"></div>
 
         <h3 style="color:#3b0764;">سجل الطلبات المنتهية (مع الصور المرسلة)</h3>
@@ -479,6 +479,7 @@
         o.deliveryStatus === "completed" ||
         o.orderCompleted === true ||
         o.status === "تم التوصيل" ||
+        o.status === "تم التوصيل والاستلام" ||
         o.status === "تم وصول الطلب" ||
         o.status === "منتهي"
       );
@@ -869,7 +870,7 @@
         stage: "completed",
         orderCompleted: true,
         deliveryStatus: "completed",
-        status: "تم التوصيل",
+        status: "تم التوصيل والاستلام",
         completedAt: now,
         completedAtFormatted: new Date(now).toLocaleString("ar-EG")
       });
@@ -883,7 +884,7 @@
         challengeTitle: ord.challengeTitle || "",
         items: ord.items || [],
         totalAmount: Number(ord.totalAmount) || 0,
-        status: "تم التوصيل",
+        status: "تم التوصيل والاستلام",
         deliveryImage: ord.deliveryImage || "",
         completedAt: now,
         dateTimeText: new Date(now).toLocaleString("ar-EG")
@@ -895,7 +896,7 @@
       if (ord.assignedChallengerId) {
         await set(ref(db, `challengerHistory/${sKey(ord.assignedChallengerId)}/${orderId}`), rec);
       }
-      notifyAdmin("تم تأكيد التوصيل وانتقل الطلب إلى السجلات.", "success");
+      notifyAdmin("تم إنهاء الطلب عند التوصيل والاستلام وانتقل إلى السجلات.", "success");
     };
 
     window.renderSelectedUserAccount = function () {
@@ -1097,7 +1098,7 @@
                 <span style="font-size:13px;">الأصناف: ${itemsTxt || esc(o.challengeTitle || "")} • الحالة: <strong>${esc(o.status || "")}</strong></span>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
                   ${!o.paymentConfirmed ? `<button type="button" class="btn-success" onclick="confirmCashReceivedAdmin('${esc(id)}')">تأكيد استلام الكاش</button>` : ""}
-                  <button type="button" class="btn-blue" onclick="confirmDeliveryDoneAdmin('${esc(id)}')">تم التوصيل</button>
+                  <button type="button" class="btn-blue" onclick="confirmDeliveryDoneAdmin('${esc(id)}')">تم التوصيل والاستلام (إنهاء)</button>
                 </div>
               </div>
             `;
