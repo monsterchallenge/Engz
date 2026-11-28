@@ -3,173 +3,103 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>انجز - لوحة تحكم الأدمن (ADMIN)</title>
+  <title>لوحة تحكم الأدمن - انجز</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 16px 14px 56px;
+      padding: 16px 14px 64px;
       font-family: Tahoma, Arial, sans-serif;
-      background: linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #082f49 100%);
+      background: radial-gradient(circle at 15% 15%, rgba(236, 72, 153, 0.25), transparent 45%),
+                  radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.25), transparent 45%),
+                  linear-gradient(135deg, #090d16 0%, #2e1065 50%, #0c4a6e 100%);
       color: #0f172a;
       line-height: 1.65;
     }
-    @keyframes adminBtnPop {
-      0% { transform: scale(1); }
-      45% { transform: scale(0.92) translateY(2px); }
-      100% { transform: scale(1) translateY(0); }
-    }
-    @keyframes adminAlertIn {
-      from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-    }
-    .admin-header {
-      background: linear-gradient(120deg, #0f172a 0%, #7c3aed 55%, #ec4899 100%);
-      color: #ffffff;
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    .top-bar {
+      background: linear-gradient(120deg, #0f172a 0%, #7e22ce 45%, #db2777 80%, #0284c7 100%);
+      color: #fff;
       border-radius: 22px;
-      padding: 18px 20px;
+      padding: 16px 20px;
       margin-bottom: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
-      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(253, 224, 71, 0.35);
     }
-    .admin-header h1 {
-      margin: 0;
-      font-size: 22px;
-      color: #fde047;
-    }
+    .top-bar h1 { margin: 0; font-size: 21px; color: #fde047; }
     .panel {
-      background: #ffffff;
+      background: linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%);
       border-radius: 22px;
       padding: 20px 18px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(168, 85, 247, 0.22);
     }
     .notice {
+      display: none;
       padding: 12px 14px;
       border-radius: 12px;
       margin-bottom: 14px;
+      font-weight: bold;
       font-size: 14px;
-      font-weight: bold;
-      display: none;
-      background: #eff6ff;
-      color: #1e3a8a;
-      border: 1px solid #bfdbfe;
-      animation: adminAlertIn 0.24s ease-out;
+      background: linear-gradient(135deg, #e0f2fe, #ede9fe);
+      color: #1e1b4b;
+      border: 1px solid #93c5fd;
     }
-    .notice.error { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-    .notice.success { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+    .notice.error { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
+    .notice.success { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
 
-    .admin-delivery-banner {
-      display: none;
-      background: linear-gradient(120deg, #0284c7 0%, #2563eb 60%, #4f46e5 100%);
-      color: #ffffff;
-      border: 2px solid #bae6fd;
-      border-radius: 14px;
-      padding: 12px 16px;
-      margin-bottom: 14px;
-      font-size: 15px;
-      font-weight: bold;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-      animation: adminAlertIn 0.25s ease-out;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    @media (min-width: 640px) {
-      .stats-grid { grid-template-columns: repeat(4, 1fr); }
-    }
-    .stat-tile {
-      background: #0f172a;
-      color: #ffffff;
-      border-radius: 14px;
-      padding: 12px;
-      text-align: center;
-    }
-    .stat-tile .val { font-size: 20px; font-weight: bold; color: #fde047; }
-    .stat-tile .lbl { font-size: 12px; color: #cbd5e1; }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
     button {
       font-family: inherit;
       cursor: pointer;
       border: none;
       border-radius: 12px;
-      padding: 10px 15px;
+      padding: 10px 14px;
       font-size: 14px;
       font-weight: bold;
-      transition: transform 0.13s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease, filter 0.15s ease;
+      transition: transform 0.12s ease, filter 0.14s ease;
     }
-    button:hover:not(:disabled) {
-      transform: translateY(-1px);
-      filter: brightness(1.03);
-    }
-    button:active:not(:disabled) {
-      transform: scale(0.92) translateY(2px);
-      filter: brightness(0.93);
-    }
-    button.btn-motion-active {
-      animation: adminBtnPop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
-    }
+    button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.04); }
+    button:active:not(:disabled) { transform: scale(0.94); filter: brightness(0.93); }
     .tab-btn { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; }
-    .tab-btn.active { background: linear-gradient(90deg, #7c3aed, #ec4899); color: #ffffff; border-color: transparent; }
-
-    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; }
-    .btn-danger { background: linear-gradient(135deg, #ef4444, #be123c); color: #ffffff; }
-    .btn-amber { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #ffffff; }
-    .btn-dark { background: #1e293b; color: #ffffff; }
-    .btn-soft { background: #e2e8f0; color: #0f172a; }
-    .btn-blue { background: linear-gradient(135deg, #0284c7, #2563eb); color: #ffffff; }
-
-    .user-name-link {
-      background: transparent;
-      color: #1d4ed8;
-      padding: 2px 6px;
-      font-size: 16px;
-      font-weight: bold;
-      text-decoration: underline;
+    .tab-btn.active { background: linear-gradient(90deg, #9333ea, #ec4899); color: #fff; border-color: transparent; }
+    .counter-pill {
+      display: inline-block;
+      background: #fde047;
+      color: #0f172a;
+      border-radius: 999px;
+      padding: 1px 8px;
+      font-size: 12px;
+      margin-right: 4px;
     }
+
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #be123c); color: #fff; }
+    .btn-amber { background: linear-gradient(135deg, #f59e0b, #f43f5e); color: #fff; }
+    .btn-blue { background: linear-gradient(135deg, #06b6d4, #2563eb); color: #fff; }
+    .btn-dark { background: linear-gradient(135deg, #0f172a, #312e81); color: #fff; }
+    .btn-soft { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #0f172a; border: 1px solid #cbd5e1; }
 
     .box {
-      background: #f8fafc;
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
       border: 1.5px solid #e2e8f0;
       border-radius: 16px;
       padding: 14px;
       margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
     }
-    .box.completed-box {
-      background: #f0fdf4;
-      border-color: #86efac;
-    }
-    .box.history-box {
-      background: #eff6ff;
-      border-color: #93c5fd;
-    }
-    .form-row-2 {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    @media (min-width: 640px) {
-      .form-row-2 { grid-template-columns: 1fr 1fr; }
-    }
+    .box.done-box { background: linear-gradient(145deg, #f0fdf4, #dcfce7); border-color: #34d399; }
+    .grid-3 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 680px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
+    .form-row-2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
     .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; color: #1e293b; }
+    label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; color: #1e1b4b; }
     input, select, textarea {
       width: 100%;
       padding: 11px;
@@ -177,397 +107,286 @@
       border-radius: 12px;
       font-size: 14px;
       font-family: inherit;
-      background: #ffffff;
+      background: #fff;
       color: #0f172a;
     }
     .thumb {
       max-width: 240px;
-      max-height: 190px;
+      max-height: 170px;
       border-radius: 10px;
       margin-top: 8px;
-      display: none;
       border: 1px solid #cbd5e1;
       object-fit: cover;
     }
-    .receipt-thumb {
-      max-width: 260px;
-      max-height: 220px;
-      border-radius: 12px;
-      display: block;
-      border: 2px solid #cbd5e1;
-      object-fit: contain;
-      background: #0f172a;
-      cursor: zoom-in;
-    }
-    .account-card {
-      background: linear-gradient(135deg, #eff6ff, #f0fdf4);
-      border: 2px solid #0284c7;
-      border-radius: 16px;
-      padding: 16px;
-      margin-top: 14px;
-    }
-    .badge-status {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .badge-status.confirmed {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-    .badge-status.completed {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .completed-highlight-box {
-      background: linear-gradient(135deg, #ecfdf5, #eff6ff);
-      border: 2px solid #10b981;
-      border-radius: 18px;
-      padding: 16px;
-      margin-top: 18px;
-    }
-    .sub-orders-bar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .top-back-row {
-      display: flex;
-      justify-content: flex-start;
-      margin-bottom: 12px;
-    }
-    .catalog-cards-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    @media (min-width: 680px) {
-      .catalog-cards-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+    .name-link {
+      background: transparent;
+      color: #7e22ce;
+      padding: 2px 6px;
+      font-size: 15px;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="admin-header">
+    <div class="top-bar">
       <div>
-        <h1>نسخة الأدمن المنفصلة • ENGZ ADMIN</h1>
-        <div style="font-size:13px; opacity:0.92;">تحكم كامل في الأقسام والأقسام الفرعية والأنواع والعروض والطلبات والسجلات</div>
+        <h1>لوحة تحكم الأدمن • ENGZ ADMIN</h1>
+        <div style="font-size:12px; opacity:0.95;">إدارة الطلبات والعملاء والمتسابقين والأقسام والتحديات والهدايا</div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button type="button" class="btn-amber" onclick="openUserAppWindow()">فتح نسخة المستخدم (index.html)</button>
-        <button type="button" class="btn-dark" id="lock-btn" style="display:none;" onclick="lockAdmin()">قفل الجلسة</button>
+        <button type="button" class="btn-amber" onclick="window.open('index.html', '_blank')">فتح نسخة المستخدم</button>
+        <button type="button" class="btn-dark" id="lock-admin-btn" style="display:none;" onclick="lockAdmin()">قفل</button>
       </div>
     </div>
 
-    <div class="top-back-row">
-      <button type="button" class="btn-soft" onclick="goBackAdmin()">عودة</button>
-    </div>
-
-    <div id="admin-delivery-banner" class="admin-delivery-banner"></div>
     <div id="admin-notice" class="notice"></div>
 
-    <!-- شاشة تسجيل دخول الأدمن -->
-    <div id="admin-login-box" class="panel">
-      <h2 style="margin-top:0;">تسجيل دخول الأدمن</h2>
-      <p style="color:#475569; font-size:14px;">أدخل كلمة مرور الأدمن للوصول إلى لوحة التحكم الكاملة والطلبات وإيصالات الدفع.</p>
-      <div class="form-group" style="max-width:380px;">
-        <label for="admin-pass-input">كلمة مرور الأدمن</label>
-        <input type="password" id="admin-pass-input" placeholder="أدخل كلمة مرور الأدمن..." onkeydown="if(event.key==='Enter'){event.preventDefault();unlockAdmin();}" />
+    <div id="admin-login-panel" class="panel">
+      <h2 style="margin-top:0; color:#3b0764;">دخول الأدمن</h2>
+      <div class="form-group" style="max-width:360px;">
+        <label for="admin-pass">كلمة المرور</label>
+        <input type="password" id="admin-pass" placeholder="أدخل كلمة مرور الأدمن..." onkeydown="if(event.key==='Enter')unlockAdmin()" />
       </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button type="button" class="btn-success" onclick="unlockAdmin()">دخول لوحة الأدمن</button>
-        <button type="button" class="btn-soft" onclick="goBackAdmin()">عودة</button>
-      </div>
+      <button type="button" class="btn-success" onclick="unlockAdmin()">دخول</button>
     </div>
 
-    <!-- لوحة الأدمن الكاملة -->
-    <div id="admin-dashboard" class="panel" style="display:none;">
-      <div id="stats-grid" class="stats-grid"></div>
-
+    <div id="admin-main-panel" class="panel" style="display:none;">
       <div class="tabs">
-        <button type="button" class="tab-btn active" id="tab-requests" onclick="switchTab('requests')">طلبات التسجيل</button>
-        <button type="button" class="tab-btn" id="tab-users" onclick="switchTab('users')">المستخدمون والوصول لحساب</button>
-        <button type="button" class="tab-btn" id="tab-catalog" onclick="switchTab('catalog')">الأقسام والفرعيات والمنتجات</button>
-        <button type="button" class="tab-btn" id="tab-challenges" onclick="switchTab('challenges')">المهام والتحديات والهدايا</button>
-        <button type="button" class="tab-btn" id="tab-orders" onclick="switchTab('orders')">الطلبات وسجلات المتسابقين والعملاء</button>
+        <button type="button" class="tab-btn active" id="atab-requests" onclick="switchAdminTab('requests')">
+          طلبات التسجيل <span class="counter-pill" id="cnt-requests">0</span>
+        </button>
+        <button type="button" class="tab-btn" id="atab-users" onclick="switchAdminTab('users')">
+          العملاء والمتسابقون والنشطون <span class="counter-pill" id="cnt-users">0</span>
+        </button>
+        <button type="button" class="tab-btn" id="atab-catalog" onclick="switchAdminTab('catalog')">
+          إعداد الأقسام والصور والعروض <span class="counter-pill" id="cnt-catalog">0</span>
+        </button>
+        <button type="button" class="tab-btn" id="atab-challenges" onclick="switchAdminTab('challenges')">
+          التحديات والهدايا <span class="counter-pill" id="cnt-challenges">0</span>
+        </button>
+        <button type="button" class="tab-btn" id="atab-orders" onclick="switchAdminTab('orders')">
+          الطلبات والسجلات والأرقام <span class="counter-pill" id="cnt-orders">0</span>
+        </button>
       </div>
 
-      <!-- 1. طلبات التسجيل -->
-      <div id="sec-requests">
-        <h3>طلبات تسجيل العملاء الجدد</h3>
-        <div id="client-reqs-list"></div>
-        <h3>طلبات تسجيل المتسابقين الجدد</h3>
-        <div id="chal-reqs-list"></div>
+      <div id="asec-requests">
+        <h3 style="color:#3b0764;">طلبات تسجيل العملاء</h3>
+        <div id="admin-client-reqs"></div>
+
+        <h3 style="color:#3b0764;">طلبات تسجيل المتسابقين (قبول / رفض / waiting)</h3>
+        <div id="admin-chal-reqs"></div>
+
+        <h3 style="color:#3b0764;">قائمة الانتظار (ترتيب تنازلي حسب تاريخ تقديم الطلب)</h3>
+        <div id="admin-waiting-list"></div>
       </div>
 
-      <!-- 2. المستخدمون والحظر والوصول إلى حساب + إرسال نقاط وصور -->
-      <div id="sec-users" style="display:none;">
+      <div id="asec-users" style="display:none;">
         <div class="box">
-          <h3 style="margin-top:0;">الوصول إلى حساب مستخدم وإرسال نقاط أو صور (كاميرا / استوديو)</h3>
-          <p style="font-size:13px; color:#475569; margin-top:0;">
-            اضغط على اسم أي مستخدم في القائمة بالأسفل أو اختره من هنا لعرض سجل عملياته بالكامل، إرسال نقاط له، أو إرسال صورة له من الكاميرا أو الاستوديو.
-          </p>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            <select id="inspect-user-select" style="max-width:360px;" onchange="renderInspectedAccount()"></select>
-            <button type="button" class="btn-success" onclick="openSelectedAccountInUserApp()">فتح هذا الحساب في index.html</button>
+          <h3 style="margin-top:0; color:#3b0764;">الدخول إلى حساب مستخدم (عميل أو متسابق) وعرض سجل عملياته</h3>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <select id="admin-user-picker" style="max-width:360px;" onchange="renderSelectedUserAccount()"></select>
+            <button type="button" class="btn-success" onclick="openPickedUserInIndex()">فتح الحساب في index.html</button>
           </div>
-          <div id="inspected-account-details"></div>
+          <div id="admin-picked-user-details" style="margin-top:12px;"></div>
         </div>
 
-        <div class="box">
-          <h3 style="margin-top:0;">حظر اسم أو رقم تلفون</h3>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label for="ban-name">الاسم</label>
-              <input type="text" id="ban-name" placeholder="اسم المستخدم..." />
-            </div>
-            <div class="form-group">
-              <label for="ban-phone">رقم التلفون</label>
-              <input type="tel" id="ban-phone" placeholder="01xxxxxxxxx" maxlength="11" />
-            </div>
+        <div class="form-row-2">
+          <div class="box">
+            <h3 style="margin-top:0; color:#3b0764;">العملاء النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد مرات الطلب)</h3>
+            <div id="active-clients-ranked"></div>
           </div>
-          <button type="button" class="btn-danger" onclick="addBan()">إضافة إلى المحظورين</button>
-          <div id="banned-list" style="margin-top:12px;"></div>
+          <div class="box">
+            <h3 style="margin-top:0; color:#3b0764;">المتسابقون النشطون (ترتيب تنازلي حسب قيمة الشراء وعدد المهام الناجحة)</h3>
+            <div id="active-challengers-ranked"></div>
+          </div>
         </div>
 
-        <h3>جميع الحسابات المسجلة (اضغط على اسم العميل أو المتسابق لعرض سجل عملياته)</h3>
-        <div id="all-users-list"></div>
+        <h3 style="color:#3b0764;">إعداد العملاء (وحذف أي عميل لمنعه من الدخول بنفس البيانات)</h3>
+        <div id="admin-clients-list"></div>
+
+        <h3 style="color:#3b0764;">إعداد المتسابقين (ترتيب حسب النشاط وعدد التحديات + سجل الطلبات + حذف)</h3>
+        <div id="admin-challengers-list"></div>
       </div>
 
-      <!-- 3. الأقسام والأقسام الفرعية والمنتجات والعروض -->
-      <div id="sec-catalog" style="display:none;">
+      <div id="asec-catalog" style="display:none;">
         <div class="box">
-          <h3 style="margin-top:0;">إضافة قسم رئيسي (مع صورة معبرة)</h3>
+          <h3 style="margin-top:0; color:#3b0764;">إضافة قسم رئيسي + صورة تعبر عن القسم</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="dept-name">اسم القسم الرئيسي</label>
-              <input type="text" id="dept-name" placeholder="مثال: سوبرمركت أو مطعم أو صيدلية" />
+              <label for="new-dept-name">اسم القسم</label>
+              <input type="text" id="new-dept-name" placeholder="مثال: سوبرمركت أو خضار وفاكهه" />
             </div>
             <div class="form-group">
-              <label>صورة القسم الرئيسي (كاميرا / استوديو)</label>
-              <input type="file" id="dept-cam-file" accept="image/*" capture="environment" style="display:none;" onchange="handleImg(this, 'dept-img-prev', 'deptImg')" />
-              <input type="file" id="dept-img-file" accept="image/*" style="display:none;" onchange="handleImg(this, 'dept-img-prev', 'deptImg')" />
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button type="button" class="btn-dark" onclick="document.getElementById('dept-cam-file').click()">📷 كاميرا</button>
-                <button type="button" class="btn-amber" onclick="document.getElementById('dept-img-file').click()">🖼️ استوديو</button>
+              <label>صورة القسم (كاميرا / استوديو)</label>
+              <input type="file" id="dept-cam" accept="image/*" capture="environment" style="display:none;" onchange="pickImg(this, 'dept')" />
+              <input type="file" id="dept-gal" accept="image/*" style="display:none;" onchange="pickImg(this, 'dept')" />
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn-dark" onclick="document.getElementById('dept-cam').click()">📷 كاميرا</button>
+                <button type="button" class="btn-amber" onclick="document.getElementById('dept-gal').click()">🖼️ استوديو</button>
               </div>
-              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
-                <img id="dept-img-prev" class="thumb" style="margin-top:0;" alt="معاينة القسم" />
-                <button type="button" id="del-dept-img-btn" class="btn-danger" style="display:none;" onclick="clearAdminPreview('dept-img-file', 'dept-img-prev', 'del-dept-img-btn', 'deptImg')">🗑️ حذف الصورة</button>
-              </div>
+              <img id="prev-dept" class="thumb" style="display:none;" alt="معاينة القسم" />
             </div>
           </div>
-          <button type="button" class="btn-success" onclick="addDepartment()">حفظ القسم الرئيسي</button>
-          <div id="departments-cards-list" class="catalog-cards-grid" style="margin-top:14px;"></div>
+          <button type="button" class="btn-success" onclick="saveNewDepartment()">إضافة قسم</button>
+          <div id="admin-depts-grid" class="grid-3" style="margin-top:12px;"></div>
         </div>
 
         <div class="box">
-          <h3 style="margin-top:0;">إضافة قسم فرعي تابع لقسم كبير (مثال: ألبان، أجبان، مكرونات، مجمدات، أيس كريم)</h3>
+          <h3 style="margin-top:0; color:#3b0764;">إضافة قسم فرعي تابع لقسم كبير (مثال: ألبان، أجبان، مكرونات، مجمدات، أيس كريم)</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="subdept-parent">القسم الرئيسي التابع له</label>
-              <select id="subdept-parent" onchange="renderSubDepartmentsAdminList()"></select>
+              <label for="sub-parent-dept">القسم الكبير</label>
+              <select id="sub-parent-dept" onchange="renderSubDeptsAdmin()"></select>
             </div>
             <div class="form-group">
-              <label for="subdept-name">اسم القسم الفرعي</label>
-              <input type="text" id="subdept-name" placeholder="مثال: أجبان أو ألبان أو مكرونات" />
+              <label for="sub-dept-title">اسم القسم الفرعي</label>
+              <input type="text" id="sub-dept-title" placeholder="مثال: أجبان أو ألبان" />
             </div>
           </div>
           <div class="form-group">
             <label>صورة القسم الفرعي (كاميرا / استوديو)</label>
-            <input type="file" id="subdept-cam-file" accept="image/*" capture="environment" style="display:none;" onchange="handleImg(this, 'subdept-img-prev', 'subDeptImg')" />
-            <input type="file" id="subdept-img-file" accept="image/*" style="display:none;" onchange="handleImg(this, 'subdept-img-prev', 'subDeptImg')" />
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button type="button" class="btn-dark" onclick="document.getElementById('subdept-cam-file').click()">📷 كاميرا</button>
-              <button type="button" class="btn-amber" onclick="document.getElementById('subdept-img-file').click()">🖼️ استوديو</button>
+            <input type="file" id="sub-cam" accept="image/*" capture="environment" style="display:none;" onchange="pickImg(this, 'sub')" />
+            <input type="file" id="sub-gal" accept="image/*" style="display:none;" onchange="pickImg(this, 'sub')" />
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-dark" onclick="document.getElementById('sub-cam').click()">📷 كاميرا</button>
+              <button type="button" class="btn-amber" onclick="document.getElementById('sub-gal').click()">🖼️ استوديو</button>
             </div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
-              <img id="subdept-img-prev" class="thumb" style="margin-top:0;" alt="معاينة القسم الفرعي" />
-              <button type="button" id="del-subdept-img-btn" class="btn-danger" style="display:none;" onclick="clearAdminPreview('subdept-img-file', 'subdept-img-prev', 'del-subdept-img-btn', 'subDeptImg')">🗑️ حذف الصورة</button>
-            </div>
+            <img id="prev-sub" class="thumb" style="display:none;" alt="معاينة القسم الفرعي" />
           </div>
-          <button type="button" class="btn-success" onclick="addSubDepartment()">حفظ القسم الفرعي</button>
-          <div id="subdepartments-cards-list" class="catalog-cards-grid" style="margin-top:14px;"></div>
+          <button type="button" class="btn-success" onclick="saveSubDepartment()">إضافة قسم فرعي</button>
+          <div id="admin-subdepts-grid" class="grid-3" style="margin-top:12px;"></div>
         </div>
 
         <div class="box">
-          <h3 style="margin-top:0;">إضافة نوع / صنف / حجم / عرض (مع دمج السعر بدقة عالية على الصورة)</h3>
+          <h3 style="margin-top:0; color:#3b0764;">إضافة سلعة / نوع / حجم / عرض (دمج السعر بدقة عالية كجزء من الصورة)</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="prod-dept">القسم الرئيسي</label>
-              <select id="prod-dept" onchange="syncProdSubDeptOptions()"></select>
+              <label for="item-dept">القسم</label>
+              <select id="item-dept" onchange="syncItemSubDeptSelect()"></select>
             </div>
             <div class="form-group">
-              <label for="prod-subdept">القسم الفرعي التابع له</label>
-              <select id="prod-subdept"></select>
+              <label for="item-subdept">القسم الفرعي</label>
+              <select id="item-subdept"></select>
             </div>
           </div>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="prod-type">النوع / التصنيف</label>
-              <input type="text" id="prod-type" placeholder="مثال: أجبان / ألبان / عروض" />
+              <label for="item-title">اسم النوع / الحجم / العرض</label>
+              <input type="text" id="item-title" placeholder="مثال: لبن بخيره نص لتر أو جبنة رومي" />
             </div>
             <div class="form-group">
-              <label for="prod-title">اسم النوع أو الحجم أو العرض</label>
-              <input type="text" id="prod-title" placeholder="مثال: جبنة براميلي أو جبنة رومي أو لبن بخيره نص لتر" />
-            </div>
-          </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label for="prod-price">السعر (جنيه) — يدمج على الصورة بدقة عالية</label>
-              <input type="number" id="prod-price" min="0" step="0.5" placeholder="45" />
-            </div>
-            <div class="form-group">
-              <label for="prod-desc">الوصف / الحجم</label>
-              <input type="text" id="prod-desc" placeholder="مثال: وزن ربع كيلو أو 500 مل" />
+              <label for="item-price">السعر (جنيه)</label>
+              <input type="number" id="item-price" min="0" step="0.5" placeholder="35" />
             </div>
           </div>
           <div class="form-group">
             <label>
-              <input type="checkbox" id="prod-offer" style="width:auto; margin-left:6px;" />
-              تحديد كـ «عرض خاص» (يظهر عند ضغط العميل على زر اطلب عرض)
+              <input type="checkbox" id="item-is-offer" style="width:auto; margin-left:6px;" />
+              عرض خاص
             </label>
           </div>
           <div class="form-group">
-            <label>سحب صورة من الاستوديو أو تصوير بالكاميرا لهذا النوع/الصنف</label>
-            <input type="file" id="prod-cam-file" accept="image/*" capture="environment" style="display:none;" onchange="handleImg(this, 'prod-img-prev', 'prodImg')" />
-            <input type="file" id="prod-img-file" accept="image/*" style="display:none;" onchange="handleImg(this, 'prod-img-prev', 'prodImg')" />
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button type="button" class="btn-dark" onclick="document.getElementById('prod-cam-file').click()">📷 كاميرا</button>
-              <button type="button" class="btn-amber" onclick="document.getElementById('prod-img-file').click()">🖼️ سحب صورة من الاستوديو</button>
+            <label>صورة الصنف / العرض (كاميرا / استوديو)</label>
+            <input type="file" id="item-cam" accept="image/*" capture="environment" style="display:none;" onchange="pickImg(this, 'item')" />
+            <input type="file" id="item-gal" accept="image/*" style="display:none;" onchange="pickImg(this, 'item')" />
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-dark" onclick="document.getElementById('item-cam').click()">📷 كاميرا</button>
+              <button type="button" class="btn-amber" onclick="document.getElementById('item-gal').click()">🖼️ استوديو</button>
             </div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
-              <img id="prod-img-prev" class="thumb" style="margin-top:0;" alt="معاينة المنتج" />
-              <button type="button" id="del-prod-img-btn" class="btn-danger" style="display:none;" onclick="clearAdminPreview('prod-img-file', 'prod-img-prev', 'del-prod-img-btn', 'prodImg')">🗑️ حذف الصورة</button>
-            </div>
+            <img id="prev-item" class="thumb" style="display:none;" alt="معاينة الصنف" />
           </div>
-          <button type="button" class="btn-success" onclick="addProduct()">إضافة النوع / الصنف / العرض</button>
+          <button type="button" class="btn-success" onclick="saveCatalogItem()">إضافة</button>
         </div>
 
-        <h3>الأنواع والمنتجات والعروض الحالية (إمكانية تغيير الصورة أو حذفها أو حذف الصنف)</h3>
-        <div id="all-products-list" class="catalog-cards-grid"></div>
+        <h3 style="color:#3b0764;">الأصناف والعروض المضافة</h3>
+        <div id="admin-items-grid" class="grid-3"></div>
       </div>
 
-      <!-- 4. المهام والتحديات والهدايا -->
-      <div id="sec-challenges" style="display:none;">
+      <div id="asec-challenges" style="display:none;">
         <div class="box">
-          <h3 style="margin-top:0;">إضافة تحدٍ / مهمة جديدة</h3>
+          <h3 style="margin-top:0; color:#3b0764;">إعداد التحديات (خانات للكتابة + كاميرا/استوديو + زر تأكيد)</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="chal-title">عنوان التحدي / المهمة</label>
-              <input type="text" id="chal-title" placeholder="مثال: توصيل طلب" />
+              <label for="chal-title-in">عنوان التحدي / المهمة</label>
+              <input type="text" id="chal-title-in" placeholder="عنوان المهمة..." />
             </div>
             <div class="form-group">
-              <label for="chal-reward">المكافأة (جنيه)</label>
-              <input type="number" id="chal-reward" min="0" step="1" placeholder="50" />
+              <label for="chal-reward-in">المكافأة (جنيه)</label>
+              <input type="number" id="chal-reward-in" min="0" placeholder="50" />
             </div>
           </div>
           <div class="form-group">
-            <label for="chal-details">تفاصيل التحدي / المهمة</label>
-            <textarea id="chal-details" rows="2" placeholder="تفاصيل المهمة..."></textarea>
+            <label for="chal-details-in">تفاصيل التحدي</label>
+            <textarea id="chal-details-in" rows="2" placeholder="تفاصيل المهمة..."></textarea>
           </div>
-          <button type="button" class="btn-success" onclick="addChallenge()">نشر التحدي</button>
+          <div class="form-group">
+            <label>صورة للتحدي (كاميرا / استوديو)</label>
+            <input type="file" id="chal-cam" accept="image/*" capture="environment" style="display:none;" onchange="pickImg(this, 'chal')" />
+            <input type="file" id="chal-gal" accept="image/*" style="display:none;" onchange="pickImg(this, 'chal')" />
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-dark" onclick="document.getElementById('chal-cam').click()">📷 كاميرا</button>
+              <button type="button" class="btn-amber" onclick="document.getElementById('chal-gal').click()">🖼️ استوديو</button>
+            </div>
+            <img id="prev-chal" class="thumb" style="display:none;" alt="معاينة التحدي" />
+          </div>
+          <button type="button" class="btn-success" onclick="saveNewChallenge()">تأكيد</button>
         </div>
 
         <div class="box">
-          <h3 style="margin-top:0;">إرسال هدية</h3>
+          <h3 style="margin-top:0; color:#3b0764;">إرسال هدية / عرض / مكافأة (مع كاميرا / استوديو)</h3>
           <div class="form-row-2">
             <div class="form-group">
-              <label for="gift-title">عنوان الهدية</label>
-              <input type="text" id="gift-title" placeholder="مثال: مكافأة أو خصم" />
+              <label for="gift-title-in">عنوان الهدية / العرض / المكافأة</label>
+              <input type="text" id="gift-title-in" placeholder="عنوان الهدية..." />
             </div>
             <div class="form-group">
-              <label for="gift-target">اسم المستفيد (فارغ = للجميع)</label>
-              <input type="text" id="gift-target" placeholder="اختياري..." />
+              <label for="gift-target-in">اسم العميل أو المتسابق (فارغ = للجميع)</label>
+              <input type="text" id="gift-target-in" placeholder="اختياري..." />
             </div>
           </div>
           <div class="form-group">
-            <label for="gift-details">تفاصيل الهدية</label>
-            <input type="text" id="gift-details" placeholder="تفاصيل الهدية..." />
+            <label for="gift-details-in">التفاصيل</label>
+            <input type="text" id="gift-details-in" placeholder="تفاصيل الهدية أو المكافأة..." />
           </div>
-          <button type="button" class="btn-amber" onclick="sendGift()">إرسال الهدية</button>
+          <div class="form-group">
+            <label>صورة الهدية (كاميرا / استوديو)</label>
+            <input type="file" id="gift-cam" accept="image/*" capture="environment" style="display:none;" onchange="pickImg(this, 'gift')" />
+            <input type="file" id="gift-gal" accept="image/*" style="display:none;" onchange="pickImg(this, 'gift')" />
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-dark" onclick="document.getElementById('gift-cam').click()">📷 كاميرا</button>
+              <button type="button" class="btn-amber" onclick="document.getElementById('gift-gal').click()">🖼️ استوديو</button>
+            </div>
+            <img id="prev-gift" class="thumb" style="display:none;" alt="معاينة الهدية" />
+          </div>
+          <button type="button" class="btn-amber" onclick="saveNewGift()">إرسال الهدية</button>
         </div>
 
-        <h3>المهام النشطة / المعلّقة</h3>
-        <div id="pending-challenges-list"></div>
-
-        <div class="completed-highlight-box">
-          <h3 style="margin-top:0; color:#166534;">سجل المهام المكتملة</h3>
-          <div id="completed-challenges-list"></div>
-        </div>
+        <h3 style="color:#3b0764;">قائمة التحديات</h3>
+        <div id="admin-challenges-list"></div>
       </div>
 
-      <!-- 5. الطلبات وسجلات المتسابقين والعملاء -->
-      <div id="sec-orders" style="display:none;">
+      <div id="asec-orders" style="display:none;">
         <div class="box">
-          <h3 style="margin-top:0;">إعدادات الكاميرا والاستوديو عند «تم التوصيل / تم وصول الطلب»</h3>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:10px;">
-            <input type="checkbox" id="require-photo-toggle" style="width:auto;" onchange="toggleRequireDeliveryPhoto(this.checked)" />
-            <span>جعل تصوير أو اختيار صورة (كاميرا / استوديو) شرطاً إجبارياً قبل تأكيد التوصيل</span>
-          </label>
-        </div>
-
-        <div class="box">
-          <h3 style="margin-top:0;">أرقام الكاش للاستقبال (حد أقصى 5 أرقام)</h3>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <input type="tel" id="cash-phone-input" placeholder="01xxxxxxxxx" maxlength="11" style="max-width:260px;" />
-            <button type="button" class="btn-success" onclick="addCashPhone()">إضافة رقم</button>
+          <h3 style="margin-top:0; color:#3b0764;">إعداد أرقام الاتصال لاستقبال الكاش (7 خانات + Check Box لاختيار حتى 5 أرقام + زر + لإضافة أرقام)</h3>
+          <div id="seven-slots-box" class="form-row-2"></div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; max-width:380px;">
+            <input type="tel" id="extra-phone-in" placeholder="إضافة رقم جديد عبر + (01xxxxxxxxx)" maxlength="11" />
+            <button type="button" class="btn-blue" onclick="addExtraPhoneSlot()">+ إضافة رقم</button>
           </div>
-          <div id="cash-phones-list" style="margin-top:12px;"></div>
-        </div>
-
-        <div class="sub-orders-bar">
-          <button type="button" class="tab-btn active" id="subtab-active-orders" onclick="switchOrdersSubSection('active')">
-            الطلبات والمهام النشطة
-          </button>
-          <button type="button" class="tab-btn" id="subtab-completed-orders" onclick="switchOrdersSubSection('completed')">
-            سجل طلبات الأدمن المنتهية
-          </button>
-          <button type="button" class="tab-btn" id="subtab-runners-log" onclick="switchOrdersSubSection('runners')">
-            سجلات المتسابقين
-          </button>
-          <button type="button" class="tab-btn" id="subtab-clients-log" onclick="switchOrdersSubSection('clients')">
-            سجلات العملاء
-          </button>
-        </div>
-
-        <div id="orders-active-panel">
-          <h3>الطلبات والمهام النشطة وإيصالات الدفع</h3>
-          <div id="all-orders-list"></div>
-        </div>
-
-        <div id="orders-completed-panel" style="display:none;">
-          <div class="completed-highlight-box" style="margin-top:0;">
-            <h3 style="margin-top:0; color:#166534;">سجل الطلبات المنتهية (الأدمن)</h3>
-            <div id="completed-orders-list"></div>
+          <div style="margin-top:12px;">
+            <button type="button" class="btn-success" onclick="saveSelectedCashPhones()">حفظ الأرقام المختارة (حتى 5 أرقام)</button>
           </div>
         </div>
 
-        <div id="orders-runners-panel" style="display:none;">
-          <div class="box history-box">
-            <h3 style="margin-top:0; color:#1e3a8a;">سجل المهام والعمليات المنتهية لكل متسابق</h3>
-            <div id="admin-runners-history-list"></div>
-          </div>
-        </div>
+        <h3 style="color:#3b0764;">الطلبات النشطة (وتأكيد استلام الكاش / تأكيد التوصيل)</h3>
+        <div id="admin-active-orders-list"></div>
 
-        <div id="orders-clients-panel" style="display:none;">
-          <div class="box history-box">
-            <h3 style="margin-top:0; color:#1e3a8a;">سجل الطلبات المنتهية لكل عميل</h3>
-            <div id="admin-clients-history-list"></div>
-          </div>
-        </div>
+        <h3 style="color:#3b0764;">سجل الطلبات المنتهية (مع الصور المرسلة)</h3>
+        <div id="admin-completed-orders-list"></div>
       </div>
     </div>
   </div>
-
-  <input type="file" id="replace-entity-img-input" accept="image/*" style="display:none;" onchange="handleReplaceEntityImageFile(this)" />
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -578,24 +397,19 @@
       push,
       onValue,
       update,
-      remove,
-      runTransaction
+      remove
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const ADMIN_PASSWORD = "38512385";
-    const DEFAULT_DEPARTMENTS = [
-      "سوبرمركت",
-      "مطعم",
+    const ADMIN_PASS = "38512385";
+    const DEFAULT_DEPTS = [
       "كتابة وتلخيص",
+      "مطعم",
+      "سوبرمركت",
       "خضار وفاكهه",
       "توصيل عملاء",
       "توصيل اغراض",
       "خدمات الشراء والبيع"
     ];
-
-    const DEFAULT_SUBDEPTS = {
-      "سوبرمركت": ["ألبان", "أجبان", "مكرونات", "مجمدات", "أيس كريم"]
-    };
 
     const firebaseConfig = {
       apiKey: "AIzaSyCVsWJJTPCrtgbBh-vTHnuzdAfwiO-iHtM",
@@ -611,94 +425,39 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    document.addEventListener("click", function (ev) {
-      const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
-      if (!btn) return;
-      btn.classList.remove("btn-motion-active");
-      void btn.offsetWidth;
-      btn.classList.add("btn-motion-active");
-      setTimeout(() => btn.classList.remove("btn-motion-active"), 260);
-    }, true);
+    let unlocked = sessionStorage.getItem("engz_admin_ok_v2") === "1";
+    let activeAdminTab = "requests";
+    let pickedUserId = "";
+    const draftImgs = { dept: "", sub: "", item: "", chal: "", gift: "" };
+    let phoneSlots = ["", "", "", "", "", "", ""];
+    let checkedSlots = [false, false, false, false, false, false, false];
+    let renderRAF = null;
 
-    let unlocked = sessionStorage.getItem("engz_admin_auth_v1") === "1";
-    const adminNavStack = ["requests"];
-    let currentTab = "requests";
-    let ordersSubSection = "active";
-    let selectedUserIdForLog = "";
-    const imgs = { deptImg: "", subDeptImg: "", prodImg: "" };
-    let pendingReplaceTarget = null;
-    const adminDeliveryProofs = {};
-    const adminUserMediaDrafts = {};
-    let noticeTimer = null;
-    let deliveryBannerTimer = null;
-    let renderScheduled = false;
-
-    const store = {
+    const st = {
       users: {},
       banned: {},
       clientRegRequests: {},
       challengerRegRequests: {},
+      waitingList: {},
       departments: [],
       departmentsMeta: {},
       subDepartments: {},
       products: {},
       cashPhones: [],
+      phonePool: [],
       orders: {},
       userOrderHistory: {},
-      userOrderHistoryByName: {},
       challengerHistory: {},
       challengersStats: {},
       clientActivity: {},
-      userMessages: {},
-      paymentReceipts: {},
       challenges: {},
       gifts: {},
-      receipts: {},
-      referrals: {},
-      appSettings: { requireDeliveryPhoto: false }
+      userMessages: {},
+      referrals: {}
     };
 
-    function sanitizeKey(k) {
-      return String(k || "").trim().replace(/[.#$[\]/]/g, "_") || "item";
-    }
-
-    function scheduleRender() {
-      if (!unlocked || renderScheduled) return;
-      renderScheduled = true;
-      requestAnimationFrame(() => {
-        renderScheduled = false;
-        renderAll();
-      });
-    }
-
-    function notify(msg, type = "info", durationMs = 8000) {
-      const el = document.getElementById("admin-notice");
-      if (!el) return;
-      if (noticeTimer) clearTimeout(noticeTimer);
-      el.style.display = "block";
-      el.className = "notice" + (type === "error" ? " error" : type === "success" ? " success" : "");
-      el.textContent = msg;
-      if (durationMs > 0) {
-        noticeTimer = setTimeout(() => {
-          el.style.display = "none";
-          el.textContent = "";
-        }, durationMs);
-      }
-    }
-
-    function showAdminDeliveryBanner(orderId, customText = "", durationMs = 8000) {
-      const banner = document.getElementById("admin-delivery-banner");
-      if (!banner) return;
-      if (deliveryBannerTimer) clearTimeout(deliveryBannerTimer);
-      const suffix = orderId ? ` • طلب #${String(orderId).slice(-6)}` : "";
-      banner.textContent = customText ? `${customText}${suffix}` : `تم التوصيل${suffix}`;
-      banner.style.display = "block";
-      if (durationMs > 0) {
-        deliveryBannerTimer = setTimeout(() => {
-          banner.style.display = "none";
-          banner.textContent = "";
-        }, durationMs);
-      }
+    function sKey(v) {
+      return String(v || "").trim().replace(/[.#$[\]/]/g, "_") || "item";
     }
 
     function esc(v) {
@@ -709,131 +468,70 @@
         .replace(/"/g, "&quot;");
     }
 
-    function isValidPhone(p) {
+    function isEgyptMobile(p) {
       return /^01[0125][0-9]{8}$/.test(String(p || "").trim());
     }
 
-    function isOrderCompleted(o) {
+    function isDoneOrder(o) {
       if (!o) return false;
       return (
         o.stage === "completed" ||
         o.deliveryStatus === "completed" ||
         o.orderCompleted === true ||
-        o.status === "منتهي" ||
         o.status === "تم التوصيل" ||
-        o.status === "تم وصول الطلب"
+        o.status === "تم وصول الطلب" ||
+        o.status === "منتهي"
       );
     }
 
-    function formatDuration(sec) {
-      const s = Math.max(0, Number(sec) || 0);
-      const mins = Math.floor(s / 60);
-      const rem = s % 60;
-      return mins > 0 ? `${mins} دقيقة و ${rem} ثانية` : `${rem} ثانية`;
+    function notifyAdmin(msg, type = "info") {
+      const el = document.getElementById("admin-notice");
+      if (!el) return;
+      el.style.display = "block";
+      el.className = "notice" + (type === "error" ? " error" : type === "success" ? " success" : "");
+      el.textContent = msg;
     }
 
-    function syncAuthView() {
-      document.getElementById("admin-login-box").style.display = unlocked ? "none" : "block";
-      document.getElementById("admin-dashboard").style.display = unlocked ? "block" : "none";
-      document.getElementById("lock-btn").style.display = unlocked ? "inline-block" : "none";
-      if (unlocked) renderAll();
+    function scheduleRender() {
+      if (!unlocked || renderRAF) return;
+      renderRAF = requestAnimationFrame(() => {
+        renderRAF = null;
+        renderAdminAll();
+      });
     }
 
-    window.goBackAdmin = function () {
-      if (adminNavStack.length > 1) {
-        adminNavStack.pop();
-        const prevTab = adminNavStack[adminNavStack.length - 1];
-        applyTabState(prevTab);
-      } else {
-        notify("أنت في الشاشة الرئيسية للوحة الأدمن.", "info");
-      }
-    };
+    function syncAuth() {
+      document.getElementById("admin-login-panel").style.display = unlocked ? "none" : "block";
+      document.getElementById("admin-main-panel").style.display = unlocked ? "block" : "none";
+      document.getElementById("lock-admin-btn").style.display = unlocked ? "inline-block" : "none";
+      if (unlocked) renderAdminAll();
+    }
 
     window.unlockAdmin = function () {
-      const pass = document.getElementById("admin-pass-input").value.trim();
-      if (pass !== ADMIN_PASSWORD) {
-        return notify("كلمة مرور الأدمن غير صحيحة.", "error");
-      }
+      const p = document.getElementById("admin-pass").value.trim();
+      if (p !== ADMIN_PASS) return notifyAdmin("كلمة مرور الأدمن غير صحيحة.", "error");
       unlocked = true;
-      sessionStorage.setItem("engz_admin_auth_v1", "1");
-      syncAuthView();
-      notify("تم فتح لوحة تحكم الأدمن المنفصلة.", "success");
+      sessionStorage.setItem("engz_admin_ok_v2", "1");
+      syncAuth();
     };
 
     window.lockAdmin = function () {
       unlocked = false;
-      sessionStorage.removeItem("engz_admin_auth_v1");
-      syncAuthView();
-      notify("تم قفل جلسة الأدمن.", "info");
+      sessionStorage.removeItem("engz_admin_ok_v2");
+      syncAuth();
     };
 
-    window.openUserAppWindow = function () {
-      window.open("index.html", "_blank");
-    };
-
-    window.openSelectedAccountInUserApp = function () {
-      const uid = document.getElementById("inspect-user-select").value || selectedUserIdForLog;
-      if (!uid || !store.users[uid]) return notify("اختر حساباً أولاً.", "error");
-      const u = store.users[uid];
-      localStorage.setItem("engz_admin_impersonate_v1", JSON.stringify({ id: uid, ...u }));
-      window.open(`index.html?asUser=${encodeURIComponent(uid)}`, "_blank");
-      notify(`تم فتح حساب (${u.name}) في نسخة المستخدم index.html.`, "success");
-    };
-
-    function applyTabState(tab) {
-      currentTab = tab;
+    window.switchAdminTab = function (tab) {
+      activeAdminTab = tab;
       ["requests", "users", "catalog", "challenges", "orders"].forEach((t) => {
-        const b = document.getElementById(`tab-${t}`);
-        const sec = document.getElementById(`sec-${t}`);
-        if (b) b.classList.toggle("active", t === tab);
+        document.getElementById(`atab-${t}`)?.classList.toggle("active", t === tab);
+        const sec = document.getElementById(`asec-${t}`);
         if (sec) sec.style.display = t === tab ? "block" : "none";
       });
-      renderAll();
-    }
-
-    window.switchTab = function (tab) {
-      if (adminNavStack[adminNavStack.length - 1] !== tab) {
-        adminNavStack.push(tab);
-      }
-      applyTabState(tab);
+      renderAdminAll();
     };
 
-    window.switchOrdersSubSection = function (sub) {
-      ordersSubSection = ["active", "completed", "runners", "clients"].includes(sub) ? sub : "active";
-      ["active", "completed", "runners", "clients"].forEach((k) => {
-        const btn = document.getElementById(`subtab-${k}-orders`) || document.getElementById(`subtab-${k}-log`);
-        const panel = document.getElementById(`orders-${k}-panel`);
-        if (btn) btn.classList.toggle("active", ordersSubSection === k);
-        if (panel) panel.style.display = ordersSubSection === k ? "block" : "none";
-      });
-      renderOrdersAndCash();
-    };
-
-    window.toggleRequireDeliveryPhoto = async function (checked) {
-      await set(ref(db, "appSettings/requireDeliveryPhoto"), Boolean(checked));
-      notify(
-        checked
-          ? "تم تفعيل شرط الصورة (كاميرا / استوديو) قبل تأكيد التوصيل."
-          : "تم جعل الصورة (كاميرا / استوديو) اختيارية.",
-        "success"
-      );
-    };
-
-    window.clearAdminPreview = function (inputId, prevId, delBtnId, key) {
-      imgs[key] = "";
-      const inp = document.getElementById(inputId);
-      if (inp) inp.value = "";
-      const prev = document.getElementById(prevId);
-      if (prev) {
-        prev.src = "";
-        prev.style.display = "none";
-      }
-      const btn = document.getElementById(delBtnId);
-      if (btn) btn.style.display = "none";
-      notify("تم حذف صورة المعاينة.", "info");
-    };
-
-    function encodeDataUrl(file, cb, maxDim = 1800, quality = 0.94) {
+    function compressImage(file, cb, maxDim = 1800, quality = 0.94) {
       const reader = new FileReader();
       reader.onload = function (ev) {
         const img = new Image();
@@ -856,7 +554,7 @@
       reader.readAsDataURL(file);
     }
 
-    function bakePriceIntoProductImage(baseDataUrl, titleText, priceNum, callback) {
+    function burnPriceOnImage(rawUrl, title, price, cb) {
       const img = new Image();
       img.onload = function () {
         const canvas = document.createElement("canvas");
@@ -867,1088 +565,598 @@
         ctx.imageSmoothingQuality = "high";
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        const barHeight = Math.max(78, Math.round(canvas.height * 0.14));
-        const grad = ctx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
-        grad.addColorStop(0, "rgba(15, 23, 42, 0.15)");
-        grad.addColorStop(0.35, "rgba(15, 23, 42, 0.82)");
-        grad.addColorStop(1, "rgba(15, 23, 42, 0.95)");
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, canvas.height - barHeight, canvas.width, barHeight);
+        const bh = Math.max(76, Math.round(canvas.height * 0.14));
+        ctx.fillStyle = "rgba(15, 23, 42, 0.88)";
+        ctx.fillRect(0, canvas.height - bh, canvas.width, bh);
 
-        const priceLabel = `${Number(priceNum) || 0} جنيه`;
-        const fontSizePrice = Math.max(28, Math.round(barHeight * 0.46));
-        ctx.font = `bold ${fontSizePrice}px Tahoma, Arial, sans-serif`;
+        const priceFont = Math.max(28, Math.round(bh * 0.46));
+        ctx.font = `bold ${priceFont}px Tahoma, Arial, sans-serif`;
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#fde047";
-        ctx.fillText(priceLabel, canvas.width - 24, canvas.height - barHeight * 0.48);
+        ctx.fillText(`${Number(price) || 0} جنيه`, canvas.width - 22, canvas.height - bh * 0.5);
 
-        if (titleText) {
-          const fontSizeTitle = Math.max(20, Math.round(barHeight * 0.32));
-          ctx.font = `bold ${fontSizeTitle}px Tahoma, Arial, sans-serif`;
+        if (title) {
+          const tFont = Math.max(20, Math.round(bh * 0.32));
+          ctx.font = `bold ${tFont}px Tahoma, Arial, sans-serif`;
           ctx.textAlign = "left";
           ctx.fillStyle = "#ffffff";
-          ctx.fillText(String(titleText), 24, canvas.height - barHeight * 0.48);
+          ctx.fillText(String(title), 22, canvas.height - bh * 0.5);
         }
 
-        callback(canvas.toDataURL("image/jpeg", 0.94));
+        cb(canvas.toDataURL("image/jpeg", 0.94));
       };
-      img.src = baseDataUrl;
+      img.src = rawUrl;
     }
 
-    window.handleImg = function (input, prevId, key) {
-      const file = input.files && input.files[0];
-      if (!file) return;
-      encodeDataUrl(file, (dataUrl) => {
-        imgs[key] = dataUrl;
-        const prev = document.getElementById(prevId);
-        prev.src = dataUrl;
-        prev.style.display = "block";
-        if (key === "deptImg") {
-          const b = document.getElementById("del-dept-img-btn");
-          if (b) b.style.display = "inline-block";
-        } else if (key === "subDeptImg") {
-          const b = document.getElementById("del-subdept-img-btn");
-          if (b) b.style.display = "inline-block";
-        } else if (key === "prodImg") {
-          const b = document.getElementById("del-prod-img-btn");
-          if (b) b.style.display = "inline-block";
-        }
-      });
-    };
-
-    window.startReplaceEntityImage = function (kind, deptName, subDeptName = "", itemId = "") {
-      pendingReplaceTarget = { kind, deptName, subDeptName, itemId };
-      const inp = document.getElementById("replace-entity-img-input");
-      if (inp) {
-        inp.value = "";
-        inp.click();
-      }
-    };
-
-    window.handleReplaceEntityImageFile = function (inputEl) {
-      const file = inputEl.files && inputEl.files[0];
-      const target = pendingReplaceTarget;
-      pendingReplaceTarget = null;
-      if (!file || !target) return;
-
-      encodeDataUrl(file, async (rawDataUrl) => {
-        const safeDept = sanitizeKey(target.deptName);
-        const safeSub = sanitizeKey(target.subDeptName);
-        if (target.kind === "dept") {
-          await set(ref(db, `departmentsMeta/${safeDept}`), { image: rawDataUrl });
-          notify(`تم تحديث صورة القسم (${target.deptName}) بدقة عالية.`, "success");
-        } else if (target.kind === "subdept") {
-          await set(ref(db, `subDepartments/${safeDept}/${safeSub}`), { name: target.subDeptName, image: rawDataUrl });
-          notify(`تم تحديث صورة القسم الفرعي (${target.subDeptName}).`, "success");
-        } else if (target.kind === "product") {
-          const existingProd = store.products?.[target.deptName]?.[target.itemId] || store.products?.[safeDept]?.[target.itemId] || {};
-          bakePriceIntoProductImage(
-            rawDataUrl,
-            existingProd.title || existingProd.type || "",
-            existingProd.price || 0,
-            async (bakedImg) => {
-              await update(ref(db, `products/${safeDept}/${target.itemId}`), { image: bakedImg });
-              notify(`تم تحديث صورة (${existingProd.title || "المنتج"}) مع دمج السعر بدقة عالية.`, "success");
-            }
-          );
-        }
-      });
-    };
-
-    window.deleteDeptImage = async function (deptName) {
-      await set(ref(db, `departmentsMeta/${sanitizeKey(deptName)}`), { image: "" });
-      notify(`تم حذف صورة القسم (${deptName}).`, "info");
-    };
-
-    window.deleteSubDeptImage = async function (deptName, subDeptName) {
-      await set(ref(db, `subDepartments/${sanitizeKey(deptName)}/${sanitizeKey(subDeptName)}`), { name: subDeptName, image: "" });
-      notify(`تم حذف صورة القسم الفرعي (${subDeptName}).`, "info");
-    };
-
-    window.deleteProductImage = async function (deptName, itemId) {
-      await update(ref(db, `products/${sanitizeKey(deptName)}/${itemId}`), { image: "" });
-      notify("تم حذف صورة الصنف.", "info");
-    };
-
-    window.triggerAdminOrderPhotoPick = function (orderId, mode) {
-      const inputId = mode === "camera" ? `admin-cam-${orderId}` : `admin-gal-${orderId}`;
-      const el = document.getElementById(inputId);
-      if (el) el.click();
-    };
-
-    window.handleAdminOrderPhotoFile = function (inputEl, orderId) {
+    window.pickImg = function (inputEl, key) {
       const file = inputEl.files && inputEl.files[0];
       if (!file) return;
-      encodeDataUrl(file, (dataUrl) => {
-        adminDeliveryProofs[orderId] = dataUrl;
-        renderOrdersAndCash();
-        notify("تم إرفاق صورة تأكيد التوصيل للطلب.", "success");
+      compressImage(file, (dataUrl) => {
+        draftImgs[key] = dataUrl;
+        const prev = document.getElementById(`prev-${key}`);
+        if (prev) {
+          prev.src = dataUrl;
+          prev.style.display = "block";
+        }
       });
     };
 
-    window.clearAdminOrderPhoto = function (orderId) {
-      adminDeliveryProofs[orderId] = "";
-      const c = document.getElementById(`admin-cam-${orderId}`);
-      const g = document.getElementById(`admin-gal-${orderId}`);
-      if (c) c.value = "";
-      if (g) g.value = "";
-      renderOrdersAndCash();
-      notify("تم حذف صورة التأكيد المؤقتة.", "info");
-    };
-
-    async function archiveCompletedDeliveryEverywhere(orderId, ord, completedAtMs) {
-      const durationSec = Math.max(
-        1,
-        Math.round((completedAtMs - (Number(ord.deliveryStartAt || ord.acceptedAt || ord.createdAt) || completedAtMs)) / 1000)
-      );
-      const dateTimeText = new Date(completedAtMs).toLocaleString("ar-EG");
-
-      const record = {
-        orderId,
-        buyerId: ord.buyerId || "",
-        buyerName: ord.buyerName || "عميل",
-        buyerPhone: ord.buyerPhone || ord.payerPhone || "",
-        assignedChallengerId: ord.assignedChallengerId || "",
-        assignedChallengerName: ord.assignedChallengerName || "",
-        assignedChallengerPhone: ord.assignedChallengerPhone || "",
-        challengeId: ord.challengeId || "",
-        challengeTitle: ord.challengeTitle || "",
-        items: ord.items || [],
-        totalAmount: Number(ord.totalAmount) || 0,
-        status: "تم التوصيل",
-        createdAt: ord.createdAt || completedAtMs,
-        deliveredAt: completedAtMs,
-        completedAt: completedAtMs,
-        deliveryDurationSec: durationSec,
-        dateTimeText
-      };
-
-      if (ord.buyerId) {
-        await set(ref(db, `userOrderHistory/${sanitizeKey(ord.buyerId)}/${orderId}`), record);
-      }
-      const cleanBuyer = sanitizeKey((ord.buyerName || "").trim().toLowerCase());
-      if (cleanBuyer) {
-        await set(ref(db, `userOrderHistoryByName/${cleanBuyer}/${orderId}`), record);
-      }
-
-      if (ord.assignedChallengerId) {
-        await set(ref(db, `challengerHistory/${sanitizeKey(ord.assignedChallengerId)}/${orderId}`), record);
-        await runTransaction(ref(db, `challengersStats/${sanitizeKey(ord.assignedChallengerId)}`), (curr) => {
-          const prev = curr || {
-            name: ord.assignedChallengerName || "متسابق",
-            phone: ord.assignedChallengerPhone || "",
-            completedCount: 0,
-            totalEarned: 0,
-            totalDeliverySec: 0,
-            deliverySamples: 0
-          };
-          return {
-            name: ord.assignedChallengerName || prev.name,
-            phone: ord.assignedChallengerPhone || prev.phone,
-            completedCount: (Number(prev.completedCount) || 0) + 1,
-            totalEarned: Number(((Number(prev.totalEarned) || 0) + (Number(ord.totalAmount) || 0)).toFixed(2)),
-            totalDeliverySec: (Number(prev.totalDeliverySec) || 0) + durationSec,
-            deliverySamples: (Number(prev.deliverySamples) || 0) + 1,
-            lastDeliverySec: durationSec,
-            lastDeliveredAt: completedAtMs,
-            lastDeliveredText: dateTimeText
-          };
-        });
-      }
-
-      if (ord.buyerId) {
-        await runTransaction(ref(db, `clientActivity/${sanitizeKey(ord.buyerId)}`), (curr) => {
-          const prev = curr || {
-            userId: ord.buyerId,
-            name: ord.buyerName || "عميل",
-            phone: ord.buyerPhone || "",
-            orderCount: 0,
-            completedOrdersCount: 0,
-            totalSpent: 0
-          };
-          return {
-            ...prev,
-            userId: ord.buyerId,
-            name: ord.buyerName || prev.name,
-            phone: ord.buyerPhone || prev.phone,
-            completedOrdersCount: (Number(prev.completedOrdersCount) || 0) + 1,
-            lastDeliveredAt: completedAtMs,
-            lastDeliveredText: dateTimeText
-          };
-        });
-      }
-    }
-
-    window.markOrderArrivedAdmin = async function (orderId) {
-      const o = store.orders[orderId];
-      if (!o) return notify("الطلب غير موجود.", "error");
-
-      const photoData = adminDeliveryProofs[orderId] || o.deliveryImage || o.receiptImage || "";
-      if (store.appSettings?.requireDeliveryPhoto && !photoData) {
-        return notify("الصورة مفعلة إجبارية من إعدادات الأدمن — التقط أو اختر صورة أولاً.", "error");
-      }
-
-      const now = Date.now();
-      const completedLabel = "تم التوصيل";
-      const startTs = Number(o.deliveryStartAt || o.acceptedAt || o.createdAt) || now;
-      const elapsedSec = Math.max(1, Math.round((now - startTs) / 1000));
-
-      await update(ref(db, `orders/${orderId}`), {
-        stage: "completed",
-        orderCompleted: true,
-        deliveryStatus: "completed",
-        status: completedLabel,
-        userAlertMessage: completedLabel,
-        deliveryImage: photoData,
-        deliveredAt: now,
-        deliveredAtFormatted: new Date(now).toLocaleString("ar-EG"),
-        deliveryDurationSec: elapsedSec,
-        completedAt: now,
-        completedAtFormatted: new Date(now).toLocaleString("ar-EG"),
-        completedBy: "admin"
-      });
-
-      await archiveCompletedDeliveryEverywhere(orderId, { ...o, completedAt: now }, now);
-
-      if (o.challengeId) {
-        await update(ref(db, `challenges/${o.challengeId}`), {
-          completed: true,
-          status: "مكتملة",
-          deliveredAt: now,
-          completedAt: now
-        });
-      }
-
-      delete adminDeliveryProofs[orderId];
-
-      window.switchTab("orders");
-      window.switchOrdersSubSection("completed");
-      showAdminDeliveryBanner(orderId, `تم التوصيل (${formatDuration(elapsedSec)}) وانتقل إلى السجلات`, 8000);
-      notify(`تم تأكيد توصيل الطلب #${orderId.slice(-6)} وحُذف من النشطة وظهر في السجلات.`, "success", 8000);
-    };
-
-    window.deleteCompletedOrder = async function (orderId) {
-      const ok = confirm(`هل تريد حذف الطلب #${String(orderId).slice(-6)} من الطلبات المنتهية؟ (سيبقى محفوظاً في سجلات المستخدم والأدمن بالتاريخ والوقت)`);
-      if (!ok) return;
-
-      const ord = store.orders[orderId];
-      if (ord) {
-        await archiveCompletedDeliveryEverywhere(orderId, ord, ord.completedAt || Date.now());
-      }
-
-      await remove(ref(db, `orders/${orderId}`));
-      notify(`تم حذف الطلب #${String(orderId).slice(-6)} من القائمة النشطة/المنتهية وبقي في السجل.`, "success", 8000);
-    };
-
-    function allDepts() {
-      const extra = Array.isArray(store.departments) ? store.departments : [];
-      return [...new Set([...DEFAULT_DEPARTMENTS, ...extra])];
-    }
-
-    function getSubDeptsForParent(parentDept) {
-      const defaults = DEFAULT_SUBDEPTS[parentDept] || [];
-      const fromDb = store.subDepartments?.[parentDept] || store.subDepartments?.[sanitizeKey(parentDept)] || {};
-      const dbNames = Object.values(fromDb)
-        .map((v) => (typeof v === "object" && v && v.name ? v.name : ""))
-        .filter(Boolean);
-      return [...new Set([...defaults, ...Object.keys(fromDb), ...dbNames])];
-    }
-
-    function renderAll() {
-      if (!unlocked) return;
-      const pendC = Object.values(store.clientRegRequests || {}).filter((r) => r.status === "pending").length;
-      const pendH = Object.values(store.challengerRegRequests || {}).filter((r) => r.status === "pending").length;
-
-      document.getElementById("stats-grid").innerHTML = `
-        <div class="stat-tile"><div class="val">${pendC + pendH}</div><div class="lbl">طلبات تسجيل معلقة</div></div>
-        <div class="stat-tile"><div class="val">${Object.keys(store.users || {}).length}</div><div class="lbl">المستخدمون</div></div>
-        <div class="stat-tile"><div class="val">${allDepts().length}</div><div class="lbl">الأقسام</div></div>
-        <div class="stat-tile"><div class="val">${Object.keys(store.orders || {}).length}</div><div class="lbl">الطلبات</div></div>
-      `;
-
-      const reqToggle = document.getElementById("require-photo-toggle");
-      if (reqToggle) reqToggle.checked = Boolean(store.appSettings?.requireDeliveryPhoto);
-
-      renderRequests();
-      renderUsersAndInspector();
-      renderCatalog();
-      renderChallenges();
-      renderOrdersAndCash();
-    }
-
-    function renderRequests() {
-      const cEl = document.getElementById("client-reqs-list");
-      const hEl = document.getElementById("chal-reqs-list");
-
-      const cPending = Object.entries(store.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
-      cEl.innerHTML = cPending.length
-        ? cPending.map(([id, r]) => `
-          <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <div><strong>${esc(r.name)}</strong> • ${esc(r.phone)}</div>
-            <div style="display:flex; gap:8px;">
-              <button type="button" class="btn-success" onclick="decideReq('client', '${esc(id)}', 'approved')">موافقة</button>
-              <button type="button" class="btn-danger" onclick="decideReq('client', '${esc(id)}', 'rejected')">رفض</button>
-            </div>
-          </div>
-        `).join("")
-        : `<div class="box">لا توجد طلبات عملاء معلقة.</div>`;
-
-      const hPending = Object.entries(store.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
-      hEl.innerHTML = hPending.length
-        ? hPending.map(([id, r]) => `
-          <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <div><strong>${esc(r.name)}</strong> • ${esc(r.phone)}</div>
-            <div style="display:flex; gap:8px;">
-              <button type="button" class="btn-success" onclick="decideReq('challenger', '${esc(id)}', 'approved')">موافقة</button>
-              <button type="button" class="btn-danger" onclick="decideReq('challenger', '${esc(id)}', 'rejected')">رفض</button>
-            </div>
-          </div>
-        `).join("")
-        : `<div class="box">لا توجد طلبات متسابقين معلقة.</div>`;
-    }
-
-    window.decideReq = async function (role, reqId, decision) {
-      const path = role === "challenger" ? "challengerRegRequests" : "clientRegRequests";
-      const reqObj = store[path][reqId];
-      if (!reqObj) return;
-      await update(ref(db, `${path}/${reqId}`), { status: decision, decidedAt: Date.now() });
-
-      const found = Object.entries(store.users || {}).find(
-        ([, u]) => (u.name || "").trim().toLowerCase() === (reqObj.name || "").trim().toLowerCase() || (reqObj.phone && u.phone === reqObj.phone)
+    async function ensureUserRecord(name, phone, role, status, invitedBy = "") {
+      const found = Object.entries(st.users || {}).find(
+        ([, u]) => String(u.name || "").trim().toLowerCase() === String(name || "").trim().toLowerCase()
       );
       if (found) {
-        await update(ref(db, `users/${found[0]}`), { status: decision, role, phone: reqObj.phone || found[1].phone });
-      } else {
-        const uRef = push(ref(db, "users"));
-        await set(uRef, {
-          name: reqObj.name,
-          phone: reqObj.phone,
-          role,
-          status: decision,
-          wallet: 0,
-          points: 0,
-          invitedBy: reqObj.invitedBy || "",
-          createdAt: Date.now()
-        });
+        await update(ref(db, `users/${found[0]}`), { role, status, phone: phone || found[1].phone });
+        return found[0];
       }
-      notify(decision === "approved" ? `تمت الموافقة على ${reqObj.name}` : `تم رفض طلب ${reqObj.name}`, "success");
-    };
-
-    window.openUserOperationsLog = function (uid) {
-      if (!uid || !store.users[uid]) return;
-      selectedUserIdForLog = uid;
-      const sel = document.getElementById("inspect-user-select");
-      if (sel) sel.value = uid;
-      if (currentTab !== "users") {
-        window.switchTab("users");
-      } else {
-        renderInspectedAccount();
-      }
-      const card = document.getElementById("inspected-account-details");
-      if (card) card.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
-
-    window.sendPointsToUser = async function (uid) {
-      const inp = document.getElementById(`send-pts-input-${uid}`);
-      const ptsToAdd = Number(inp ? inp.value : 0);
-      if (!ptsToAdd || ptsToAdd <= 0) return notify("أدخل عدداً صحيحاً للنقاط لإرسالها.", "error");
-      await runTransaction(ref(db, `users/${uid}/points`), (cur) => (Number(cur) || 0) + ptsToAdd);
-      await push(ref(db, `userMessages/${uid}`), {
-        type: "points",
-        text: `تم إرسال ${ptsToAdd} نقطة إليك من الأدمن.`,
-        pointsAdded: ptsToAdd,
-        createdAt: Date.now(),
-        dateTimeText: new Date().toLocaleString("ar-EG")
+      const uRef = push(ref(db, "users"));
+      await set(uRef, {
+        name,
+        phone,
+        role,
+        status,
+        wallet: 0,
+        points: 0,
+        invitedBy,
+        createdAt: Date.now()
       });
-      if (inp) inp.value = "";
-      notify(`تم إرسال ${ptsToAdd} نقطة إلى (${store.users[uid]?.name || "المستخدم"}) بنجاح.`, "success");
-      renderInspectedAccount();
-    };
-
-    window.triggerAdminUserMediaPick = function (uid, mode) {
-      const id = mode === "camera" ? `admin-user-cam-${uid}` : `admin-user-gal-${uid}`;
-      const el = document.getElementById(id);
-      if (el) el.click();
-    };
-
-    window.handleAdminUserMediaFile = function (inputEl, uid) {
-      const file = inputEl.files && inputEl.files[0];
-      if (!file) return;
-      encodeDataUrl(file, (dataUrl) => {
-        adminUserMediaDrafts[uid] = dataUrl;
-        notify("تم تجهيز الصورة — اضغط (إرسال الصورة للمستخدم) لتأكيد الإرسال.", "success");
-        renderInspectedAccount();
-      });
-    };
-
-    window.sendMediaToUser = async function (uid) {
-      const imgData = adminUserMediaDrafts[uid];
-      if (!imgData) return notify("اختر أو صوّر صورة أولاً عبر زر كاميرا أو استوديو.", "error");
-      const captionEl = document.getElementById(`admin-user-caption-${uid}`);
-      const caption = (captionEl ? captionEl.value : "").trim() || "صورة مرسلة من الأدمن";
-      const now = Date.now();
-      await push(ref(db, `userMessages/${uid}`), {
-        type: "image",
-        caption,
-        image: imgData,
-        createdAt: now,
-        dateTimeText: new Date(now).toLocaleString("ar-EG")
-      });
-      delete adminUserMediaDrafts[uid];
-      notify(`تم إرسال الصورة إلى (${store.users[uid]?.name || "المستخدم"}) بنجاح.`, "success");
-      renderInspectedAccount();
-    };
-
-    function renderUsersAndInspector() {
-      const sel = document.getElementById("inspect-user-select");
-      const entries = Object.entries(store.users || {});
-      if (!selectedUserIdForLog && entries.length) {
-        selectedUserIdForLog = entries[0][0];
-      }
-      const targetUid = sel.value || selectedUserIdForLog;
-      sel.innerHTML = entries.length
-        ? entries.map(([uid, u]) => `<option value="${esc(uid)}">${esc(u.name)} (${u.role === "challenger" ? "متسابق" : "عميل"}) - ${esc(u.phone || "")}</option>`).join("")
-        : `<option value="">لا يوجد مستخدمون</option>`;
-      if (targetUid && store.users[targetUid]) {
-        sel.value = targetUid;
-        selectedUserIdForLog = targetUid;
-      }
-      window.renderInspectedAccount();
-
-      const banEl = document.getElementById("banned-list");
-      const bans = Object.entries(store.banned || {});
-      banEl.innerHTML = bans.length
-        ? bans.map(([id, b]) => `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #e2e8f0;">
-            <span>🚫 ${esc(b.name || "")} ${b.phone ? "• " + esc(b.phone) : ""}</span>
-            <button type="button" class="btn-soft" onclick="removeBan('${esc(id)}')">فك الحظر</button>
-          </div>
-        `).join("")
-        : `<div style="font-size:13px; color:#64748b;">لا يوجد محظورون.</div>`;
-
-      const listEl = document.getElementById("all-users-list");
-      listEl.innerHTML = entries.length
-        ? entries.map(([uid, u]) => {
-            const cStat = store.challengersStats[uid] || {};
-            const clStat = store.clientActivity?.[uid] || {};
-            const completedCount = u.role === "challenger"
-              ? (Number(cStat.completedCount) || 0)
-              : (Number(clStat.completedOrdersCount) || Number(clStat.orderCount) || 0);
-
-            return `
-              <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <div>
-                  <button type="button" class="user-name-link" onclick="openUserOperationsLog('${esc(uid)}')">
-                    ${esc(u.name)}
-                  </button>
-                  <span>(${u.role === "challenger" ? "متسابق" : "عميل"}) • ${esc(u.phone || "")}</span><br/>
-                  <span style="font-size:13px; color:#059669; font-weight:bold;">
-                    الرصيد: ${Number(u.wallet) || 0} جنيه • النقاط: ${Number(u.points) || 0} • العمليات المنتهية: ${completedCount}
-                  </span>
-                </div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                  <button type="button" class="btn-blue" onclick="openUserOperationsLog('${esc(uid)}')">سجل العمليات</button>
-                  <button type="button" class="btn-dark" onclick="setWallet('${esc(uid)}')">تعديل الرصيد</button>
-                  <button type="button" class="btn-amber" onclick="setPoints('${esc(uid)}')">تعديل النقاط</button>
-                  <button type="button" class="btn-danger" onclick="banUserDirectly('${esc(u.name)}', '${esc(u.phone || "")}')">حظر</button>
-                </div>
-              </div>
-            `;
-          }).join("")
-        : `<div class="box">لا يوجد مستخدمون مسجلون.</div>`;
+      return uRef.key;
     }
 
-    window.renderInspectedAccount = function () {
-      const sel = document.getElementById("inspect-user-select");
-      const uid = (sel && sel.value) || selectedUserIdForLog;
-      selectedUserIdForLog = uid;
-      const box = document.getElementById("inspected-account-details");
-      if (!uid || !store.users[uid]) {
-        box.innerHTML = "";
-        return;
+    window.handleClientReq = async function (reqId, action) {
+      const r = st.clientRegRequests?.[reqId];
+      if (!r) return;
+      await update(ref(db, `clientRegRequests/${reqId}`), { status: action });
+      if (action === "approved") {
+        await ensureUserRecord(r.name, r.phone, "client", "approved", r.invitedBy || "");
+        notifyAdmin(`تمت الموافقة على العميل (${r.name}) وانتقل لصفحة الطلبات.`, "success");
+      } else {
+        await ensureUserRecord(r.name, r.phone, "client", "rejected", r.invitedBy || "");
+        notifyAdmin(`تم رفض طلب العميل (${r.name}).`, "info");
       }
-      const u = store.users[uid];
-      const cleanName = sanitizeKey((u.name || "").trim().toLowerCase());
+    };
 
-      const completedOrders = Object.entries(store.orders || {})
-        .filter(([, o]) => isOrderCompleted(o) && (o.buyerId === uid || o.assignedChallengerId === uid))
-        .map(([id, o]) => ({ orderId: id, ...o }));
-
-      const historyMap = {};
-      if (store.userOrderHistory?.[uid]) Object.assign(historyMap, store.userOrderHistory[uid]);
-      if (store.challengerHistory?.[uid]) Object.assign(historyMap, store.challengerHistory[uid]);
-      if (cleanName && store.userOrderHistoryByName?.[cleanName]) Object.assign(historyMap, store.userOrderHistoryByName[cleanName]);
-      for (const co of completedOrders) {
-        if (!historyMap[co.orderId]) historyMap[co.orderId] = co;
+    window.handleChallengerReq = async function (reqId, action) {
+      const r = st.challengerRegRequests?.[reqId];
+      if (!r) return;
+      await update(ref(db, `challengerRegRequests/${reqId}`), { status: action });
+      if (action === "approved") {
+        await ensureUserRecord(r.name, r.phone, "challenger", "approved", r.invitedBy || "");
+        notifyAdmin(`تمت الموافقة على المتسابق (${r.name}) وأصبح مشتركاً.`, "success");
+      } else if (action === "rejected") {
+        await ensureUserRecord(r.name, r.phone, "challenger", "rejected", r.invitedBy || "");
+        notifyAdmin(`تم رفض طلب المتسابق (${r.name}).`, "info");
+      } else if (action === "waiting") {
+        await ensureUserRecord(r.name, r.phone, "challenger", "waiting", r.invitedBy || "");
+        await push(ref(db, "waitingList"), {
+          name: r.name,
+          phone: r.phone,
+          role: "challenger",
+          createdAt: r.createdAt || Date.now(),
+          dateText: new Date(r.createdAt || Date.now()).toLocaleString("ar-EG")
+        });
+        notifyAdmin(`تم وضع (${r.name}) في قائمة الانتظار.`, "info");
       }
-
-      const logEntries = Object.entries(historyMap).sort(
-        (a, b) => (b[1]?.completedAt || b[1]?.deliveredAt || 0) - (a[1]?.completedAt || a[1]?.deliveredAt || 0)
-      );
-
-      const cStat = store.challengersStats[uid] || {};
-      const completedCount = u.role === "challenger"
-        ? Math.max(Number(cStat.completedCount) || 0, logEntries.length)
-        : logEntries.length;
-
-      const draftImg = adminUserMediaDrafts[uid] || "";
-      const userMsgs = Object.values(store.userMessages?.[uid] || {}).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-      box.innerHTML = `
-        <div class="account-card">
-          <h4 style="margin:0 0 8px;">سجل عمليات الحساب: ${esc(u.name)} (${u.role === "challenger" ? "متسابق" : "عميل"})</h4>
-          <div><strong>رقم التلفون:</strong> ${esc(u.phone || "")} • <strong>الرصيد:</strong> ${Number(u.wallet) || 0} جنيه • <strong>النقاط:</strong> ${Number(u.points) || 0}</div>
-          <div style="margin-top:4px; color:#059669; font-weight:bold;">
-            عدد العمليات المنتهية: ${completedCount}
-            ${u.role === "challenger" && cStat.lastDeliverySec ? ` • آخر وقت توصيل: ${formatDuration(cStat.lastDeliverySec)}` : ""}
-          </div>
-
-          <div style="margin-top:12px; padding-top:12px; border-top:1px dashed #93c5fd;">
-            <label>إرسال نقاط مباشرة لهذا المستخدم</label>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; max-width:420px;">
-              <input type="number" id="send-pts-input-${esc(uid)}" min="1" step="1" placeholder="عدد النقاط..." />
-              <button type="button" class="btn-success" onclick="sendPointsToUser('${esc(uid)}')">إرسال نقاط</button>
-            </div>
-          </div>
-
-          <div style="margin-top:12px; padding-top:12px; border-top:1px dashed #93c5fd;">
-            <label>إرسال صورة لهذا المستخدم (كاميرا / استوديو)</label>
-            <input type="file" id="admin-user-cam-${esc(uid)}" accept="image/*" capture="environment" style="display:none;" onchange="handleAdminUserMediaFile(this, '${esc(uid)}')" />
-            <input type="file" id="admin-user-gal-${esc(uid)}" accept="image/*" style="display:none;" onchange="handleAdminUserMediaFile(this, '${esc(uid)}')" />
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-              <button type="button" class="btn-dark" onclick="triggerAdminUserMediaPick('${esc(uid)}', 'camera')">📷 كاميرا</button>
-              <button type="button" class="btn-amber" onclick="triggerAdminUserMediaPick('${esc(uid)}', 'gallery')">🖼️ استوديو</button>
-            </div>
-            <input type="text" id="admin-user-caption-${esc(uid)}" placeholder="تعليق أو ملاحظة مع الصورة (اختياري)..." style="max-width:420px; margin-bottom:8px;" />
-            <div><button type="button" class="btn-blue" onclick="sendMediaToUser('${esc(uid)}')">إرسال الصورة للمستخدم</button></div>
-            ${draftImg ? `<img src="${draftImg}" class="receipt-thumb" style="margin-top:10px;" alt="معاينة الصورة المرسلة" />` : ""}
-          </div>
-
-          <div style="margin-top:14px;">
-            <h5 style="margin:0 0 8px;">سجل العمليات والتوصيل المنتهية:</h5>
-            ${
-              logEntries.length
-                ? logEntries.map(([oid, item]) => {
-                    const dt = item.dateTimeText || (item.completedAt ? new Date(item.completedAt).toLocaleString("ar-EG") : "");
-                    const dur = item.deliveryDurationSec ? ` • مدة التوصيل: ${formatDuration(item.deliveryDurationSec)}` : "";
-                    const itemsStr = Array.isArray(item.items) && item.items.length
-                      ? item.items.map((x) => `${esc(x.title)} (${Number(x.price) || 0} جنيه)`).join(" ، ")
-                      : esc(item.challengeTitle || "عملية");
-                    return `
-                      <div class="box completed-box" style="margin-bottom:8px;">
-                        <strong>عملية #${esc(String(item.orderId || oid).slice(-6))}</strong> • <strong style="color:#166534;">${esc(item.status || "تم التوصيل")}</strong><br/>
-                        <span style="font-size:13px;">${itemsStr} • الإجمالي: <strong>${Number(item.totalAmount) || 0} جنيه</strong></span><br/>
-                        <span style="font-size:12px; color:#1d4ed8; font-weight:bold;">التاريخ والوقت: ${esc(dt)}${dur}</span>
-                      </div>
-                    `;
-                  }).join("")
-                : `<div style="font-size:13px; color:#475569;">لا توجد عمليات منتهية مسجلة لهذا الحساب حتى الآن.</div>`
-            }
-          </div>
-
-          ${
-            userMsgs.length
-              ? `
-            <div style="margin-top:12px;">
-              <h5 style="margin:0 0 6px;">الرسائل والصور والنقاط المرسلة لهذا الحساب:</h5>
-              ${userMsgs.map((m) => `
-                <div style="font-size:13px; padding:6px 0; border-bottom:1px solid #cbd5e1;">
-                  • ${esc(m.text || m.caption || "")} (${esc(m.dateTimeText || "")})
-                </div>
-              `).join("")}
-            </div>
-          `
-              : ""
-          }
-        </div>
-      `;
     };
 
-    window.setWallet = async function (uid) {
-      const cur = Number(store.users[uid]?.wallet) || 0;
-      const val = prompt("أدخل الرصيد الجديد بالجنيه:", String(cur));
-      if (val === null) return;
-      const num = Number(val);
-      if (Number.isNaN(num) || num < 0) return notify("قيمة غير صالحة.", "error");
-      await update(ref(db, `users/${uid}`), { wallet: num });
-      notify("تم تحديث رصيد المستخدم.", "success");
+    window.deleteUserAccount = async function (uid) {
+      const u = st.users?.[uid];
+      if (!u) return;
+      if (!confirm(`تأكيد حذف (${u.name}) ومنعه من الدخول بنفس البيانات؟`)) return;
+      await push(ref(db, "banned"), { name: u.name, phone: u.phone || "", createdAt: Date.now() });
+      await remove(ref(db, `users/${uid}`));
+      notifyAdmin(`تم حذف (${u.name}) وحظره من الدخول بنفس البيانات.`, "success");
     };
 
-    window.setPoints = async function (uid) {
-      const cur = Number(store.users[uid]?.points) || 0;
-      const val = prompt("أدخل عدد النقاط الجديد (point):", String(cur));
-      if (val === null) return;
-      const num = Number(val);
-      if (Number.isNaN(num) || num < 0) return notify("قيمة غير صالحة.", "error");
-      await update(ref(db, `users/${uid}`), { points: num });
-      notify("تم تحديث نقاط المستخدم.", "success");
+    window.openPickedUserInIndex = function () {
+      const uid = document.getElementById("admin-user-picker").value || pickedUserId;
+      if (!uid || !st.users[uid]) return;
+      localStorage.setItem("engz_user_session_v2", JSON.stringify({ id: uid, ...st.users[uid] }));
+      window.open("index.html", "_blank");
     };
 
-    window.addBan = async function () {
-      const name = document.getElementById("ban-name").value.trim();
-      const phone = document.getElementById("ban-phone").value.trim();
-      if (!name && !phone) return notify("أدخل الاسم أو رقم التلفون للحظر.", "error");
-      await push(ref(db, "banned"), { name, phone, createdAt: Date.now() });
-      document.getElementById("ban-name").value = "";
-      document.getElementById("ban-phone").value = "";
-      notify("تمت الإضافة إلى قائمة المحظورين.", "success");
-    };
+    function getAllDepts() {
+      const extra = Array.isArray(st.departments) ? st.departments : [];
+      return [...new Set([...DEFAULT_DEPTS, ...extra])];
+    }
 
-    window.banUserDirectly = async function (name, phone) {
-      await push(ref(db, "banned"), { name, phone, createdAt: Date.now() });
-      notify(`تم حظر ${name}.`, "success");
-    };
+    function getSubDepts(parentDept) {
+      const m = st.subDepartments?.[parentDept] || st.subDepartments?.[sKey(parentDept)] || {};
+      return Object.entries(m).map(([k, v]) => ({
+        key: k,
+        name: typeof v === "object" && v ? (v.name || k) : k,
+        image: typeof v === "object" && v ? (v.image || "") : ""
+      }));
+    }
 
-    window.removeBan = async function (id) {
-      await remove(ref(db, `banned/${id}`));
-      notify("تم فك الحظر.", "info");
-    };
-
-    window.addDepartment = async function () {
-      const name = document.getElementById("dept-name").value.trim();
-      if (!name) return notify("اكتب اسم القسم الرئيسي أولاً.", "error");
-      const current = allDepts();
-      if (!current.includes(name)) {
-        const extra = [...new Set([...(Array.isArray(store.departments) ? store.departments : []), name])];
-        await set(ref(db, "departments"), extra);
+    window.saveNewDepartment = async function () {
+      const name = document.getElementById("new-dept-name").value.trim();
+      if (!name) return notifyAdmin("اكتب اسم القسم.", "error");
+      const extra = [...new Set([...(Array.isArray(st.departments) ? st.departments : []), name])];
+      await set(ref(db, "departments"), extra);
+      if (draftImgs.dept) {
+        await set(ref(db, `departmentsMeta/${sKey(name)}`), { image: draftImgs.dept });
       }
-      if (imgs.deptImg) {
-        await set(ref(db, `departmentsMeta/${sanitizeKey(name)}`), { image: imgs.deptImg });
-      }
-      document.getElementById("dept-name").value = "";
-      window.clearAdminPreview("dept-img-file", "dept-img-prev", "del-dept-img-btn", "deptImg");
-      notify(`تم حفظ القسم الرئيسي (${name}).`, "success");
+      document.getElementById("new-dept-name").value = "";
+      draftImgs.dept = "";
+      document.getElementById("prev-dept").style.display = "none";
+      notifyAdmin(`تم حفظ القسم (${name}).`, "success");
     };
 
-    window.addSubDepartment = async function () {
-      const parentDept = document.getElementById("subdept-parent").value;
-      const subName = document.getElementById("subdept-name").value.trim();
-      if (!parentDept) return notify("اختر القسم الرئيسي أولاً.", "error");
-      if (!subName) return notify("اكتب اسم القسم الفرعي (مثل: أجبان أو ألبان).", "error");
-
-      const safeParent = sanitizeKey(parentDept);
-      const safeSub = sanitizeKey(subName);
-      const existingImg = store.subDepartments?.[parentDept]?.[subName]?.image
-        || store.subDepartments?.[safeParent]?.[safeSub]?.image
-        || "";
-
-      await set(ref(db, `subDepartments/${safeParent}/${safeSub}`), {
+    window.saveSubDepartment = async function () {
+      const parentDept = document.getElementById("sub-parent-dept").value;
+      const subName = document.getElementById("sub-dept-title").value.trim();
+      if (!parentDept || !subName) return notifyAdmin("اختر القسم الكبير واكتب اسم القسم الفرعي.", "error");
+      await set(ref(db, `subDepartments/${sKey(parentDept)}/${sKey(subName)}`), {
         name: subName,
-        image: imgs.subDeptImg || existingImg,
-        updatedAt: Date.now()
+        image: draftImgs.sub || ""
       });
-
-      document.getElementById("subdept-name").value = "";
-      window.clearAdminPreview("subdept-img-file", "subdept-img-prev", "del-subdept-img-btn", "subDeptImg");
-      notify(`تم إضافة القسم الفرعي (${subName}) تحت (${parentDept}).`, "success");
+      document.getElementById("sub-dept-title").value = "";
+      draftImgs.sub = "";
+      document.getElementById("prev-sub").style.display = "none";
+      notifyAdmin(`تم حفظ القسم الفرعي (${subName}) تحت (${parentDept}).`, "success");
     };
 
-    window.syncProdSubDeptOptions = function () {
-      const parentDept = document.getElementById("prod-dept").value;
-      const subSel = document.getElementById("prod-subdept");
-      const subs = getSubDeptsForParent(parentDept);
-      subSel.innerHTML = subs.length
-        ? subs.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join("")
-        : `<option value="">عام / بدون قسم فرعي</option>`;
+    window.syncItemSubDeptSelect = function () {
+      const dept = document.getElementById("item-dept").value;
+      const sel = document.getElementById("item-subdept");
+      const subs = getSubDepts(dept);
+      sel.innerHTML = subs.length
+        ? subs.map((s) => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join("")
+        : `<option value="">عام</option>`;
     };
 
-    window.addProduct = async function () {
-      const dept = document.getElementById("prod-dept").value;
-      const subDept = document.getElementById("prod-subdept").value;
-      const type = document.getElementById("prod-type").value.trim();
-      const title = document.getElementById("prod-title").value.trim();
-      const price = Number(document.getElementById("prod-price").value);
-      const desc = document.getElementById("prod-desc").value.trim();
-      const isOffer = Boolean(document.getElementById("prod-offer").checked);
-
+    window.saveCatalogItem = async function () {
+      const dept = document.getElementById("item-dept").value;
+      const subDept = document.getElementById("item-subdept").value;
+      const title = document.getElementById("item-title").value.trim();
+      const price = Number(document.getElementById("item-price").value);
+      const isOffer = Boolean(document.getElementById("item-is-offer").checked);
       if (!dept || !title || Number.isNaN(price) || price < 0) {
-        return notify("أدخل القسم والاسم والسعر بشكل صحيح.", "error");
+        return notifyAdmin("أدخل القسم والاسم والسعر بشكل صحيح.", "error");
       }
 
-      const saveItem = async (finalImageData) => {
-        const pRef = push(ref(db, `products/${sanitizeKey(dept)}`));
+      const writeItem = async (finalImg) => {
+        const pRef = push(ref(db, `products/${sKey(dept)}`));
         await set(pRef, {
-          subDept: subDept || "",
-          type: type || subDept || title,
+          subDept,
           title,
           price,
-          desc,
           isOffer,
-          image: finalImageData || "",
+          image: finalImg || "",
           createdAt: Date.now()
         });
-        document.getElementById("prod-title").value = "";
-        document.getElementById("prod-price").value = "";
-        document.getElementById("prod-desc").value = "";
-        document.getElementById("prod-offer").checked = false;
-        window.clearAdminPreview("prod-img-file", "prod-img-prev", "del-prod-img-btn", "prodImg");
-        notify(`تمت إضافة (${title}) بسعر ${price} جنيه مدمج بدقة عالية على الصورة.`, "success");
+        document.getElementById("item-title").value = "";
+        document.getElementById("item-price").value = "";
+        document.getElementById("item-is-offer").checked = false;
+        draftImgs.item = "";
+        document.getElementById("prev-item").style.display = "none";
+        notifyAdmin("تمت الإضافة بنجاح.", "success");
       };
 
-      if (imgs.prodImg) {
-        bakePriceIntoProductImage(imgs.prodImg, title, price, saveItem);
+      if (draftImgs.item) {
+        burnPriceOnImage(draftImgs.item, title, price, writeItem);
       } else {
-        await saveItem("");
+        await writeItem("");
       }
     };
 
-    window.deleteProduct = async function (dept, id) {
-      await remove(ref(db, `products/${sanitizeKey(dept)}/${id}`));
-      notify("تم حذف الصنف.", "info");
+    window.deleteCatalogItem = async function (dept, id) {
+      await remove(ref(db, `products/${sKey(dept)}/${id}`));
+      notifyAdmin("تم حذف الصنف.", "info");
     };
 
-    function renderSubDepartmentsAdminList() {
-      const parentDept = document.getElementById("subdept-parent")?.value || "سوبرمركت";
-      const box = document.getElementById("subdepartments-cards-list");
-      if (!box) return;
-      const subs = getSubDeptsForParent(parentDept);
-      const metaMap = store.subDepartments?.[parentDept] || store.subDepartments?.[sanitizeKey(parentDept)] || {};
-
-      box.innerHTML = subs.map((sd) => {
-        const m = metaMap[sd] || metaMap[sanitizeKey(sd)] || {};
-        return `
-          <div class="box" style="margin-bottom:0;">
-            ${m.image ? `<img src="${m.image}" class="receipt-thumb" style="width:100%; height:130px; object-fit:cover; margin-bottom:8px;" alt="${esc(sd)}" />` : ""}
-            <div style="font-weight:bold; font-size:15px; margin-bottom:8px;">${esc(sd)} <span style="font-size:12px; color:#64748b;">(${esc(parentDept)})</span></div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button type="button" class="btn-amber" onclick="startReplaceEntityImage('subdept', '${esc(parentDept)}', '${esc(sd)}')">🖼️ تغيير الصورة</button>
-              ${m.image ? `<button type="button" class="btn-danger" onclick="deleteSubDeptImage('${esc(parentDept)}', '${esc(sd)}')">🗑️ حذف الصورة</button>` : ""}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function renderCatalog() {
-      const depts = allDepts();
-      const subParentSel = document.getElementById("subdept-parent");
-      const prevSubParent = subParentSel.value || "سوبرمركت";
-      subParentSel.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
-      if (depts.includes(prevSubParent)) subParentSel.value = prevSubParent;
-      renderSubDepartmentsAdminList();
-
-      const prodDeptSel = document.getElementById("prod-dept");
-      const prevProdDept = prodDeptSel.value || "سوبرمركت";
-      prodDeptSel.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
-      if (depts.includes(prevProdDept)) prodDeptSel.value = prevProdDept;
-      window.syncProdSubDeptOptions();
-
-      const deptCardsBox = document.getElementById("departments-cards-list");
-      deptCardsBox.innerHTML = depts.map((d) => {
-        const m = store.departmentsMeta[d] || store.departmentsMeta[sanitizeKey(d)] || {};
-        return `
-          <div class="box" style="margin-bottom:0;">
-            ${m.image ? `<img src="${m.image}" class="receipt-thumb" style="width:100%; height:130px; object-fit:cover; margin-bottom:8px;" alt="${esc(d)}" />` : ""}
-            <div style="font-weight:bold; font-size:15px; margin-bottom:8px;">${esc(d)}</div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button type="button" class="btn-amber" onclick="startReplaceEntityImage('dept', '${esc(d)}')">🖼️ تغيير الصورة</button>
-              ${m.image ? `<button type="button" class="btn-danger" onclick="deleteDeptImage('${esc(d)}')">🗑️ حذف الصورة</button>` : ""}
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      const pBox = document.getElementById("all-products-list");
-      const rows = [];
-      for (const [dept, items] of Object.entries(store.products || {})) {
-        for (const [id, it] of Object.entries(items || {})) {
-          rows.push({ dept, id, ...it });
-        }
-      }
-      pBox.innerHTML = rows.length
-        ? rows.map((r) => `
-          <div class="box" style="margin-bottom:0;">
-            ${r.image ? `<img src="${r.image}" class="receipt-thumb" style="width:100%; height:150px; object-fit:cover; margin-bottom:8px;" alt="${esc(r.title)}" />` : ""}
-            <div><strong>${esc(r.title)}</strong> • <span style="color:#be185d; font-weight:bold;">${Number(r.price) || 0} جنيه</span></div>
-            <div style="font-size:12px; color:#64748b; margin-bottom:8px;">
-              ${esc(r.dept)}${r.subDept ? " / " + esc(r.subDept) : ""}${r.isOffer ? " • ⭐ عرض خاص" : ""}
-            </div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button type="button" class="btn-amber" onclick="startReplaceEntityImage('product', '${esc(r.dept)}', '${esc(r.subDept || "")}', '${esc(r.id)}')">🖼️ تغيير الصورة</button>
-              ${r.image ? `<button type="button" class="btn-soft" onclick="deleteProductImage('${esc(r.dept)}', '${esc(r.id)}')">حذف الصورة</button>` : ""}
-              <button type="button" class="btn-danger" onclick="deleteProduct('${esc(r.dept)}', '${esc(r.id)}')">حذف الصنف</button>
-            </div>
-          </div>
-        `).join("")
-        : `<div class="box">لا توجد منتجات أو أنواع أو عروض مضافة بعد.</div>`;
-    }
-
-    window.addChallenge = async function () {
-      const title = document.getElementById("chal-title").value.trim();
-      const reward = Number(document.getElementById("chal-reward").value) || 0;
-      const details = document.getElementById("chal-details").value.trim();
-      if (!title || !details) return notify("أدخل عنوان المهمة وتفاصيلها.", "error");
+    window.saveNewChallenge = async function () {
+      const title = document.getElementById("chal-title-in").value.trim();
+      const reward = Number(document.getElementById("chal-reward-in").value) || 0;
+      const details = document.getElementById("chal-details-in").value.trim();
+      if (!title || !details) return notifyAdmin("أدخل عنوان التحدي وتفاصيله.", "error");
       await push(ref(db, "challenges"), {
         title,
         reward,
         details,
+        image: draftImgs.chal || "",
         completed: false,
-        status: "متاحة",
         createdAt: Date.now()
       });
-      document.getElementById("chal-title").value = "";
-      document.getElementById("chal-reward").value = "";
-      document.getElementById("chal-details").value = "";
-      notify("تم نشر التحدي / المهمة.", "success");
+      document.getElementById("chal-title-in").value = "";
+      document.getElementById("chal-reward-in").value = "";
+      document.getElementById("chal-details-in").value = "";
+      draftImgs.chal = "";
+      document.getElementById("prev-chal").style.display = "none";
+      notifyAdmin("تم تأكيد ونشر التحدي.", "success");
     };
 
-    window.sendGift = async function () {
-      const title = document.getElementById("gift-title").value.trim();
-      const targetName = document.getElementById("gift-target").value.trim();
-      const details = document.getElementById("gift-details").value.trim();
-      if (!title || !details) return notify("أدخل عنوان الهدية وتفاصيلها.", "error");
-      await push(ref(db, "gifts"), { title, targetName, details, createdAt: Date.now() });
-      document.getElementById("gift-title").value = "";
-      document.getElementById("gift-target").value = "";
-      document.getElementById("gift-details").value = "";
-      notify("تم إرسال الهدية.", "success");
+    window.saveNewGift = async function () {
+      const title = document.getElementById("gift-title-in").value.trim();
+      const targetName = document.getElementById("gift-target-in").value.trim();
+      const details = document.getElementById("gift-details-in").value.trim();
+      if (!title || !details) return notifyAdmin("أدخل عنوان الهدية وتفاصيلها.", "error");
+      await push(ref(db, "gifts"), {
+        title,
+        targetName,
+        details,
+        image: draftImgs.gift || "",
+        createdAt: Date.now()
+      });
+      document.getElementById("gift-title-in").value = "";
+      document.getElementById("gift-target-in").value = "";
+      document.getElementById("gift-details-in").value = "";
+      draftImgs.gift = "";
+      document.getElementById("prev-gift").style.display = "none";
+      notifyAdmin("تم إرسال الهدية.", "success");
     };
 
-    function renderChallenges() {
-      const pendEl = document.getElementById("pending-challenges-list");
-      const compEl = document.getElementById("completed-challenges-list");
-      const entries = Object.entries(store.challenges || {});
+    window.updatePhoneSlotVal = function (idx, val) {
+      phoneSlots[idx] = val.trim();
+    };
 
-      const pending = entries.filter(([, c]) => !c.completed);
-      const completed = entries.filter(([, c]) => Boolean(c.completed));
+    window.togglePhoneSlotCheck = function (idx, checked) {
+      const selectedCount = checkedSlots.filter(Boolean).length;
+      if (checked && selectedCount >= 5) {
+        checkedSlots[idx] = false;
+        renderPhoneSlotsEditor();
+        return notifyAdmin("يمكن اختيار 5 أرقام كحد أقصى.", "error");
+      }
+      checkedSlots[idx] = checked;
+    };
 
-      pendEl.innerHTML = pending.length
-        ? pending.map(([id, c]) => `
-          <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <div>
-              <strong>${esc(c.title)}</strong> • مكافأة: <strong>${Number(c.reward) || 0} جنيه</strong><br/>
-              <span style="font-size:13px; color:#475569;">${esc(c.details)}</span>
-            </div>
-            <button type="button" class="btn-danger" onclick="deleteChallenge('${esc(id)}')">حذف</button>
-          </div>
-        `).join("")
-        : `<div class="box">لا توجد مهام نشطة أو معلقة.</div>`;
+    window.addExtraPhoneSlot = function () {
+      const p = document.getElementById("extra-phone-in").value.trim();
+      if (!isEgyptMobile(p)) return notifyAdmin("أدخل رقم موبايل صالح يعمل في مصر (11 رقماً).", "error");
+      phoneSlots.push(p);
+      checkedSlots.push(checkedSlots.filter(Boolean).length < 5);
+      document.getElementById("extra-phone-in").value = "";
+      renderPhoneSlotsEditor();
+    };
 
-      compEl.innerHTML = completed.length
-        ? completed.map(([id, c]) => `
-          <div class="box completed-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <div>
-              <strong>${esc(c.title)}</strong> • <span class="badge-status completed">مكتملة ✓</span><br/>
-              <span style="font-size:13px; color:#166534;">المتسابق: <strong>${esc(c.acceptedByName || "متسابق")}</strong> • المكافأة: <strong>${Number(c.reward) || 0} جنيه</strong></span>
-            </div>
-            <button type="button" class="btn-danger" onclick="deleteChallenge('${esc(id)}')">حذف من السجل</button>
-          </div>
-        `).join("")
-        : `<div class="box">لا توجد مهام مكتملة بعد.</div>`;
+    window.saveSelectedCashPhones = async function () {
+      const chosen = phoneSlots
+        .map((p, i) => (checkedSlots[i] ? p.trim() : ""))
+        .filter((p) => isEgyptMobile(p))
+        .slice(0, 5);
+      await set(ref(db, "cashPhones"), chosen);
+      await set(ref(db, "phoneSlots"), phoneSlots);
+      notifyAdmin(`تم حفظ (${chosen.length}) رقم استقبال كاش.`, "success");
+    };
+
+    function renderPhoneSlotsEditor() {
+      const box = document.getElementById("seven-slots-box");
+      if (!box) return;
+      box.innerHTML = phoneSlots.map((ph, idx) => `
+        <div class="box" style="display:flex; align-items:center; gap:8px; margin-bottom:0;">
+          <input type="checkbox" style="width:20px; height:20px;" ${checkedSlots[idx] ? "checked" : ""} onchange="togglePhoneSlotCheck(${idx}, this.checked)" />
+          <input type="tel" value="${esc(ph)}" maxlength="11" placeholder="رقم ${idx + 1} (01xxxxxxxxx)" oninput="updatePhoneSlotVal(${idx}, this.value)" />
+        </div>
+      `).join("");
     }
 
-    window.deleteChallenge = async function (id) {
-      await remove(ref(db, `challenges/${id}`));
-      notify("تم حذف المهمة.", "info");
-    };
-
-    window.addCashPhone = async function () {
-      const phone = document.getElementById("cash-phone-input").value.trim();
-      if (!isValidPhone(phone)) return notify("أدخل رقم تلفون مصرياً صحيحاً (11 رقماً).", "error");
-      const current = Array.isArray(store.cashPhones) ? [...store.cashPhones] : [];
-      if (current.length >= 5) return notify("الحد الأقصى 5 أرقام كاش.", "error");
-      if (!current.includes(phone)) current.push(phone);
-      await set(ref(db, "cashPhones"), current);
-      document.getElementById("cash-phone-input").value = "";
-      notify("تم حفظ رقم الكاش.", "success");
-    };
-
-    window.removeCashPhone = async function (idx) {
-      const current = Array.isArray(store.cashPhones) ? [...store.cashPhones] : [];
-      current.splice(idx, 1);
-      await set(ref(db, "cashPhones"), current);
-      notify("تم حذف الرقم.", "info");
-    };
-
-    window.confirmOrderPaymentAdmin = async function (orderId) {
-      const ord = store.orders[orderId];
-      if (!ord) return notify("الطلب غير موجود.", "error");
-
-      const now = Date.now();
+    window.confirmCashReceivedAdmin = async function (orderId) {
       await update(ref(db, `orders/${orderId}`), {
         paymentConfirmed: true,
         paymentStatus: "confirmed",
-        paymentConfirmedAt: now,
-        deliveryStatus: "out_for_delivery",
-        deliveryStartAt: now,
-        status: "جارى تنفيذ طلبك • جارى التوصيل"
+        status: "جارى تنفيذ طلبك"
       });
-
-      if (ord.buyerId) {
-        await runTransaction(ref(db, `clientActivity/${sanitizeKey(ord.buyerId)}`), (curr) => {
-          const prev = curr || {
-            userId: ord.buyerId,
-            name: ord.buyerName || "عميل",
-            phone: ord.buyerPhone || "",
-            orderCount: 0,
-            completedOrdersCount: 0,
-            totalSpent: 0
-          };
-          return {
-            ...prev,
-            userId: ord.buyerId,
-            name: ord.buyerName || prev.name,
-            phone: ord.buyerPhone || prev.phone,
-            confirmedPaymentsCount: (Number(prev.confirmedPaymentsCount) || 0) + 1
-          };
-        });
-      }
-
-      notify(`تم تأكيد الدفع للطلب #${orderId.slice(-6)} — ظهر للمستخدم (جارى تنفيذ طلبك • جارى التوصيل).`, "success");
+      notifyAdmin("تم تأكيد استلام الكاش ووصلت رسالة (جارى تنفيذ طلبك) للمستخدم.", "success");
     };
 
-    function renderOrdersAndCash() {
-      const cList = document.getElementById("cash-phones-list");
-      const phones = Array.isArray(store.cashPhones) ? store.cashPhones.slice(0, 5) : [];
-      cList.innerHTML = phones.length
-        ? phones.map((p, i) => `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #e2e8f0;">
-            <strong>${esc(p)}</strong>
-            <button type="button" class="btn-soft" onclick="removeCashPhone(${i})">حذف</button>
-          </div>
-        `).join("")
-        : `<div style="font-size:13px; color:#64748b;">لم تتم إضافة أرقام كاش بعد.</div>`;
+    window.confirmDeliveryDoneAdmin = async function (orderId) {
+      const ord = st.orders?.[orderId];
+      if (!ord) return;
+      const now = Date.now();
+      await update(ref(db, `orders/${orderId}`), {
+        stage: "completed",
+        orderCompleted: true,
+        deliveryStatus: "completed",
+        status: "تم التوصيل",
+        completedAt: now,
+        completedAtFormatted: new Date(now).toLocaleString("ar-EG")
+      });
 
-      const oList = document.getElementById("all-orders-list");
-      const compList = document.getElementById("completed-orders-list");
-      const allEntries = Object.entries(store.orders || {}).sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0));
-
-      const activeEntries = allEntries.filter(([, o]) => !isOrderCompleted(o));
-      const completedEntries = allEntries.filter(([, o]) => isOrderCompleted(o));
-
-      const renderOrderCard = (id, o, isDone) => {
-        const itemsText = (o.items || []).map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ");
-        const isPayConfirmed = o.paymentStatus === "confirmed" || o.paymentConfirmed === true;
-        const receiptImg = o.receiptImage || "";
-        const proofImg = adminDeliveryProofs[id] || o.deliveryImage || "";
-        const payerPhone = o.payerPhone || o.buyerPhone || "غير محدد";
-        const receiverPhone = o.cashReceiverPhone || "غير محدد";
-        const doneDate = o.completedAtFormatted || o.deliveredAtFormatted || (o.completedAt ? new Date(o.completedAt).toLocaleString("ar-EG") : "");
-        const durText = o.deliveryDurationSec ? ` • مدة التوصيل: ${formatDuration(o.deliveryDurationSec)}` : "";
-
-        return `
-          <div class="box ${isDone ? "completed-box" : ""}">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-              <div>
-                <strong>طلب #${esc(id.slice(-6))}</strong> •
-                <button type="button" class="user-name-link" onclick="openUserOperationsLog('${esc(o.buyerId || "")}')">${esc(o.buyerName || "مستخدم")}</button>
-                • <strong>${Number(o.totalAmount) || 0} جنيه</strong>
-              </div>
-              <span class="badge-status ${isDone ? "completed" : isPayConfirmed ? "confirmed" : ""}">
-                ${isDone ? "تم التوصيل ✓" : isPayConfirmed ? "تم تأكيد الدفع • جارى التوصيل" : esc(o.status || "بانتظار تأكيد الدفع")}
-              </span>
-            </div>
-
-            <div style="font-size:13px; color:#334155; margin-top:6px;">
-              الأصناف: ${itemsText || esc(o.challengeTitle || "طلب")}<br/>
-              رقم الدفع: <strong>${esc(payerPhone)}</strong> • رقم الاستقبال المحدد: <strong>${esc(receiverPhone)}</strong>
-              ${isDone && doneDate ? `<br/><strong style="color:#166534;">تاريخ ووقت التوصيل: ${esc(doneDate)}${durText}</strong>` : ""}
-            </div>
-
-            ${
-              receiptImg
-                ? `
-              <div style="margin-top:10px;">
-                <div style="font-size:12px; font-weight:bold; color:#1e293b; margin-bottom:4px;">صورة إيصال الدفع المرسلة من العميل:</div>
-                <img src="${receiptImg}" class="receipt-thumb" onclick="window.open('${receiptImg}', '_blank')" alt="إيصال الدفع" />
-              </div>
-            `
-                : ""
-            }
-
-            ${
-              !isDone
-                ? `
-              <input type="file" id="admin-cam-${esc(id)}" accept="image/*" capture="environment" style="display:none;" onchange="handleAdminOrderPhotoFile(this, '${esc(id)}')" />
-              <input type="file" id="admin-gal-${esc(id)}" accept="image/*" style="display:none;" onchange="handleAdminOrderPhotoFile(this, '${esc(id)}')" />
-
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; align-items:center;">
-                ${!isPayConfirmed ? `<button type="button" class="btn-success" onclick="confirmOrderPaymentAdmin('${esc(id)}')">تأكيد الدفع</button>` : ""}
-                <button type="button" class="btn-dark" onclick="triggerAdminOrderPhotoPick('${esc(id)}', 'camera')">📷 كاميرا</button>
-                <button type="button" class="btn-amber" onclick="triggerAdminOrderPhotoPick('${esc(id)}', 'gallery')">🖼️ استوديو</button>
-                ${proofImg ? `<button type="button" class="btn-soft" onclick="clearAdminOrderPhoto('${esc(id)}')">حذف صورة التأكيد</button>` : ""}
-                <button type="button" class="btn-blue" onclick="markOrderArrivedAdmin('${esc(id)}')">تم التوصيل</button>
-                <button type="button" class="btn-danger" onclick="deleteCompletedOrder('${esc(id)}')">حذف</button>
-              </div>
-              ${proofImg ? `<img src="${proofImg}" class="receipt-thumb" style="margin-top:8px;" alt="صورة تأكيد التوصيل" />` : ""}
-            `
-                : `
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
-                <button type="button" class="btn-danger" onclick="deleteCompletedOrder('${esc(id)}')">حذف الطلب</button>
-              </div>
-            `
-            }
-          </div>
-        `;
+      const rec = {
+        orderId,
+        buyerId: ord.buyerId || "",
+        buyerName: ord.buyerName || "عميل",
+        assignedChallengerId: ord.assignedChallengerId || "",
+        assignedChallengerName: ord.assignedChallengerName || "",
+        challengeTitle: ord.challengeTitle || "",
+        items: ord.items || [],
+        totalAmount: Number(ord.totalAmount) || 0,
+        status: "تم التوصيل",
+        deliveryImage: ord.deliveryImage || "",
+        completedAt: now,
+        dateTimeText: new Date(now).toLocaleString("ar-EG")
       };
 
-      oList.innerHTML = activeEntries.length
-        ? activeEntries.map(([id, o]) => renderOrderCard(id, o, false)).join("")
-        : `<div class="box">لا توجد طلبات نشطة حالياً.</div>`;
+      if (ord.buyerId) {
+        await set(ref(db, `userOrderHistory/${sKey(ord.buyerId)}/${orderId}`), rec);
+      }
+      if (ord.assignedChallengerId) {
+        await set(ref(db, `challengerHistory/${sKey(ord.assignedChallengerId)}/${orderId}`), rec);
+      }
+      notifyAdmin("تم تأكيد التوصيل وانتقل الطلب إلى السجلات.", "success");
+    };
 
-      compList.innerHTML = completedEntries.length
-        ? completedEntries.map(([id, o]) => renderOrderCard(id, o, true)).join("")
-        : `<div class="box">لا توجد طلبات منتهية حتى الآن.</div>`;
+    window.renderSelectedUserAccount = function () {
+      const uid = document.getElementById("admin-user-picker")?.value || pickedUserId;
+      pickedUserId = uid;
+      const box = document.getElementById("admin-picked-user-details");
+      if (!box) return;
+      const u = st.users?.[uid];
+      if (!u) { box.innerHTML = ""; return; }
 
-      const runnersBox = document.getElementById("admin-runners-history-list");
-      const allChallengers = Object.entries(store.users || {}).filter(([, u]) => u.role === "challenger");
-      runnersBox.innerHTML = allChallengers.length
-        ? allChallengers.map(([uid, u]) => {
-            const cHist = Object.values(store.challengerHistory?.[uid] || {});
-            const cStat = store.challengersStats[uid] || {};
-            const count = Math.max(Number(cStat.completedCount) || 0, cHist.length);
+      const refSumm = st.referrals?.[sKey(uid)]?.summary || {};
+      const histObj = u.role === "challenger"
+        ? (st.challengerHistory?.[sKey(uid)] || {})
+        : (st.userOrderHistory?.[sKey(uid)] || {});
+      const histArr = Object.values(histObj);
+
+      box.innerHTML = `
+        <div class="box">
+          <strong>الاسم:</strong> ${esc(u.name)} • <strong>النوع:</strong> ${u.role === "challenger" ? "متسابق" : "عميل"} • <strong>الموبايل:</strong> ${esc(u.phone || "")}<br/>
+          <strong>الرصيد:</strong> ${Number(u.wallet) || 0} جنيه • <strong>النقاط (point):</strong> ${Number(u.points) || 0}<br/>
+          <strong>إرسال التطبيق بنجاح إلى:</strong> ${Number(refSumm.invitedCount) || 0} أشخاص • <strong>تحولوا لطلب/مهمة:</strong> ${Number(refSumm.activeConversions) || 0}
+          <div style="margin-top:8px;">
+            <strong>سجل العمليات:</strong>
+            ${histArr.length ? histArr.map((h) => `<div style="font-size:13px;">• ${esc(h.challengeTitle || h.orderId || "")} — ${Number(h.totalAmount) || 0} جنيه (${esc(h.dateTimeText || "")})</div>`).join("") : `<div style="font-size:13px;">لا توجد عمليات مسجلة.</div>`}
+          </div>
+        </div>
+      `;
+    };
+
+    function renderAdminAll() {
+      const cReqs = Object.entries(st.clientRegRequests || {}).filter(([, r]) => r.status === "pending");
+      const hReqs = Object.entries(st.challengerRegRequests || {}).filter(([, r]) => r.status === "pending");
+      const allUsers = Object.entries(st.users || {});
+      const allOrders = Object.entries(st.orders || {});
+      const allChals = Object.entries(st.challenges || {});
+
+      document.getElementById("cnt-requests").textContent = String(cReqs.length + hReqs.length);
+      document.getElementById("cnt-users").textContent = String(allUsers.length);
+      document.getElementById("cnt-catalog").textContent = String(getAllDepts().length);
+      document.getElementById("cnt-challenges").textContent = String(allChals.length);
+      document.getElementById("cnt-orders").textContent = String(allOrders.length);
+
+      document.getElementById("admin-client-reqs").innerHTML = cReqs.length
+        ? cReqs.map(([id, r]) => `
+          <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div><strong>${esc(r.name)}</strong> • ${esc(r.phone)}</div>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-success" onclick="handleClientReq('${esc(id)}', 'approved')">قبول</button>
+              <button type="button" class="btn-danger" onclick="handleClientReq('${esc(id)}', 'rejected')">رفض</button>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد طلبات عملاء جديدة.</div>`;
+
+      document.getElementById("admin-chal-reqs").innerHTML = hReqs.length
+        ? hReqs.map(([id, r]) => `
+          <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div><strong>${esc(r.name)}</strong> • ${esc(r.phone)}</div>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-success" onclick="handleChallengerReq('${esc(id)}', 'approved')">قبول</button>
+              <button type="button" class="btn-danger" onclick="handleChallengerReq('${esc(id)}', 'rejected')">رفض</button>
+              <button type="button" class="btn-amber" onclick="handleChallengerReq('${esc(id)}', 'waiting')">waiting</button>
+            </div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد طلبات متسابقين جديدة.</div>`;
+
+      const waitEntries = Object.values(st.waitingList || {}).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      document.getElementById("admin-waiting-list").innerHTML = waitEntries.length
+        ? waitEntries.map((w) => `
+          <div class="box"><strong>${esc(w.name)}</strong> • ${esc(w.phone || "")} • ${esc(w.dateText || "")}</div>
+        `).join("")
+        : `<div class="box">قائمة الانتظار فارغة.</div>`;
+
+      const picker = document.getElementById("admin-user-picker");
+      if (!pickedUserId && allUsers.length) pickedUserId = allUsers[0][0];
+      picker.innerHTML = allUsers.map(([uid, u]) => `<option value="${esc(uid)}">${esc(u.name)} (${u.role})</option>`).join("");
+      if (pickedUserId && st.users[pickedUserId]) picker.value = pickedUserId;
+      window.renderSelectedUserAccount();
+
+      const clients = allUsers.filter(([, u]) => u.role !== "challenger");
+      const rankedClients = [...clients].sort((a, b) => {
+        const volA = Number(st.referrals?.[sKey(a[0])]?.summary?.totalVolume) || 0;
+        const volB = Number(st.referrals?.[sKey(b[0])]?.summary?.totalVolume) || 0;
+        const cntA = Number(st.referrals?.[sKey(a[0])]?.summary?.activeConversions) || 0;
+        const cntB = Number(st.referrals?.[sKey(b[0])]?.summary?.activeConversions) || 0;
+        return (volB + cntB * 100) - (volA + cntA * 100);
+      });
+      document.getElementById("active-clients-ranked").innerHTML = rankedClients.length
+        ? rankedClients.map(([uid, u], i) => {
+            const sum = st.referrals?.[sKey(uid)]?.summary || {};
+            return `<div class="box">#${i + 1} <strong>${esc(u.name)}</strong> • قيمة: <strong>${Number(sum.totalVolume) || 0}</strong> • طلبات محالة: <strong>${Number(sum.activeConversions) || 0}</strong></div>`;
+          }).join("")
+        : `<div class="box">لا يوجد عملاء.</div>`;
+
+      const challengers = allUsers.filter(([, u]) => u.role === "challenger");
+      const rankedChals = [...challengers].sort((a, b) => {
+        const cA = Object.keys(st.challengerHistory?.[sKey(a[0])] || {}).length;
+        const cB = Object.keys(st.challengerHistory?.[sKey(b[0])] || {}).length;
+        const vA = Number(st.referrals?.[sKey(a[0])]?.summary?.totalVolume) || 0;
+        const vB = Number(st.referrals?.[sKey(b[0])]?.summary?.totalVolume) || 0;
+        return (cB * 100 + vB) - (cA * 100 + vA);
+      });
+      document.getElementById("active-challengers-ranked").innerHTML = rankedChals.length
+        ? rankedChals.map(([uid, u], i) => {
+            const doneCnt = Object.keys(st.challengerHistory?.[sKey(uid)] || {}).length;
+            const vol = Number(st.referrals?.[sKey(uid)]?.summary?.totalVolume) || 0;
+            return `<div class="box">#${i + 1} <strong>${esc(u.name)}</strong> • مهام ناجحة: <strong>${doneCnt}</strong> • قيمة: <strong>${vol}</strong></div>`;
+          }).join("")
+        : `<div class="box">لا يوجد متسابقون.</div>`;
+
+      document.getElementById("admin-clients-list").innerHTML = clients.length
+        ? clients.map(([uid, u]) => `
+          <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div><button type="button" class="name-link" onclick="pickedUserId='${esc(uid)}'; renderSelectedUserAccount();">${esc(u.name)}</button> • ${esc(u.phone || "")}</div>
+            <button type="button" class="btn-danger" onclick="deleteUserAccount('${esc(uid)}')">حذف</button>
+          </div>
+        `).join("")
+        : `<div class="box">لا يوجد عملاء.</div>`;
+
+      document.getElementById("admin-challengers-list").innerHTML = rankedChals.length
+        ? rankedChals.map(([uid, u]) => {
+            const doneCnt = Object.keys(st.challengerHistory?.[sKey(uid)] || {}).length;
             return `
-              <div class="box">
-                <button type="button" class="user-name-link" onclick="openUserOperationsLog('${esc(uid)}')">${esc(u.name)}</button>
-                <span>• ${esc(u.phone || "")} • المهام المنتهية: <strong>${count}</strong></span>
+              <div class="box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <div>
+                  <button type="button" class="name-link" onclick="pickedUserId='${esc(uid)}'; renderSelectedUserAccount();">${esc(u.name)}</button>
+                  • عدد الطلبات المنفذة: <strong>${doneCnt}</strong>
+                </div>
+                <div style="display:flex; gap:8px;">
+                  <button type="button" class="btn-blue" onclick="pickedUserId='${esc(uid)}'; renderSelectedUserAccount();">سجل الطلبات</button>
+                  <button type="button" class="btn-danger" onclick="deleteUserAccount('${esc(uid)}')">حذف</button>
+                </div>
               </div>
             `;
           }).join("")
-        : `<div class="box">لا يوجد متسابقون مسجلون.</div>`;
+        : `<div class="box">لا يوجد متسابقون.</div>`;
 
-      const clientsBox = document.getElementById("admin-clients-history-list");
-      const allClients = Object.entries(store.users || {}).filter(([, u]) => u.role !== "challenger");
-      clientsBox.innerHTML = allClients.length
-        ? allClients.map(([uid, u]) => {
-            const clHist = Object.values(store.userOrderHistory?.[uid] || {});
+      const depts = getAllDepts();
+      const subParent = document.getElementById("sub-parent-dept");
+      const itemDept = document.getElementById("item-dept");
+      const curParent = subParent.value || "سوبرمركت";
+      subParent.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+      if (depts.includes(curParent)) subParent.value = curParent;
+
+      const curItemDept = itemDept.value || "سوبرمركت";
+      itemDept.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+      if (depts.includes(curItemDept)) itemDept.value = curItemDept;
+      window.syncItemSubDeptSelect();
+      window.renderSubDeptsAdmin();
+
+      document.getElementById("admin-depts-grid").innerHTML = depts.map((d) => {
+        const m = st.departmentsMeta?.[d] || st.departmentsMeta?.[sKey(d)] || {};
+        return `
+          <div class="box" style="margin-bottom:0;">
+            ${m.image ? `<img src="${m.image}" class="thumb" style="width:100%; height:120px;" alt="${esc(d)}" />` : ""}
+            <div style="font-weight:bold; margin-top:6px;">${esc(d)}</div>
+          </div>
+        `;
+      }).join("");
+
+      const prodRows = [];
+      for (const [d, map] of Object.entries(st.products || {})) {
+        for (const [id, it] of Object.entries(map || {})) {
+          prodRows.push({ d, id, ...it });
+        }
+      }
+      document.getElementById("admin-items-grid").innerHTML = prodRows.length
+        ? prodRows.map((p) => `
+          <div class="box" style="margin-bottom:0;">
+            ${p.image ? `<img src="${p.image}" class="thumb" style="width:100%; height:130px;" alt="${esc(p.title)}" />` : ""}
+            <div><strong>${esc(p.title)}</strong> • <strong>${Number(p.price) || 0} جنيه</strong></div>
+            <div style="font-size:12px; color:#64748b;">${esc(p.d)}${p.subDept ? " / " + esc(p.subDept) : ""}${p.isOffer ? " • عرض خاص" : ""}</div>
+            <button type="button" class="btn-danger" style="margin-top:8px;" onclick="deleteCatalogItem('${esc(p.d)}', '${esc(p.id)}')">حذف</button>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد أصناف مضافة.</div>`;
+
+      document.getElementById("admin-challenges-list").innerHTML = allChals.length
+        ? allChals.map(([id, c]) => `
+          <div class="box ${c.completed ? "done-box" : ""}">
+            <strong>${esc(c.title)}</strong> • <strong>${Number(c.reward) || 0} جنيه</strong>
+            <div style="font-size:13px;">${esc(c.details)}</div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد تحديات.</div>`;
+
+      renderPhoneSlotsEditor();
+
+      const activeOrd = allOrders.filter(([, o]) => !isDoneOrder(o));
+      const doneOrd = allOrders.filter(([, o]) => isDoneOrder(o));
+
+      document.getElementById("admin-active-orders-list").innerHTML = activeOrd.length
+        ? activeOrd.map(([id, o]) => {
+            const itemsTxt = (o.items || []).map((i) => `${esc(i.title)} (${Number(i.price) || 0} جنيه)`).join(" ، ");
             return `
               <div class="box">
-                <button type="button" class="user-name-link" onclick="openUserOperationsLog('${esc(uid)}')">${esc(u.name)}</button>
-                <span>• ${esc(u.phone || "")} • الطلبات المنتهية: <strong>${clHist.length}</strong></span>
+                <strong>طلب #${esc(id.slice(-6))}</strong> • <strong>${esc(o.buyerName || "")}</strong> • <strong>${Number(o.totalAmount) || 0} جنيه</strong><br/>
+                <span style="font-size:13px;">الأصناف: ${itemsTxt || esc(o.challengeTitle || "")} • الحالة: <strong>${esc(o.status || "")}</strong></span>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                  ${!o.paymentConfirmed ? `<button type="button" class="btn-success" onclick="confirmCashReceivedAdmin('${esc(id)}')">تأكيد استلام الكاش</button>` : ""}
+                  <button type="button" class="btn-blue" onclick="confirmDeliveryDoneAdmin('${esc(id)}')">تم التوصيل</button>
+                </div>
               </div>
             `;
           }).join("")
-        : `<div class="box">لا يوجد عملاء مسجلون.</div>`;
+        : `<div class="box">لا توجد طلبات نشطة.</div>`;
+
+      document.getElementById("admin-completed-orders-list").innerHTML = doneOrd.length
+        ? doneOrd.map(([id, o]) => `
+          <div class="box done-box">
+            <strong>طلب #${esc(id.slice(-6))}</strong> • <strong>${esc(o.buyerName || "")}</strong> • <strong>${Number(o.totalAmount) || 0} جنيه</strong><br/>
+            <span style="font-size:12px;">${esc(o.completedAtFormatted || "")}</span>
+            ${o.deliveryImage ? `<div><img src="${o.deliveryImage}" class="thumb" alt="صورة التوصيل" /></div>` : ""}
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد طلبات منتهية بعد.</div>`;
     }
 
-    onValue(ref(db, "appSettings"), (s) => {
-      store.appSettings = Object.assign({ requireDeliveryPhoto: false }, s.val() || {});
+    window.renderSubDeptsAdmin = function () {
+      const parent = document.getElementById("sub-parent-dept")?.value || "سوبرمركت";
+      const subs = getSubDepts(parent);
+      document.getElementById("admin-subdepts-grid").innerHTML = subs.length
+        ? subs.map((s) => `
+          <div class="box" style="margin-bottom:0;">
+            ${s.image ? `<img src="${s.image}" class="thumb" style="width:100%; height:110px;" alt="${esc(s.name)}" />` : ""}
+            <div style="font-weight:bold; margin-top:6px;">${esc(s.name)}</div>
+          </div>
+        `).join("")
+        : `<div class="box">لا توجد أقسام فرعية لهذا القسم.</div>`;
+    };
+
+    onValue(ref(db, "users"), (s) => { st.users = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "banned"), (s) => { st.banned = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "clientRegRequests"), (s) => { st.clientRegRequests = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "challengerRegRequests"), (s) => { st.challengerRegRequests = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "waitingList"), (s) => { st.waitingList = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "departments"), (s) => { st.departments = s.val() || []; scheduleRender(); });
+    onValue(ref(db, "departmentsMeta"), (s) => { st.departmentsMeta = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "subDepartments"), (s) => { st.subDepartments = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "products"), (s) => { st.products = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "cashPhones"), (s) => { st.cashPhones = s.val() || []; scheduleRender(); });
+    onValue(ref(db, "phoneSlots"), (s) => {
+      const arr = s.val();
+      if (Array.isArray(arr) && arr.length) {
+        phoneSlots = arr.map((x) => String(x || ""));
+        checkedSlots = phoneSlots.map((p) => Array.isArray(st.cashPhones) && st.cashPhones.includes(p));
+      }
       scheduleRender();
     });
-    onValue(ref(db, "users"), (s) => { store.users = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "banned"), (s) => { store.banned = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "clientRegRequests"), (s) => { store.clientRegRequests = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "challengerRegRequests"), (s) => { store.challengerRegRequests = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "departments"), (s) => { store.departments = s.val() || []; scheduleRender(); });
-    onValue(ref(db, "departmentsMeta"), (s) => { store.departmentsMeta = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "subDepartments"), (s) => { store.subDepartments = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "products"), (s) => { store.products = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "cashPhones"), (s) => { store.cashPhones = s.val() || []; scheduleRender(); });
-    onValue(ref(db, "orders"), (s) => { store.orders = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "userOrderHistory"), (s) => { store.userOrderHistory = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "userOrderHistoryByName"), (s) => { store.userOrderHistoryByName = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "challengerHistory"), (s) => { store.challengerHistory = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "challengersStats"), (s) => { store.challengersStats = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "clientActivity"), (s) => { store.clientActivity = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "userMessages"), (s) => { store.userMessages = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "paymentReceipts"), (s) => { store.paymentReceipts = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "challenges"), (s) => { store.challenges = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "gifts"), (s) => { store.gifts = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "receipts"), (s) => { store.receipts = s.val() || {}; scheduleRender(); });
-    onValue(ref(db, "referrals"), (s) => { store.referrals = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "orders"), (s) => { st.orders = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "userOrderHistory"), (s) => { st.userOrderHistory = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "challengerHistory"), (s) => { st.challengerHistory = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "challengersStats"), (s) => { st.challengersStats = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "clientActivity"), (s) => { st.clientActivity = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "challenges"), (s) => { st.challenges = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "gifts"), (s) => { st.gifts = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "userMessages"), (s) => { st.userMessages = s.val() || {}; scheduleRender(); });
+    onValue(ref(db, "referrals"), (s) => { st.referrals = s.val() || {}; scheduleRender(); });
 
-    syncAuthView();
+    syncAuth();
   </script>
 </body>
 </html>
