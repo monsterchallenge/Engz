@@ -53,7 +53,7 @@
     .notice.error { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
     .notice.success { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
 
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tabs { display: flex; gap: 8px; flex-wrap:wrap; margin-bottom: 16px; }
     button {
       font-family: inherit;
       cursor: pointer;
@@ -237,7 +237,7 @@
           <div class="form-row-2">
             <div class="form-group">
               <label for="sub-parent-dept">اختر القسم الرئيسي</label>
-              <select id="sub-parent-dept" onchange="renderSubDeptsAdmin()"></select>
+              <select id="sub-parent-dept" onchange="onSubParentDeptChange(this.value)"></select>
             </div>
             <div class="form-group">
               <label for="sub-dept-title">اسم القسم الفرعي الجديد</label>
@@ -263,11 +263,11 @@
           <div class="form-row-2">
             <div class="form-group">
               <label for="item-dept">القسم</label>
-              <select id="item-dept" onchange="syncItemSubDeptSelect()"></select>
+              <select id="item-dept" onchange="onItemDeptChange(this.value)"></select>
             </div>
             <div class="form-group">
               <label for="item-subdept">القسم الفرعي</label>
-              <select id="item-subdept"></select>
+              <select id="item-subdept" onchange="selectedItemSubDept = this.value"></select>
             </div>
           </div>
           <div class="form-row-2">
@@ -428,6 +428,9 @@
     let unlocked = sessionStorage.getItem("engz_admin_ok_v2") === "1";
     let activeAdminTab = "requests";
     let pickedUserId = "";
+    let selectedSubParentDept = "سوبرمركت";
+    let selectedItemDept = "سوبرمركت";
+    let selectedItemSubDept = "";
     const draftImgs = { dept: "", sub: "", item: "", chal: "", gift: "" };
     let phoneSlots = ["", "", "", "", "", "", ""];
     let checkedSlots = [false, false, false, false, false, false, false];
@@ -693,6 +696,17 @@
       }));
     }
 
+    window.onSubParentDeptChange = function (val) {
+      selectedSubParentDept = val || "سوبرمركت";
+      window.renderSubDeptsAdmin();
+    };
+
+    window.onItemDeptChange = function (val) {
+      selectedItemDept = val || "سوبرمركت";
+      selectedItemSubDept = "";
+      window.syncItemSubDeptSelect();
+    };
+
     window.saveNewDepartment = async function () {
       const name = document.getElementById("new-dept-name").value.trim();
       if (!name) return notifyAdmin("اكتب اسم القسم.", "error");
@@ -701,6 +715,8 @@
       if (draftImgs.dept) {
         await set(ref(db, `departmentsMeta/${sKey(name)}`), { image: draftImgs.dept });
       }
+      selectedSubParentDept = name;
+      selectedItemDept = name;
       document.getElementById("new-dept-name").value = "";
       draftImgs.dept = "";
       document.getElementById("prev-dept").style.display = "none";
@@ -708,15 +724,20 @@
     };
 
     window.saveSubDepartment = async function () {
-      const parentDept = document.getElementById("sub-parent-dept").value;
+      const parentDept = document.getElementById("sub-parent-dept").value || selectedSubParentDept;
       const subName = document.getElementById("sub-dept-title").value.trim();
       if (!parentDept || !subName) return notifyAdmin("اختر القسم الرئيسي واكتب اسم القسم الفرعي.", "error");
-      await set(ref(db, `subDepartments/${sKey(parentDept)}/${sKey(subName)}`), {
+      const payload = {
         name: subName,
         parentDept,
         image: draftImgs.sub || "",
         createdAt: Date.now()
-      });
+      };
+      await set(ref(db, `subDepartments/${sKey(parentDept)}/${sKey(subName)}`), payload);
+      await set(ref(db, `subDepartments/${parentDept}/${sKey(subName)}`), payload);
+      selectedSubParentDept = parentDept;
+      selectedItemDept = parentDept;
+      selectedItemSubDept = subName;
       document.getElementById("sub-dept-title").value = "";
       draftImgs.sub = "";
       document.getElementById("prev-sub").style.display = "none";
@@ -725,16 +746,23 @@
 
     window.deleteSubDepartment = async function (parentDept, subKey, subName) {
       await remove(ref(db, `subDepartments/${sKey(parentDept)}/${subKey}`));
+      await remove(ref(db, `subDepartments/${parentDept}/${subKey}`));
       notifyAdmin(`تم حذف القسم الفرعي (${subName}).`, "info");
     };
 
     window.syncItemSubDeptSelect = function () {
-      const dept = document.getElementById("item-dept").value;
+      const dept = document.getElementById("item-dept")?.value || selectedItemDept;
       const sel = document.getElementById("item-subdept");
+      if (!sel) return;
       const subs = getSubDepts(dept);
       sel.innerHTML = subs.length
         ? subs.map((s) => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join("")
         : `<option value="">عام</option>`;
+      if (selectedItemSubDept && subs.some((s) => s.name === selectedItemSubDept)) {
+        sel.value = selectedItemSubDept;
+      } else {
+        selectedItemSubDept = sel.value || "";
+      }
     };
 
     window.saveCatalogItem = async function () {
@@ -1047,13 +1075,14 @@
       const depts = getAllDepts();
       const subParent = document.getElementById("sub-parent-dept");
       const itemDept = document.getElementById("item-dept");
-      const curParent = subParent.value || "سوبرمركت";
-      subParent.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
-      if (depts.includes(curParent)) subParent.value = curParent;
+      if (!depts.includes(selectedSubParentDept)) selectedSubParentDept = depts[0] || "سوبرمركت";
+      if (!depts.includes(selectedItemDept)) selectedItemDept = depts[0] || "سوبرمركت";
 
-      const curItemDept = itemDept.value || "سوبرمركت";
+      subParent.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+      subParent.value = selectedSubParentDept;
+
       itemDept.innerHTML = depts.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
-      if (depts.includes(curItemDept)) itemDept.value = curItemDept;
+      itemDept.value = selectedItemDept;
       window.syncItemSubDeptSelect();
       window.renderSubDeptsAdmin();
 
@@ -1126,7 +1155,7 @@
     }
 
     window.renderSubDeptsAdmin = function () {
-      const parent = document.getElementById("sub-parent-dept")?.value || "سوبرمركت";
+      const parent = document.getElementById("sub-parent-dept")?.value || selectedSubParentDept;
       const subs = getSubDepts(parent);
       document.getElementById("admin-subdepts-grid").innerHTML = subs.length
         ? subs.map((s) => `
